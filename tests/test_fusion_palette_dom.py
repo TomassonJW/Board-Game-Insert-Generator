@@ -71,6 +71,16 @@ class FusionPaletteDomTests(unittest.TestCase):
         for forbidden in ("Ã", "Â", "�"):
             self.assertNotIn(forbidden, self.markup)
 
+    def test_final_preview_prefers_exact_subtractive_operations(self) -> None:
+        self.assertIn(
+            "view.flat_inset_subtractions?.length",
+            self.markup,
+        )
+        self.assertIn(
+            "soustraction ${interval.bottom} a ${interval.top} mm",
+            self.markup,
+        )
+
     def test_supports_dynamic_rows_progressive_disclosure_and_local_file_import(self) -> None:
         self.assertNotIn("expert-mode", self.dom.ids)
         for marker in ("import-file", "preset-import-file", "personal-presets", "lifecycle", "technical-drawer", "technical-detail"):

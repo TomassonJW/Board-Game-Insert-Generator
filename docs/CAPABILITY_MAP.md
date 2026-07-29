@@ -13,12 +13,12 @@
 - `C-FINALIZATION` : R8-E `automated-validated`. Le composite v3 fige le
   conteneur positif, puis une passe séparée publie uniquement des différences
   plates.
-- `C-CAD-IR` : R8-E `automated-validated`. Le plan soustractif est reconstruit
-  et son digest, son certificat et ses intervalles sont contrôlés.
-- `C-FUSION` : R8-E `automated-validated`, `fusion-validated=false`. Les trois
-  coupes livret ne sont plus décalées de `+4 mm` dans le plan automatisé et le
-  BRep utilise l’intervalle exact ; une nouvelle observation humaine reste
-  nécessaire après R8-G.
+- `C-CAD-IR` : R8-F `automated-validated`. Aperçu et CAD IR reconstruisent le
+  même plan soustractif et contrôlent digest, certificat et intervalles.
+- `C-FUSION` : R8-F `automated-validated`, `fusion-validated=false`. Les
+  replays personnels prouvent `20/20` et `23/23` opérations identiques
+  jusqu’à l’intervalle BRep ; l’observation humaine reste nécessaire après
+  R8-G.
 - `C-PRODUCT-GRID` : acquis automatisé à préserver, résolution `0,1 mm`.
 - `C-ARCHITECTURE` : ADR-0105 acceptée. Les conteneurs finalisés figent toute
   géométrie positive avant une passe plate uniquement soustractive.
@@ -26,10 +26,10 @@
   prouve `0 mm³`, `0` corps, `0` union, `0` support et `0` coupe positifs liés
   aux éléments plats ; toute compensation Z est rejetée.
 - `C-RELEASE` : 0.1.78 `human-KO`, `do-not-run`; R8-A `done-diagnostic`,
-  R8-B `done-architecture`, R8-C à R8-E `automated-validated`, R8-F `ready`.
+  R8-B `done-architecture`, R8-C à R8-F `automated-validated`, R8-G `ready`.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : R8-F, fidélité de l’aperçu à la BRep et régressions.
+Prochaine frontière : R8-G, suite autorisée, candidate et installation.
 
 ### Historique R7 clôturé en human-KO
 

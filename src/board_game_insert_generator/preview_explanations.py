@@ -31,6 +31,12 @@ def build_preview_explanations(partition: object) -> dict[str, object]:
     suggestions = _mappings(plan.get("suggestions", []), "partition.suggestions")
     stage_support = _mapping_or_empty(plan.get("stage_support"))
     flat_support = _mapping_or_empty(plan.get("support"))
+    flat_subtraction_plan = _mapping_or_empty(
+        plan.get("flat_inset_subtraction_plan")
+    )
+    flat_subtraction_certificate = _mapping_or_empty(
+        flat_subtraction_plan.get("certificate")
+    )
     score_breakdown = _mapping_or_empty(summary.get("score_breakdown"))
     stage_count = _integer_or_zero(summary.get("stage_count"))
 
@@ -38,7 +44,10 @@ def build_preview_explanations(partition: object) -> dict[str, object]:
         "schema_version": PREVIEW_EXPLANATIONS_SCHEMA_V1,
         "score": _score_explanation(score_breakdown),
         "stage_support": _stage_support_explanation(stage_support, stage_count),
-        "flat_support": _flat_support_explanation(flat_support),
+        "flat_support": _flat_support_explanation(
+            flat_support,
+            flat_subtraction_certificate,
+        ),
         "removal": _removal_explanation(
             _mappings(plan.get("removal_sequence", []), "partition.removal_sequence"),
             placements,
@@ -51,6 +60,9 @@ def build_preview_explanations(partition: object) -> dict[str, object]:
             "does_not_change_materializability": True,
             "does_not_create_bodies": True,
             "does_not_mutate_plan": True,
+            "subtractive_flat_inset_contract_projected": bool(
+                flat_subtraction_certificate
+            ),
         },
     }
 
@@ -106,9 +118,58 @@ def _stage_support_explanation(support: dict[str, Any], stage_count: int) -> dic
     }
 
 
-def _flat_support_explanation(support: dict[str, Any]) -> dict[str, object]:
+def _flat_support_explanation(
+    support: dict[str, Any],
+    certificate: dict[str, Any],
+) -> dict[str, object]:
     status = str(support.get("status", ""))
-    if status == "not_required":
+    strict_contract = bool(certificate)
+    if strict_contract:
+        positive_before = str(
+            certificate.get("positive_geometry_digest_before", "")
+        )
+        positive_after = str(
+            certificate.get("positive_geometry_digest_after", "")
+        )
+        if (
+            certificate.get("schema_version")
+            != "bgig.subtractive_flat_inset_certificate.v1"
+            or certificate.get("certified") is not True
+            or float(certificate.get("flat_positive_volume_mm3", -1.0))
+            != 0.0
+            or int(certificate.get("flat_positive_body_count", -1)) != 0
+            or int(certificate.get("flat_positive_union_count", -1)) != 0
+            or int(
+                certificate.get(
+                    "new_printable_body_count_attributed_to_flat_items",
+                    -1,
+                )
+            )
+            != 0
+            or not positive_before
+            or positive_before != positive_after
+        ):
+            raise PreviewExplanationsError(
+                "Le certificat soustractif affiche est invalide."
+            )
+    strict_operation_count = (
+        int(certificate.get("operation_count", 0))
+        if strict_contract
+        else 0
+    )
+    if strict_contract and strict_operation_count == 0:
+        summary = (
+            "Aucun plateau ou livret ne demande d encastrement dans "
+            "cette proposition ; le contrat soustractif reste certifie."
+        )
+        state = "not_required"
+    elif strict_contract:
+        summary = (
+            "Les plateaux et livrets creusent uniquement les conteneurs "
+            "finalises ; ils ne creent aucune matiere, union ou nouveau corps."
+        )
+        state = "confirmed"
+    elif status == "not_required":
         summary = "Aucun plateau ou livret ne demande d encastrement dans cette proposition."
         state = "not_required"
     elif status == "supported_by_requested_bodies":
@@ -117,13 +178,32 @@ def _flat_support_explanation(support: dict[str, Any]) -> dict[str, object]:
     else:
         summary = "L appui des plateaux ou livrets doit etre verifie avant fabrication."
         state = "attention"
-    return {
+    result = {
         "title": "Plateaux et livrets",
         "summary": summary,
         "state": state,
         "support_count_label": f"Zones d appui : {_integer_or_zero(support.get('top_support_count'))}",
         "coverage_label": _coverage_label(_number_or_none(support.get("coverage_ratio")), "Couverture projetee"),
     }
+    if strict_contract:
+        result.update(
+            {
+                "contract": "strictly_subtractive_flat_insets_v1",
+                "operation_count": strict_operation_count,
+                "flat_positive_volume_mm3": 0.0,
+                "flat_positive_body_count": 0,
+                "flat_positive_union_count": 0,
+                "new_printable_body_count": 0,
+                "positive_geometry_unchanged": True,
+                "observed_combined_local_depths_mm": deepcopy(
+                    certificate.get(
+                        "observed_combined_local_depths_mm",
+                        [],
+                    )
+                ),
+            }
+        )
+    return result
 
 
 def _removal_explanation(

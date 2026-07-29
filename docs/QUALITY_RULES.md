@@ -15,6 +15,17 @@
 - Le digest positif est calculé avant les soustractions et ne dépend d’aucune
   cavité ou coupe.
 - Toute divergence bloque la CAD IR avant la construction du plan Fusion.
+- Une passe plate publiée utilise `bgig.flat_inset_subtraction_plan.v1`.
+- Chaque opération plate est un `difference` sur un volume négatif attribué à
+  `flat_inset` ou `flat_grip`.
+- `positive_geometry_digest_before` égale
+  `positive_geometry_digest_after`.
+- Les opérations négatives sont disjointes ; leur somme volumique égale leur
+  union.
+- L’aperçu final, la CAD IR, Fusion et le BRep portent les mêmes identifiants et
+  intervalles `[bottom, top]`.
+- `top_inset_cuts` est un miroir de compatibilité et ne peut jamais devenir une
+  autorité aval.
 
 <!-- P64-L09T-QUALITY -->
 ## Gardes P64-L09T

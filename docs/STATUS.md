@@ -9,7 +9,8 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
 `P64-L09U-R8-A-done-diagnostic`, `P64-L09U-R8-B-done-architecture`,
 `P64-L09U-R8-C-automated-validated`,
 `P64-L09U-R8-D-automated-validated`,
-`P64-L09U-R8-E-automated-validated`, `P64-L09U-R8-F-ready`,
+`P64-L09U-R8-E-automated-validated`,
+`P64-L09U-R8-F-automated-validated`, `P64-L09U-R8-G-ready`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.78 est `human-KO`, `do-not-run`.
@@ -62,8 +63,14 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
   `0 corps / 0 union / 0 opération / 0 nouveau corps / 0 mm³`.
 - CAD IR, plan Fusion et BRep consomment le même intervalle `[bottom, top]`.
 - Validation R8-E : `207/207` tests ciblés et compilation Python OK.
-- R8-F doit maintenant fermer la fidélité de l’aperçu à la BRep et rejouer les
-  deux projets personnels en lecture seule.
+- R8-F projette directement le plan soustractif dans l’aperçu et ferme la
+  chaîne d’identifiants et d’intervalles jusqu’au BRep.
+- La régression forcée prouve `2/4/6 mm`.
+- `CasLimite02+` passe avec `20` opérations et `CasLimite02++` avec `23` ;
+  tous les comptes aperçu/CAD IR/Fusion/BRep sont identiques.
+- Les SHA personnels sont inchangés avant/après.
+- Validation R8-F : `302/302` tests ciblés.
+- R8-G doit maintenant exécuter la suite autorisée et installer la candidate.
 - Les acquis de profondeur, accès, parois, ordre, grille `0,1 mm` et BRep
   transitoire restent obligatoires.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
@@ -84,6 +91,8 @@ Preuve R8-D :
 `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md`.
 Preuve R8-E :
 `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md`.
+Preuve R8-F :
+`docs/P64_L09U_R8_F_END_TO_END_FIDELITY_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

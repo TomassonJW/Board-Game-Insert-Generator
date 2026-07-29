@@ -57,8 +57,14 @@
 - CAD IR, plan Fusion et BRep utilisent le même intervalle `[bottom, top]`.
   Une coupe livret enterrée n’est plus déplacée vers le sommet du corps.
 - La validation ciblée R8-E passe `207/207`.
-- R8-F est maintenant la mission unique `ready` : fidélité de l’aperçu à la
-  BRep, régressions complètes et replays personnels en lecture seule.
+- R8-F est terminée : l’aperçu final projette directement le plan soustractif
+  canonique ; les réservations historiques ne décident plus la géométrie.
+- Le cas forcé prouve la même opération `2/4/6 mm` de l’aperçu au BRep.
+- `CasLimite02+` passe en lecture seule avec `20` opérations identiques ;
+  `CasLimite02++` passe avec `23` opérations et `2/4/6 mm`.
+- Les SHA personnels restent inchangés ; la validation ciblée passe `302/302`.
+- R8-G est maintenant la mission unique `ready` : suite autorisée, candidate,
+  intégration, installation automatique et recette humaine finale.
 - Les acquis R6/R7 restent à préserver : profondeurs, accès, parois minimales,
   ordre automatique, grille `0,1 mm`, BRep transitoire et projets personnels en
   lecture seule.
@@ -74,7 +80,8 @@ Autorités R8 :
 - `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md` ;
-- `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md`.
+- `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_F_END_TO_END_FIDELITY_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

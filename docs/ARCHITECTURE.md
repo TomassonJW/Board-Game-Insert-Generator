@@ -23,12 +23,15 @@ positif cible et à un intervalle Z exact. Son certificat impose zéro volume,
 corps, union ou opération positive, zéro nouveau corps imprimable et un digest
 positif inchangé.
 
-`partition_cad.py` reconstruit l’artefact pur et refuse un plan, un certificat
-ou un digest divergent. Il consomme le plan top-level comme seule autorité ;
-les coupes recopiées dans les placements restent un miroir de compatibilité.
-La CAD IR, Fusion et le BRep ne recalculent ensuite ni profondeur ni position.
-Les anciens schémas composites v1/v2 restent lisibles pour les artefacts
-historiques, sans être produits par R8.
+`partition_result_view.py` et `partition_cad.py` reconstruisent l’artefact pur
+et refusent un plan, un certificat ou un digest divergent. Ils consomment le
+plan top-level comme seule autorité ; les coupes recopiées dans les placements
+restent un miroir de compatibilité. L’aperçu publie les opérations exactes sous
+`flat_inset_subtractions`.
+
+La palette, la CAD IR, Fusion et le BRep ne recalculent ensuite ni profondeur
+ni position. Les anciens schémas composites v1/v2 restent lisibles pour les
+artefacts historiques, sans être produits par R8.
 
 <!-- P64-L09T-ARCHITECTURE -->
 ## Frontiere P64-L09T

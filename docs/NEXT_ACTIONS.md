@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R8-F — fidélité et régressions
+## Action courante : P64-L09U-R8-G — candidate et nouvelle gate
 
 0.1.78 est `human-KO`, `do-not-run`.
 
@@ -64,15 +64,25 @@ R8-E est terminée :
 - CAD IR, plan Fusion et BRep partagent le même intervalle `[bottom, top]` ;
 - validation ciblée `207/207`.
 
-R8-F est la seule mission `ready` :
+R8-F est terminée :
 
 - faire de l’aperçu et du résultat lisible des projections du plan canonique ;
-- prouver la même opération de l’aperçu jusqu’au BRep ;
-- préserver cavités, accès, parois, ordre, grille et rollback ;
-- rejouer `CasLimite02+` et `CasLimite02++` strictement en lecture seule ;
-- préparer la matrice de régression qui autorisera R8-G.
+- aperçu, CAD IR, Fusion et BRep portent les mêmes opérations et intervalles ;
+- la régression forcée prouve `2/4/6 mm` ;
+- cavités, accès, parois, ordre, grille et rollback restent couverts ;
+- `CasLimite02+` passe avec `20` opérations identiques de bout en bout ;
+- `CasLimite02++` passe avec `23` opérations et `2/4/6 mm` ;
+- les deux SHA personnels restent inchangés ;
+- validation ciblée `302/302`.
 
-R8-G reste `blocked-by-R8-F`.
+R8-G est la seule mission `ready` :
+
+- exécuter exactement la suite autorisée en excluant les douze modules
+  interdits documentés ;
+- construire et vérifier la nouvelle candidate Fusion ;
+- intégrer et pousser `main` ;
+- installer automatiquement l’add-in et ses réglages locaux ;
+- livrer uniquement la recette humaine finale.
 
 Preuves :
 
@@ -82,7 +92,8 @@ Preuves :
 - `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md` ;
-- `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md`.
+- `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_F_END_TO_END_FIDELITY_EVIDENCE.md`.
 
 Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.

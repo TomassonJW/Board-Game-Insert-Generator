@@ -5,6 +5,10 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Mapping
 
+from board_game_insert_generator.flat_inset_subtraction import (
+    FlatInsetSubtractionError,
+    assert_flat_inset_subtraction_plan,
+)
 from board_game_insert_generator.partition_solver import PARTITION_PLAN_SCHEMA_V1
 from board_game_insert_generator.preview_explanations import build_preview_explanations
 
@@ -31,6 +35,22 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
     storage_height = float(_mapping(plan["box"], "partition.box")["storage_height_mm"])
     placements = _mappings(plan.get("placements"), "partition.placements")
     section_y = box["y"] / 2.0
+    top_insets = _mapping(
+        plan.get("top_inset_reservations", {}),
+        "partition.top_inset_reservations",
+    )
+    reservations = _mappings(
+        top_insets.get("reservations", []),
+        "partition.top_inset_reservations.reservations",
+    )
+    flat_subtraction_plan, flat_operations = (
+        _validated_flat_subtraction_projection_source(
+            plan,
+            placements,
+            reservations,
+            top_insets,
+        )
+    )
 
     top_bodies: list[dict[str, object]] = []
     top_cavities: list[dict[str, object]] = []
@@ -247,92 +267,52 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
                 "cavity_count": len(cavities),
                 "cavity_anchors": deepcopy(frozen_cavities),
                 "composite_prism_count": len(composite_prisms),
-                "top_inset_cut_count": len(_mappings(placement.get("top_inset_cuts", []), f"placement[{index}].top_inset_cuts")),
+                "top_inset_cut_count": (
+                    sum(
+                        int(
+                            operation.get("placement_id")
+                            == placement.get("id")
+                        )
+                        for operation in flat_operations
+                    )
+                    if flat_subtraction_plan is not None
+                    else len(
+                        _mappings(
+                            placement.get("top_inset_cuts", []),
+                            f"placement[{index}].top_inset_cuts",
+                        )
+                    )
+                ),
+                "top_inset_cut_source": (
+                    "bgig.flat_inset_subtraction_plan.v1"
+                    if flat_subtraction_plan is not None
+                    else "top_inset_reservations"
+                ),
                 "requested_complement_id": placement.get("requested_complement_id"),
                 "complement_kind": placement.get("complement_kind"),
             }
         )
 
-    top_insets = _mapping(plan.get("top_inset_reservations", {}), "partition.top_inset_reservations")
-    reservation_tops: list[dict[str, object]] = []
-    reservation_cuts: list[dict[str, object]] = []
-    for index, reservation in enumerate(_mappings(top_insets.get("reservations", []), "partition.top_inset_reservations.reservations")):
-        origin = _xy(reservation.get("cut_origin_mm"), f"top_inset[{index}].cut_origin_mm")
-        size = _xy(reservation.get("cut_size_mm"), f"top_inset[{index}].cut_size_mm")
-        depth = float(reservation["inset_depth_from_top_mm"])
-        top_item = {
-            "id": str(reservation["id"]), "kind": "top_inset_reservation",
-            "label": str(reservation["name"]), "flat_item_id": str(reservation["flat_item_id"]),
-            "x_mm": _round(origin["x"]), "y_mm": _round(origin["y"]),
-            "width_mm": _round(size["x"]), "height_mm": _round(size["y"]),
-            "depth_mm": _round(depth), "removal_order": int(reservation["removal_order"]),
-            "grip_zone": deepcopy(reservation.get("grip_zone")),
-            "local_depth_regions": deepcopy(
-                reservation.get("local_depth_regions", [])
-            ),
-        }
-        reservation_tops.append(top_item)
-        raw_regions = reservation.get("local_depth_regions", [])
-        regions = (
-            _mappings(
-                raw_regions,
-                f"top_inset[{index}].local_depth_regions",
-            )
-            if isinstance(raw_regions, list) and raw_regions
-            else [
-                {
-                    "id": f"{top_item['id']}:legacy-region",
-                    "cut_origin_mm": reservation["cut_origin_mm"],
-                    "cut_size_mm": reservation["cut_size_mm"],
-                    "inset_depth_from_top_mm": depth,
-                    "layer_bottom_z_mm": (
-                        float(top_insets.get("design_top_z_mm", storage_height))
-                        - depth
-                    ),
-                    "overlapping_reservation_ids": [top_item["id"]],
-                }
-            ]
+    reservation_tops, reservation_cuts = (
+        _project_legacy_top_inset_reservations(
+            reservations,
+            top_insets=top_insets,
+            section_y=section_y,
+            storage_height=storage_height,
+            box_height=box["z"],
         )
-        for region in regions:
-            region_origin = _xy(
-                region["cut_origin_mm"],
-                f"top_inset[{index}].region.cut_origin_mm",
+    )
+    if flat_subtraction_plan is not None:
+        subtraction_tops, subtraction_cuts = (
+            _project_flat_subtraction_operations(
+                flat_operations,
+                reservations=reservations,
+                section_y=section_y,
+                box_height=box["z"],
             )
-            region_size = _xy(
-                region["cut_size_mm"],
-                f"top_inset[{index}].region.cut_size_mm",
-            )
-            if not _crosses(
-                section_y,
-                region_origin["y"],
-                region_size["y"],
-            ):
-                continue
-            reservation_cuts.append({
-                "id": str(region["id"]),
-                "reservation_id": top_item["id"],
-                "kind": "top_inset_reservation",
-                "label": top_item["label"],
-                "flat_item_id": top_item["flat_item_id"],
-                "x_mm": _round(region_origin["x"]),
-                "z_from_top_mm": _round(
-                    box["z"]
-                    - float(
-                        top_insets.get(
-                            "design_top_z_mm",
-                            storage_height,
-                        )
-                    )
-                ),
-                "width_mm": _round(region_size["x"]),
-                "height_mm": _round(
-                    float(region["inset_depth_from_top_mm"])
-                ),
-                "removal_order": top_item["removal_order"],
-                "overlapping_reservation_ids": deepcopy(
-                    region.get("overlapping_reservation_ids", [])
-                ),
-            })
+        )
+    else:
+        subtraction_tops, subtraction_cuts = [], []
 
     residual_contract = _mapping(plan.get("residuals", {}), "partition.residuals")
     residual_tops: list[dict[str, object]] = []
@@ -372,6 +352,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "cavities": top_cavities,
             "flat_stack_reservation": reservation_top,
             "top_inset_reservations": reservation_tops,
+            "flat_inset_subtractions": subtraction_tops,
             "residuals": residual_tops,
         },
         "section_xz": {
@@ -382,6 +363,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "cavity_vertical_accesses": cut_cavity_accesses,
             "flat_stack_reservation": reservation_cut,
             "top_inset_reservations": reservation_cuts,
+            "flat_inset_subtractions": subtraction_cuts,
             "residuals": residual_cuts,
         },
         "details": details,
@@ -401,6 +383,23 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "automatic_body_count": int(summary.get("automatic_body_count", -1)),
             "source_plan_unchanged": True,
             "localized_top_insets": True,
+            "flat_inset_projection_source": (
+                "bgig.flat_inset_subtraction_plan.v1"
+                if flat_subtraction_plan is not None
+                else "top_inset_reservations"
+            ),
+            "strictly_subtractive_flat_insets": (
+                flat_subtraction_plan is not None
+            ),
+            "flat_inset_operation_count_matches_plan": (
+                flat_subtraction_plan is None
+                or len(subtraction_tops) == len(flat_operations)
+            ),
+            "subtractive_flat_inset_certificate": (
+                deepcopy(flat_subtraction_plan.get("certificate"))
+                if flat_subtraction_plan is not None
+                else None
+            ),
             "stage_aware": True,
             "frozen_cavity_world_poses_projected": True,
             "final_cavity_anchors_projected": all(
@@ -436,6 +435,271 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "Cette vue ne constitue ni une CAD IR, ni une validation Fusion ou impression.",
         ],
     }
+
+
+def _validated_flat_subtraction_projection_source(
+    plan: dict[str, Any],
+    placements: list[dict[str, Any]],
+    reservations: list[dict[str, Any]],
+    top_insets: dict[str, Any],
+) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    raw_flat_plan = plan.get("flat_inset_subtraction_plan")
+    if raw_flat_plan is None:
+        return None, []
+    flat_plan = _mapping(
+        raw_flat_plan,
+        "partition.flat_inset_subtraction_plan",
+    )
+    finalization = _mapping(
+        plan.get("finalization"),
+        "partition.finalization",
+    )
+    positive_certificate = _mapping(
+        finalization.get("finalized_container_geometry_certificate"),
+        "partition.finalization.finalized_container_geometry_certificate",
+    )
+    try:
+        assert_flat_inset_subtraction_plan(
+            flat_plan,
+            placements,
+            reservations,
+            design_top_z_mm=float(
+                top_insets.get("design_top_z_mm", 0.0)
+            ),
+            positive_geometry_certificate=positive_certificate,
+        )
+    except FlatInsetSubtractionError as exc:
+        raise PartitionResultViewError(
+            "L aperçu refuse un plan d encastrement qui diverge "
+            "du certificat soustractif."
+        ) from exc
+    if (
+        finalization.get("flat_inset_subtraction_plan_digest")
+        != flat_plan.get("deterministic_digest")
+        or finalization.get("subtractive_flat_inset_certificate")
+        != flat_plan.get("certificate")
+    ):
+        raise PartitionResultViewError(
+            "L aperçu refuse des certificats d encastrement divergents."
+        )
+    operations = _mappings(
+        flat_plan.get("operations"),
+        "partition.flat_inset_subtraction_plan.operations",
+    )
+    return flat_plan, operations
+
+
+def _project_flat_subtraction_operations(
+    operations: list[dict[str, Any]],
+    *,
+    reservations: list[dict[str, Any]],
+    section_y: float,
+    box_height: float,
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    reservations_by_id = {
+        str(value.get("id", "")): value for value in reservations
+    }
+    top_items: list[dict[str, object]] = []
+    section_items: list[dict[str, object]] = []
+    for index, operation in enumerate(operations):
+        origin = _dimension(
+            operation.get("world_origin_mm"),
+            f"flat_subtraction[{index}].world_origin_mm",
+        )
+        size = _dimension(
+            operation.get("size_mm"),
+            f"flat_subtraction[{index}].size_mm",
+        )
+        interval = _mapping(
+            operation.get("local_interval_z_mm"),
+            f"flat_subtraction[{index}].local_interval_z_mm",
+        )
+        bottom = float(interval["bottom"])
+        top = float(interval["top"])
+        reservation_id = str(operation["reservation_id"])
+        reservation = reservations_by_id.get(reservation_id, {})
+        label = str(
+            reservation.get(
+                "name",
+                operation.get("flat_item_id", "Plateau ou livret"),
+            )
+        )
+        local_region = {
+            "id": str(operation.get("local_region_id", "")),
+            "cut_origin_mm": {
+                "x": _round(origin["x"]),
+                "y": _round(origin["y"]),
+            },
+            "cut_size_mm": {
+                "x": _round(size["x"]),
+                "y": _round(size["y"]),
+            },
+            "inset_depth_from_top_mm": _round(size["z"]),
+            "layer_bottom_z_mm": _round(bottom),
+            "layer_top_z_mm": _round(top),
+            "overlapping_reservation_ids": deepcopy(
+                operation.get("overlapping_reservation_ids", [])
+            ),
+        }
+        item = {
+            "id": str(operation["id"]),
+            "reservation_id": reservation_id,
+            "kind": str(operation["kind"]),
+            "label": label,
+            "flat_item_id": str(operation["flat_item_id"]),
+            "x_mm": _round(origin["x"]),
+            "y_mm": _round(origin["y"]),
+            "width_mm": _round(size["x"]),
+            "height_mm": _round(size["y"]),
+            "depth_mm": _round(size["z"]),
+            "removal_order": int(operation["removal_order"]),
+            "local_depth_regions": [local_region],
+            "local_interval_z_mm": {
+                "bottom": _round(bottom),
+                "top": _round(top),
+            },
+            "cut_plane_world_z_mm": _round(
+                float(operation["cut_plane_world_z_mm"])
+            ),
+            "boolean_operation": str(operation["boolean_operation"]),
+            "geometry_role": str(operation["geometry_role"]),
+            "geometry_attribution": str(
+                operation["geometry_attribution"]
+            ),
+            "creates_positive_geometry": False,
+            "creates_printable_body": False,
+            "creates_union": False,
+            "placement_id": str(operation["placement_id"]),
+            "target_prism_id": str(operation["target_prism_id"]),
+            "positive_geometry_digest": str(
+                operation["positive_geometry_digest"]
+            ),
+            "owner_positive_geometry_digest": str(
+                operation["owner_positive_geometry_digest"]
+            ),
+            "overlapping_reservation_ids": deepcopy(
+                operation.get("overlapping_reservation_ids", [])
+            ),
+        }
+        top_items.append(item)
+        if not _crosses(section_y, origin["y"], size["y"]):
+            continue
+        section_items.append(
+            {
+                **deepcopy(item),
+                "z_from_top_mm": _round(box_height - top),
+                "height_mm": _round(size["z"]),
+            }
+        )
+    return top_items, section_items
+
+
+def _project_legacy_top_inset_reservations(
+    reservations: list[dict[str, Any]],
+    *,
+    top_insets: dict[str, Any],
+    section_y: float,
+    storage_height: float,
+    box_height: float,
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    top_items: list[dict[str, object]] = []
+    section_items: list[dict[str, object]] = []
+    for index, reservation in enumerate(reservations):
+        origin = _xy(
+            reservation.get("cut_origin_mm"),
+            f"top_inset[{index}].cut_origin_mm",
+        )
+        size = _xy(
+            reservation.get("cut_size_mm"),
+            f"top_inset[{index}].cut_size_mm",
+        )
+        depth = float(reservation["inset_depth_from_top_mm"])
+        top_item = {
+            "id": str(reservation["id"]),
+            "kind": "top_inset_reservation",
+            "label": str(reservation["name"]),
+            "flat_item_id": str(reservation["flat_item_id"]),
+            "x_mm": _round(origin["x"]),
+            "y_mm": _round(origin["y"]),
+            "width_mm": _round(size["x"]),
+            "height_mm": _round(size["y"]),
+            "depth_mm": _round(depth),
+            "removal_order": int(reservation["removal_order"]),
+            "grip_zone": deepcopy(reservation.get("grip_zone")),
+            "local_depth_regions": deepcopy(
+                reservation.get("local_depth_regions", [])
+            ),
+        }
+        top_items.append(top_item)
+        raw_regions = reservation.get("local_depth_regions", [])
+        regions = (
+            _mappings(
+                raw_regions,
+                f"top_inset[{index}].local_depth_regions",
+            )
+            if isinstance(raw_regions, list) and raw_regions
+            else [
+                {
+                    "id": f"{top_item['id']}:legacy-region",
+                    "cut_origin_mm": reservation["cut_origin_mm"],
+                    "cut_size_mm": reservation["cut_size_mm"],
+                    "inset_depth_from_top_mm": depth,
+                    "layer_bottom_z_mm": (
+                        float(
+                            top_insets.get(
+                                "design_top_z_mm",
+                                storage_height,
+                            )
+                        )
+                        - depth
+                    ),
+                    "overlapping_reservation_ids": [top_item["id"]],
+                }
+            ]
+        )
+        for region in regions:
+            region_origin = _xy(
+                region["cut_origin_mm"],
+                f"top_inset[{index}].region.cut_origin_mm",
+            )
+            region_size = _xy(
+                region["cut_size_mm"],
+                f"top_inset[{index}].region.cut_size_mm",
+            )
+            if not _crosses(
+                section_y,
+                region_origin["y"],
+                region_size["y"],
+            ):
+                continue
+            section_items.append(
+                {
+                    "id": str(region["id"]),
+                    "reservation_id": top_item["id"],
+                    "kind": "top_inset_reservation",
+                    "label": top_item["label"],
+                    "flat_item_id": top_item["flat_item_id"],
+                    "x_mm": _round(region_origin["x"]),
+                    "z_from_top_mm": _round(
+                        box_height
+                        - float(
+                            top_insets.get(
+                                "design_top_z_mm",
+                                storage_height,
+                            )
+                        )
+                    ),
+                    "width_mm": _round(region_size["x"]),
+                    "height_mm": _round(
+                        float(region["inset_depth_from_top_mm"])
+                    ),
+                    "removal_order": top_item["removal_order"],
+                    "overlapping_reservation_ids": deepcopy(
+                        region.get("overlapping_reservation_ids", [])
+                    ),
+                }
+            )
+    return top_items, section_items
 
 
 def _composite_prisms(

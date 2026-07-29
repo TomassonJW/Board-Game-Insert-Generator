@@ -15,6 +15,7 @@ from board_game_insert_generator.coupled_finalization import (
 )
 from board_game_insert_generator.partition_cad import build_partition_cad
 from board_game_insert_generator.partition_result_view import (
+    PartitionResultViewError,
     build_partition_result_view,
 )
 from board_game_insert_generator.product_grid import is_on_product_grid
@@ -73,6 +74,15 @@ def _stepped_reservation_project() -> dict[str, object]:
             "stack_order": 1,
         },
     ]
+    return project
+
+
+def _strict_depth_reservation_project() -> dict[str, object]:
+    project = _stepped_reservation_project()
+    project["project_name"] = "P64-L09U-R8 exact 4 2 6 depths"
+    project["flat_items"][0]["dimensions_mm"]["z"] = 4.0
+    project["flat_items"][1]["dimensions_mm"]["x"] = 140.0
+    project["flat_items"][1]["dimensions_mm"]["z"] = 2.0
     return project
 
 
@@ -148,6 +158,12 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         cls.stepped_plan, cls.stepped_cad, cls.stepped_fusion = (
             _finalized_artifacts(cls.stepped_project)
         )
+        cls.strict_depth_project = _strict_depth_reservation_project()
+        (
+            cls.strict_depth_plan,
+            cls.strict_depth_cad,
+            cls.strict_depth_fusion,
+        ) = _finalized_artifacts(cls.strict_depth_project)
 
     def test_ten_plus_clearance_remains_ten_point_six_end_to_end(self) -> None:
         for label, plan, cad, fusion in (
@@ -424,6 +440,7 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
     def test_subtractive_plan_fusion_and_brep_share_exact_intervals(
         self,
     ) -> None:
+        preview = build_partition_result_view(self.stepped_plan)
         subtraction_plan = self.stepped_plan[
             "flat_inset_subtraction_plan"
         ]
@@ -443,6 +460,9 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
             for value in self.stepped_fusion.cavity_cuts
             if value.cavity_source
             in {"top_inset_reservation", "top_inset_grip"}
+        ]
+        preview_operations = preview["top_view"][
+            "flat_inset_subtractions"
         ]
 
         self.assertEqual(
@@ -466,10 +486,48 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
             certificate,
         )
         self.assertEqual(
+            preview["invariants"][
+                "subtractive_flat_inset_certificate"
+            ],
+            certificate,
+        )
+        self.assertEqual(
+            preview["invariants"]["flat_inset_projection_source"],
+            "bgig.flat_inset_subtraction_plan.v1",
+        )
+        self.assertTrue(
+            preview["invariants"]["strictly_subtractive_flat_insets"]
+        )
+        self.assertEqual(
             len(cad_operations),
             len(subtraction_plan["operations"]),
         )
+        self.assertEqual(
+            len(preview_operations),
+            len(subtraction_plan["operations"]),
+        )
         self.assertEqual(len(fusion_cuts), len(cad_operations))
+        preview_by_id = {
+            value["id"]: value for value in preview_operations
+        }
+        for operation in subtraction_plan["operations"]:
+            projected = preview_by_id[operation["id"]]
+            self.assertEqual(
+                projected["boolean_operation"],
+                operation["boolean_operation"],
+            )
+            self.assertEqual(
+                projected["geometry_attribution"],
+                operation["geometry_attribution"],
+            )
+            self.assertEqual(
+                projected["local_interval_z_mm"],
+                operation["local_interval_z_mm"],
+            )
+            self.assertEqual(
+                projected["positive_geometry_digest"],
+                operation["positive_geometry_digest"],
+            )
         self.assertTrue(
             all(
                 operation["parameters"]["boolean_operation"]
@@ -511,6 +569,137 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         )
         self.assertEqual(buried_booklet_cut.cut_origin_mm.z, 57.6)
         self.assertNotEqual(buried_booklet_cut.cut_origin_mm.z, 59.6)
+
+    def test_exact_four_two_six_contract_reaches_every_boundary(self) -> None:
+        plan = self.strict_depth_plan
+        preview = build_partition_result_view(plan)
+        subtraction_plan = plan["flat_inset_subtraction_plan"]
+        certificate = subtraction_plan["certificate"]
+        cad_operations = [
+            operation
+            for component in self.strict_depth_cad["cad_ir"]["components"]
+            for operation in component["body"]["operations"]
+            if operation["kind"]
+            in {
+                "subtract_top_inset_reservation",
+                "subtract_top_inset_grip",
+            }
+        ]
+        fusion_cuts = [
+            value
+            for value in self.strict_depth_fusion.cavity_cuts
+            if value.cavity_source
+            in {"top_inset_reservation", "top_inset_grip"}
+        ]
+
+        self.assertEqual(
+            certificate["observed_combined_local_depths_mm"],
+            [2.0, 4.0, 6.0],
+        )
+        self.assertEqual(certificate["flat_positive_volume_mm3"], 0.0)
+        self.assertEqual(certificate["flat_positive_body_count"], 0)
+        self.assertEqual(certificate["flat_positive_union_count"], 0)
+        self.assertEqual(
+            certificate[
+                "new_printable_body_count_attributed_to_flat_items"
+            ],
+            0,
+        )
+        self.assertTrue(certificate["positive_geometry_unchanged"])
+        self.assertTrue(
+            certificate["all_coordinates_on_product_grid"]
+        )
+        self.assertEqual(
+            preview["presentation"]["flat_support"]["contract"],
+            "strictly_subtractive_flat_insets_v1",
+        )
+        self.assertEqual(
+            preview["presentation"]["flat_support"][
+                "observed_combined_local_depths_mm"
+            ],
+            [2.0, 4.0, 6.0],
+        )
+        expected_intervals = {
+            (
+                value["id"],
+                value["local_interval_z_mm"]["bottom"],
+                value["local_interval_z_mm"]["top"],
+            )
+            for value in subtraction_plan["operations"]
+        }
+        self.assertEqual(
+            {
+                (
+                    value["id"],
+                    value["local_interval_z_mm"]["bottom"],
+                    value["local_interval_z_mm"]["top"],
+                )
+                for value in preview["top_view"][
+                    "flat_inset_subtractions"
+                ]
+            },
+            expected_intervals,
+        )
+        self.assertEqual(
+            {
+                (
+                    value["parameters"]["cut_id"],
+                    value["parameters"]["local_interval_z_mm"]["bottom"],
+                    value["parameters"]["local_interval_z_mm"]["top"],
+                )
+                for value in cad_operations
+            },
+            expected_intervals,
+        )
+        self.assertEqual(
+            {
+                (
+                    value.cavity_id,
+                    value.local_interval_bottom_z_mm,
+                    value.local_interval_top_z_mm,
+                )
+                for value in fusion_cuts
+            },
+            expected_intervals,
+        )
+        self.assertTrue(
+            all(
+                value.to_dict()["brep_tool_interval_z_mm"]
+                == {
+                    "bottom": value.local_interval_bottom_z_mm,
+                    "top": value.local_interval_top_z_mm,
+                }
+                for value in fusion_cuts
+            )
+        )
+
+    def test_preview_ignores_the_placement_mirror_and_rejects_plan_drift(
+        self,
+    ) -> None:
+        mirrored_drift = deepcopy(self.stepped_plan)
+        mirrored_drift["placements"][0]["top_inset_cuts"][0][
+            "boolean_operation"
+        ] = "union"
+        preview = build_partition_result_view(mirrored_drift)
+
+        self.assertTrue(
+            all(
+                value["boolean_operation"] == "difference"
+                for value in preview["top_view"][
+                    "flat_inset_subtractions"
+                ]
+            )
+        )
+
+        canonical_drift = deepcopy(self.stepped_plan)
+        canonical_drift["flat_inset_subtraction_plan"]["operations"][0][
+            "boolean_operation"
+        ] = "union"
+        with self.assertRaisesRegex(
+            PartitionResultViewError,
+            "diverge",
+        ):
+            build_partition_result_view(canonical_drift)
 
     def test_closure_guard_uses_exact_local_regions_not_global_stack(
         self,

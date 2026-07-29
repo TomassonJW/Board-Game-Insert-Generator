@@ -66,13 +66,17 @@
 
 ### P64-L09U-R8-F — Fidélité et régressions
 
-- Statut : `ready`.
+- Statut : `done-automated-validated`.
 - Prouver aperçu, CAD IR, plan Fusion et BRep identiques.
 - Préserver R6, parois, ordre automatique et grille `0,1 mm`.
+- Résultat : opérations et intervalles identiques, replays personnels
+  `20/20` et `23/23`, SHA inchangés, validation ciblée `302/302`.
+- Preuve :
+  `docs/P64_L09U_R8_F_END_TO_END_FIDELITY_EVIDENCE.md`.
 
 ### P64-L09U-R8-G — Candidate et nouvelle gate humaine
 
-- Statut : `blocked-by-R8-F`.
+- Statut : `ready`.
 - Suite autorisée, intégration directe, installation automatique.
 - La dernière validation reste humaine.
 
