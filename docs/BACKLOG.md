@@ -1,5 +1,63 @@
 # Backlog
 
+<!-- P64-L09W-BACKLOG -->
+## P64-L09W — robustesse générale du solveur
+
+Priorité : avant P64-L10 et la roadmap d’origine.
+
+### P64-L09W-A — Audit, domaine et baseline
+
+- Statut : `ready`, `no-product-code-yet`.
+- Auditer les corpus, oracles, runners, holdouts consommés, solveurs et
+  métriques L05D à L09U.
+- Définir le domaine rectangulaire V0.1, les strates et les critères
+  préenregistrés.
+- Mesurer 0.1.80 sur les fixtures déjà versionnées.
+- Ne choisir aucune optimisation avant l’attribution causale.
+
+### P64-L09W-B — Générateur produit, oracles et holdout neuf
+
+- Statut : `planned`, dépend de P64-L09W-A.
+- Cas positifs faisables par construction et témoins recertifiés.
+- Cas négatifs avec preuve formelle séparée.
+- Densités proches de 30 %, 65 %, 85 % et 95 %, cardinalités variées,
+  dimensions hétérogènes et 0 à 10 plateaux/livrets.
+- Splits régression, discovery, tuning et holdout fermé.
+
+### P64-L09W-C — Campagne de référence
+
+- Statut : `planned`, dépend de P64-L09W-B.
+- Runner borné, reprenable, déterministe et sans double exécution.
+- Taux de succès et temps p50/p95/p99 par strate.
+- Calcul, certification, finalisation, CAD IR et matérialisation séparés.
+
+### P64-L09W-D — Optimisations causales
+
+- Statut : `planned`, dépend de P64-L09W-C.
+- Un incrément mesuré, testé, documenté, committé et intégré à la fois.
+- Zéro budget augmenté, faux impossible, solution perdue ou coût déplacé.
+- ADR obligatoire pour tout changement structurant.
+
+### P64-L09W-E — Holdout et verdict
+
+- Statut : `planned`, dépend de P64-L09W-D.
+- Geler un candidat unique puis ouvrir le nouveau holdout une seule fois.
+- Publier les résultats par famille, y compris les échecs.
+- Revendiquer uniquement le domaine et les limites démontrés.
+
+### P64-L09W-F — Produit et Fusion si justifié
+
+- Statut : `planned-conditional`, dépend de P64-L09W-E.
+- Créer une candidate seulement si du code produit a changé.
+- Installer automatiquement, vérifier et remettre à Thomas uniquement la
+  recette humaine finale.
+- `print-validated=false` sans impression réelle.
+
+Handoff :
+`docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md`.
+
+### Historique R9 clos positivement
+
 <!-- P64-L09U-BACKLOG -->
 ## Correctif P64-L09U-R9 — récupération de performance
 
@@ -75,11 +133,12 @@
 
 ### P64-L09U-R9-V — Gate humaine Fusion 0.1.80
 
-- Statut : `ready-human-gate`.
-- Mesurer une seule recherche Approfondie fraîche sur chaque projet.
-- Confirmer brièvement les acquis fonctionnels 0.1.79 sans rejouer R8.
-- Recette :
-  `docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md`.
+- Statut : `done-human-positive`, `fusion-validated=true`,
+  `print-validated=false`.
+- Thomas a renvoyé `P64-L09U-R9-V Fusion OK 0.1.80`.
+- Aucun temps humain séparé n’a été fourni.
+- Preuve :
+  `docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md`.
 
 Handoff :
 `docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.

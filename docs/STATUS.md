@@ -1,15 +1,44 @@
 # Status
 
+<!-- P64-L09W-STATUS -->
+## P64-L09W — robustesse générale du solveur
+
+Date : 2026-07-29.
+
+Statut : `priority-active`, `P64-L09W-A-ready`,
+`ready-for-autonomous-goal`, `no-product-code-yet`.
+
+- R9-V est `human-positive` sur Fusion 0.1.80 :
+  `fusion-validated=true`, `print-validated=false`.
+- La récupération de performance et le résultat fonctionnel R9 sont acquis.
+- Une lacune produit distincte est reconnue : la réussite sur les deux projets
+  R9 ne démontre pas la robustesse après changement de paramètres ou sur des
+  designs réalisables très différents.
+- Les corpus L06 à L08 couvrent déjà des vérités construites, des familles 3D
+  et des campagnes reprenables, mais leurs holdouts sont consommés et leur
+  couverture ne vaut pas preuve de bout en bout pour le produit 0.1.80.
+- P64-L09W-A doit d’abord auditer, définir le domaine mesurable et établir une
+  baseline. Aucune optimisation n’est encore sélectionnée.
+- P64-L09W passe avant P64-L10 et la trajectoire d’origine.
+
+Handoff :
+`docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md`.
+
+Preuve humaine :
+`docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md`.
+
+### Historique R9 clos positivement
+
 <!-- P64-L09U-STATUS -->
-## P64-L09U-R9 — candidate de performance 0.1.80
+## P64-L09U-R9 — candidate de performance 0.1.80 validée
 
 Date : 2026-07-29.
 
 Statut : `P64-L09U-R9-A-complete`,
 `P64-L09U-R9-B-complete`, `P64-L09U-R9-C-automated-validated`,
 `P64-L09U-R9-D-done-installed`,
-`P64-L09U-R9-V-ready-human-gate`,
-`fusion-validated=false`, `print-validated=false`.
+`P64-L09U-R9-V-human-positive`,
+`fusion-validated=true`, `print-validated=false`.
 
 - Le résultat humain 0.1.79 reste l’autorité fonctionnelle.
 - Le solveur `p64-l09u-r9-c-v2` place la première voie interne Approfondie
@@ -33,13 +62,17 @@ Statut : `P64-L09U-R9-A-complete`,
   `2,881 s` et `2,896 s`, digest et SHA inchangés.
 - Manifeste, runtime, réglages, marqueur de commit et cinq marqueurs R9
   installés vérifiés indépendamment.
-- La seule action restante est la recette humaine R9-V.
+- Thomas a clos R9-V avec `P64-L09U-R9-V Fusion OK 0.1.80`.
+- Aucun temps humain séparé n’a été fourni ; aucune valeur n’est inventée.
 
 Preuve :
 `docs/P64_L09U_R9_0180_PERFORMANCE_RECOVERY_EVIDENCE.md`.
 
 Recette :
 `docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md`.
+
+Verdict humain :
+`docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md`.
 
 ### Historique R9-A à R9-C
 

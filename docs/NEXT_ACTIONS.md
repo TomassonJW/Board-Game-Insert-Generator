@@ -1,7 +1,44 @@
 # Next Actions
 
+<!-- P64-L09W-NEXT -->
+## Action courante : P64-L09W-A — audit du domaine et baseline 0.1.80
+
+R9-V est close en `human-positive` sur Fusion 0.1.80.
+`fusion-validated=true`, `print-validated=false`.
+
+P64-L09W devient prioritaire avant P64-L10 et la roadmap d’origine. Son but est
+de mesurer puis d’améliorer la capacité du solveur à trouver rapidement des
+solutions certifiées sur une diversité représentative de projets réalisables,
+sans se limiter aux deux cas R9.
+
+Action immédiate unique :
+
+1. créer un Goal Codex sans budget de tokens inventé ;
+2. auditer les corpus, générateurs, oracles, runners, holdouts consommés,
+   solveurs et métriques L05D à L09U ;
+3. définir le domaine rectangulaire V0.1 réellement supporté et les strates de
+   densité, cardinalité, dimensions, éléments plats et modifications ;
+4. mesurer la baseline 0.1.80 sur les fixtures déjà versionnées, sans créer
+   encore un corpus massif ;
+5. publier les lacunes, causes et critères préenregistrés avant tout changement
+   produit ;
+6. créer une ADR seulement si la stratégie de génération, de sélection ou de
+   solveur devient structurante.
+
+Le futur taux `95 %` ou `99 %` sera mesuré sur un holdout neuf, faisable par
+construction et fermé. Il ne sera jamais présenté comme une garantie sur tous
+les cas possibles.
+
+Handoff :
+`docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md`.
+
+Preuve R9-V :
+`docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md`.
+
+### Historique R9-V clos positivement
+
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R9-V — recette humaine 0.1.80
+## Ancienne action : P64-L09U-R9-V — recette humaine 0.1.80
 
 R9-A à R9-D sont terminées et intégrées dans `main`.
 
@@ -18,22 +55,11 @@ Acquis automatisés :
 8. candidate installée depuis `4522f72`, avec deux calculs à `4,259 s` et
    `4,458 s`, version, runtime, réglages, commit et marqueurs R9 vérifiés.
 
-Action immédiate unique :
-
-1. Thomas ferme puis rouvre Fusion et vérifie la version 0.1.80 ;
-2. il exécute une seule recherche Approfondie sur chaque projet ;
-3. il relève séparément calcul, finalisation et matérialisation ;
-4. il confirme brièvement les acquis fonctionnels 0.1.79 ;
-5. il renvoie le verdict décrit dans
-   `docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md`.
-
-La gate humaine portera sur la performance des deux projets et un contrôle
-visuel bref des acquis 0.1.79. Elle ne rejoue pas la recette R8.
-
-`fusion-validated=false`, `print-validated=false`.
+Thomas a renvoyé `P64-L09U-R9-V Fusion OK 0.1.80`. La gate est
+`human-positive`, `fusion-validated=true`, `print-validated=false`.
 
 Preuve :
-`docs/P64_L09U_R9_0180_PERFORMANCE_RECOVERY_EVIDENCE.md`.
+`docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md`.
 
 ### Historique R9-C — préfixe interne certifié
 

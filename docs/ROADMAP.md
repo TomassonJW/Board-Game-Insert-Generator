@@ -5,6 +5,37 @@ operationnel vit dans `docs/BACKLOG.md`, l'etat courant dans `docs/STATUS.md`,
 et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
 et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
+<!-- P64-L09W-ROADMAP -->
+## Priorité P64-L09W — robustesse générale du solveur
+
+La candidate 0.1.80 est `human-positive` dans Fusion. Avant de reprendre
+P64-L10 et la roadmap d’origine, P64-L09W doit mesurer puis améliorer la
+robustesse du parcours produit sur une large diversité de cas réalisables.
+
+```text
+P64-L09U-R9-V human-positive 0.1.80
+  -> P64-L09W-A audit, domaine et baseline
+  -> P64-L09W-B générateur produit, oracles et holdout neuf
+  -> P64-L09W-C campagne de référence reprenable
+  -> P64-L09W-D optimisations causales atomiques
+  -> P64-L09W-E holdout unique et verdict par strate
+  -> P64-L09W-F candidate Fusion seulement si le produit change
+  -> reprise de P64-L10 et de la roadmap d’origine
+```
+
+Le programme réutilise les campagnes L05D à L08. Il distingue régression,
+discovery, tuning, holdout et soak ; couvre densités, cardinalités, dimensions,
+éléments plats et changements de paramètres ; mesure calcul, finalisation et
+matérialisation séparément.
+
+Une cible de `95 %` ou `99 %` ne peut être promue que sur un domaine et des
+limites préenregistrés. Aucun taux universel n’est revendiqué.
+
+Handoff :
+`docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md`.
+
+### Historique R9 clos positivement
+
 <!-- P64-L09U-ROADMAP -->
 ## Correctif P64-L09U-R9 — récupération de performance
 
@@ -18,7 +49,7 @@ P64-L09U-R8-V human-positive-partial 0.1.79
   -> R9-B ADR d'optimisation [done]
   -> R9-C optimisations incrémentales mesurées [done-automated-validated]
   -> R9-D candidate 0.1.80 [done-installed]
-  -> P64-L09U-R9-V gate Fusion performance + non-régression [ready-human-gate]
+  -> P64-L09U-R9-V gate Fusion performance + non-régression [done-human-positive]
 ```
 
 R9 conserve la grille `0,1 mm`, les valeurs physiques, la capacité, les
@@ -27,13 +58,15 @@ le coût.
 
 R9-C conserve le placement autoritaire et ramène les deux calculs automatisés
 à `3,727 s` et `3,911 s`. La suite autorisée passe `953` tests avec `1` skip
-prévu. La candidate 0.1.80 est installée depuis `4522f72`; seule la gate
-humaine finale reste ouverte.
+prévu. La candidate 0.1.80 est installée depuis `4522f72` et Thomas la valide
+avec `P64-L09U-R9-V Fusion OK 0.1.80`.
 
 Preuve :
 `docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md`.
 Preuve R9 :
 `docs/P64_L09U_R9_0180_PERFORMANCE_RECOVERY_EVIDENCE.md`.
+Preuve humaine :
+`docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md`.
 Handoff :
 `docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.
 

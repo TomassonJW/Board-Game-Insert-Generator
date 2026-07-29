@@ -274,6 +274,24 @@ Les validations P64 doivent couvrir au minimum :
 - des noms de corps Fusion uniques malgre des libelles utilisateur identiques ;
 - determinisme, non-collision, appui, conservation et zero corps automatique.
 
+## Régressions P64 de robustesse générale
+
+- Un taux de succès solveur cite toujours le domaine, la distribution, les
+  limites de temps et la version mesurés.
+- Les cas positifs d’une campagne générale sont faisables par construction ou
+  portent une autre preuve indépendante recertifiée ; le solveur testé ne
+  reçoit jamais le témoin comme solution initiale implicite.
+- Régression, discovery, tuning et holdout sont séparés. Un holdout consommé ne
+  redevient jamais un contrôle fermé.
+- Les rapports ventilent les résultats par densité, cardinalité, famille,
+  éléments plats et difficulté ; une moyenne globale ne masque pas une strate
+  faible.
+- Calcul, certification, finalisation et matérialisation ont des temps et des
+  statuts distincts.
+- Un épuisement de budget reste `bounded_unknown`, jamais `impossible`.
+- Une optimisation n’est retenue que si elle conserve toutes les vérités et ne
+  déplace pas silencieusement le coût vers une étape aval.
+
 ## Orthotypographie française de la palette
 
 - Tout texte visible par l’utilisateur emploie les accents français corrects.

@@ -1,10 +1,32 @@
 # Human Gates
 
+<!-- P64-L09W-GATE -->
+## P64-L09W — aucune gate humaine ouverte pendant l’audit
+
+P64-L09U-R9-V est close en `human-positive` sur Fusion 0.1.80 :
+`fusion-validated=true`, `print-validated=false`.
+
+Le GO autonome de P64-L09W est acquis. P64-L09W-A à E portent sur l’audit, les
+oracles, la campagne, les optimisations mesurées et le holdout ; aucune nouvelle
+observation de Thomas n’est requise entre ces missions atomiques normales.
+
+Une nouvelle gate humaine n’est ouverte que si une candidate produit réellement
+modifiée est préparée et installée en P64-L09W-F, ou si une décision
+structurante non résolue par les contrats exige l’autorité de Thomas.
+
+Preuve R9-V :
+`docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md`.
+
+Handoff :
+`docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md`.
+
+### Historique R9-V clos positivement
+
 <!-- P64-L09U-GATE -->
 ## P64-L09U-R9-V — gate performance Fusion 0.1.80
 
-Statut : `ready-human-gate`, candidate 0.1.80 installée depuis `4522f72`,
-`fusion-validated=false`, `print-validated=false`.
+Statut : `human-positive`, candidate 0.1.80 validée par Thomas,
+`fusion-validated=true`, `print-validated=false`.
 
 Le résultat fonctionnel de 0.1.79 est acquis. Cette gate ne rejoue pas R8 :
 elle mesure une seule recherche Approfondie fraîche sur chacun des deux projets,
@@ -26,8 +48,8 @@ Recette :
 Preuve :
 `docs/P64_L09U_R9_0180_PERFORMANCE_RECOVERY_EVIDENCE.md`.
 
-Thomas garde l’autorité sur le verdict de performance. Une gate positive ne
-vaut pas validation d’impression.
+Thomas a renvoyé `P64-L09U-R9-V Fusion OK 0.1.80`. Aucun temps humain séparé
+n’a été fourni. Une gate positive ne vaut pas validation d’impression.
 
 ### Historique des gates R7 et R8
 

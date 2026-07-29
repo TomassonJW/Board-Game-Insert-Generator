@@ -1,7 +1,44 @@
 # Pilotage courant
 
+<!-- P64-L09W-CURRENT -->
+## Reprise canonique P64-L09W — robustesse générale du solveur
+
+- Thomas valide Fusion 0.1.80 :
+  `P64-L09U-R9-V-human-positive`, `fusion-validated=true`,
+  `print-validated=false`.
+- Les résultats fonctionnels et la récupération de performance R9 sont acquis.
+  Aucun temps humain séparé n’a été fourni ; ne pas en inventer.
+- La nouvelle limite prioritaire est la robustesse générale : des projets
+  réalisables mais différents des deux cas R9 peuvent rester sans solution
+  après une modification de paramètres.
+- P64-L09W passe avant P64-L10 et la roadmap d’origine.
+- Le dépôt possède déjà des corpus, oracles, runners et campagnes L05D à L08.
+  Les anciens holdouts sont consommés et ne constituent pas un nouveau contrôle
+  fermé.
+- La première mission unique est P64-L09W-A : auditer la couverture existante,
+  définir le domaine supporté et les strates, puis mesurer la baseline 0.1.80
+  sur les fixtures déjà versionnées.
+- Aucun code solveur, nouveau corpus massif ou seuil de succès ne doit être
+  choisi avant cette attribution.
+- Le futur objectif `95 %` ou `99 %` doit être préenregistré sur un domaine,
+  une distribution et des limites déclarés. Il ne vaut jamais promesse sur
+  tous les placements 3D possibles.
+- Le GO autonome est acquis. La tâche neuve crée immédiatement un Goal Codex,
+  sans budget de tokens inventé, puis commence R9W-A sans redemander
+  d’autorisation.
+
+Autorités :
+
+- `docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md` ;
+- `docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md` ;
+- `docs/P64_L06B_BENCHMARK_CORPUS_CONTRACT.md` ;
+- `docs/P64_L08D_REAL_3D_CORPUS_EVIDENCE.md` ;
+- `docs/P64_L08F_REAL_3D_TOURNAMENT_EVIDENCE.md`.
+
+### Historique R9 clos positivement
+
 <!-- P64-L09U-CURRENT -->
-## Reprise canonique P64-L09U-R9-V
+## Reprise canonique P64-L09U-R9-V — gate close
 
 - Le résultat fonctionnel de 0.1.79 reste l’autorité humaine : géométrie,
   ordre, dispositions et pipeline strictement soustractif conformes.
@@ -23,14 +60,15 @@
   complète : `953` tests, `1` skip prévu, aucun échec.
 - Grille `0,1 mm`, epsilon `0,0001 mm`, valeurs physiques, budgets,
   profondeurs, cavités, parois, finalisation et matérialisation sont inchangés.
-- La candidate Fusion 0.1.80 est installée. La seule action restante est la
-  recette humaine R9-V.
-- La gate est `ready-human-gate`,
-  `fusion-validated=false`, `print-validated=false`.
+- La candidate Fusion 0.1.80 est installée et Thomas l’a validée avec le
+  verdict `P64-L09U-R9-V Fusion OK 0.1.80`.
+- La gate est `human-positive`,
+  `fusion-validated=true`, `print-validated=false`.
 
 Autorités :
 
 - `docs/P64_L09U_R9_0180_PERFORMANCE_RECOVERY_EVIDENCE.md` ;
+- `docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md` ;
 - `docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md` ;
 - `docs/P64_L09U_R9_A_PERFORMANCE_CAUSAL_DIAGNOSTIC_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0106-prefixe-interne-certifie-avant-scip.md`.

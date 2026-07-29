@@ -1,7 +1,30 @@
 # Capability Map
 
+<!-- P64-L09W-CAPABILITY -->
+## P64-L09W — robustesse générale à démontrer
+
+- `C-FUSION` : 0.1.80 `human-positive`, `fusion-validated=true`.
+- `C-STAGED-CALCULATION` : performance R9 validée sur les deux cas
+  autoritaires, mais généralisation à une diversité de projets non démontrée.
+- `C-GLOBAL-LAYOUT` et `C-MINIMAL-LAYOUT` : solutions certifiées et résultat R9
+  conservés ; taux de récupération par densité, cardinalité et famille encore
+  inconnu.
+- `C-OBSERVABILITY` : télémétrie R9 disponible, à étendre à une campagne
+  produit commune du calcul à la matérialisation.
+- `C-QUALITY` : corpus et runners L05D à L08 réutilisables ; anciens holdouts
+  consommés, nouveau domaine et nouveau holdout requis.
+- `C-FINALIZATION`, `C-CAD-IR` et `C-MATERIALIZATION` : conformes sur R9, mais
+  leurs taux de succès et percentiles sur les nouvelles strates restent à
+  mesurer séparément.
+- `C-PRODUCT-GRID` : `0,1 mm`, inchangée ; epsilon `0,0001 mm` distinct.
+- `C-PRINT` : `print-validated=false`.
+
+Prochaine frontière : P64-L09W-A, audit et baseline sans changement solveur.
+
+### Historique R9 clos positivement
+
 <!-- P64-L09U-CAPABILITY -->
-## P64-L09U-R9 — candidate 0.1.80 installée
+## P64-L09U-R9 — candidate 0.1.80 validée
 
 - `C-STAGED-CALCULATION` : `automated-validated`. Les deux calculs de
   référence passent à `3,727 s` et `3,911 s`; le préparateur les confirme à
@@ -21,13 +44,13 @@
   strictement soustractif et digest fonctionnel conservé.
 - `C-QUALITY` : `174` tests ciblés du préparateur et `953` tests autorisés
   passés ; `1` skip prévu dans chaque gate concernée.
-- `C-FUSION` : résultat 0.1.79 `human-positive`; candidate performance 0.1.80
-  encore `prepared-not-human-observed`.
+- `C-FUSION` : résultat 0.1.79 et candidate performance 0.1.80
+  `human-positive`, `fusion-validated=true`.
 - `C-RELEASE` : 0.1.80 installée depuis `4522f72`; manifeste, runtime,
   réglages, commit et marqueurs R9 vérifiés.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : exécuter uniquement P64-L09U-R9-V.
+Prochaine frontière : P64-L09W-A.
 
 ### Historique R9-A à R9-C
 
