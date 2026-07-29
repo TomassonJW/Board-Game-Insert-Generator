@@ -85,12 +85,11 @@ Refus comme résultat final :
 
 Cette option sert de référence de fidélité.
 
-### Option D — Préfixe interne certifié, lot de complétions borné et repli SCIP
+### Option D — Préfixe interne certifié inchangé et repli SCIP
 
-Le premier front interne qui contient des complétions est terminé sous les
-budgets existants. Le solveur conserve au plus le plafond de candidats du
-profil, les ordonne selon les axes géométriques déjà utilisés par le produit,
-puis soumet ce lot au certificat commun.
+La première lane interne Approfondie est exécutée avec son arrêt historique
+exact à `max_complete_candidates`. Le solveur ne termine pas le front au-delà
+de ce point et n'élargit donc pas l'ensemble de candidats examiné.
 
 Dès qu'une lane possède au moins une solution certifiée, cette lane devient
 l'autorité du run. SCIP et les lanes suivantes ne sont plus exécutés.
@@ -115,24 +114,30 @@ SCIP n'est appelé que si :
 - le budget global restant le permet ;
 - aucune annulation ou obsolescence n'est active.
 
-### 2. Lot borné de complétions
+### 2. Ensemble de complétions strictement inchangé
 
-Le beam ne s'arrête pas au milieu du front courant à la première atteinte de
-`max_complete_candidates`.
+Le beam conserve son arrêt historique dès que
+`max_complete_candidates` est atteint.
 
-Il termine uniquement le front déjà ouvert, sous les plafonds existants :
+Un essai R9-B a terminé le front Normal déjà ouvert sans augmenter les limites
+publiées. Il a observé 83 complétions, n'en a retenu que 6 et a réduit le temps
+à `6,618 s`, mais le digest final est devenu
+`269f9cdc4265bac3d10aa3480ff699c34ca7a49fc633e4222829ba23867fc009`.
 
+Cet essai est rejeté : terminer le front élargit réellement l'ensemble des
+solutions parmi lesquelles le produit choisit, même si le nombre finalement
+certifié reste plafonné. Le résultat fonctionnel 0.1.79 n'est alors plus
+préservé.
+
+R9-B ne change donc ni :
+
+- l'ordre d'exploration du beam ;
+- son point d'arrêt ;
+- `max_complete_candidates` ;
 - `max_search_states` ;
 - `max_placement_trials` ;
 - `max_elapsed_ms` ;
-- deadline globale.
-
-Il ne publie et ne certifie jamais plus de
-`max_complete_candidates`.
-
-Les complétions surnuméraires du front sont classées puis éliminées. Elles ne
-constituent ni une hausse de budget ni une hausse du nombre de candidats
-certifiés.
+- la deadline globale.
 
 ### 3. Classement avant certification
 
@@ -171,8 +176,7 @@ La télémétrie doit exposer :
 
 - `first_certified_lane_authority=true` ;
 - les limites inchangées ;
-- les complétions brutes et retenues ;
-- les candidats certifiés ;
+- les complétions géométriques et les candidats certifiés ;
 - les lanes non exécutées ;
 - l'absence ou la présence d'un repli SCIP.
 
@@ -212,13 +216,12 @@ Restent autoritaires :
 
 - le travail certifiable devient prioritaire ;
 - le témoin SCIP rejeté ne monopolise plus le run ;
-- le candidat humain reste atteignable sans augmenter les plafonds ;
+- le candidat humain reste atteignable sans changer le front historique ;
 - la stratégie est déterministe et testable ;
 - SCIP reste disponible pour les échecs internes réels.
 
 ### Coûts
 
-- le beam doit distinguer complétions observées et complétions retenues ;
 - la télémétrie et les tests de préfixe doivent être adaptés ;
 - le contrat de sélection passe du meilleur portfolio entier à la première
   lane certifiée ;

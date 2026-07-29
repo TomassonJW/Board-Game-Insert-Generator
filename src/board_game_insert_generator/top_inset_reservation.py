@@ -848,6 +848,45 @@ def _resolve_automatic_xy_layout(
         "axis_anchor_occurrence_count_before_quantization": 0,
         "axis_anchor_occurrence_count_after_quantization": 0,
     }
+    rank_metrics = {
+        "automatic_rank_request_count": 0,
+        "automatic_rank_unique_count": 0,
+        "automatic_rank_cache_hit_count": 0,
+    }
+    rank_cache: dict[
+        tuple[object, ...],
+        tuple[object, ...],
+    ] = {}
+    placement_material_rectangles = _placement_material_rectangles(
+        placements
+    )
+    useful_placement_rectangles = _useful_placement_rectangles(
+        placements,
+        design_top_z=design_top_z,
+    )
+
+    def rank_layout(
+        reservations: list[dict[str, object]],
+    ) -> tuple[object, ...]:
+        rank_metrics["automatic_rank_request_count"] += 1
+        signature = _automatic_layout_signature(reservations)
+        cached = rank_cache.get(signature)
+        if cached is not None:
+            rank_metrics["automatic_rank_cache_hit_count"] += 1
+            return cached
+        rank_metrics["automatic_rank_unique_count"] += 1
+        rank = _automatic_layout_rank(
+            reservations,
+            design_top_z,
+            box,
+            project=project,
+            placements=placements,
+            require_reserved_prisms=require_reserved_prisms,
+            placement_material_rectangles=placement_material_rectangles,
+            useful_placement_rectangles=useful_placement_rectangles,
+        )
+        rank_cache[signature] = rank
+        return rank
 
     for item in items:
         expanded: list[list[dict[str, object]]] = []
@@ -927,14 +966,7 @@ def _resolve_automatic_xy_layout(
             expanded.extend(
                 sorted(
                     state_expanded,
-                    key=lambda value: _automatic_layout_rank(
-                        value,
-                        design_top_z,
-                        box,
-                        project=project,
-                        placements=placements,
-                        require_reserved_prisms=require_reserved_prisms,
-                    ),
+                    key=rank_layout,
                 )[:_MAX_AUTOMATIC_POSES_PER_STATE]
             )
         if not expanded:
@@ -965,6 +997,7 @@ def _resolve_automatic_xy_layout(
                 "retained_state_count": 0,
                 "wall_rejection_count": wall_rejections,
                 "placement_context": "frozen_bodies" if placements else "box_preview",
+                **rank_metrics,
                 **_grid_search_metrics(grid_metrics),
             }
         deduplicated: dict[tuple[object, ...], list[dict[str, object]]] = {}
@@ -973,14 +1006,7 @@ def _resolve_automatic_xy_layout(
             deduplicated.setdefault(signature, candidate_state)
         states = sorted(
             deduplicated.values(),
-            key=lambda value: _automatic_layout_rank(
-                value,
-                design_top_z,
-                box,
-                project=project,
-                placements=placements,
-                require_reserved_prisms=require_reserved_prisms,
-            ),
+            key=rank_layout,
         )[:_MAX_AUTOMATIC_LAYOUT_STATES]
 
     collision_rejections = 0
@@ -989,14 +1015,7 @@ def _resolve_automatic_xy_layout(
     selected: list[dict[str, object]] | None = None
     for state in sorted(
         states,
-        key=lambda value: _automatic_layout_rank(
-            value,
-            design_top_z,
-            box,
-            project=project,
-            placements=placements,
-            require_reserved_prisms=require_reserved_prisms,
-        ),
+        key=rank_layout,
     ):
         layered = _resolve_vertical_layers(state, design_top_z)
         if (
@@ -1058,6 +1077,7 @@ def _resolve_automatic_xy_layout(
             "application_rejection_count": len(application_rejections),
             "material_fragment_rejection_count": material_fragment_rejections,
             "placement_context": "frozen_bodies" if placements else "box_preview",
+            **rank_metrics,
             **_grid_search_metrics(grid_metrics),
         }
     return selected or [], [], {
@@ -1080,6 +1100,7 @@ def _resolve_automatic_xy_layout(
         "selected_pose_on_product_grid": _automatic_layout_on_product_grid(
             selected or []
         ),
+        **rank_metrics,
         **_grid_search_metrics(grid_metrics),
     }
 
@@ -1267,8 +1288,14 @@ def _automatic_layout_rank(
     project: dict[str, object],
     placements: list[dict[str, object]],
     require_reserved_prisms: bool,
+    placement_material_rectangles: list[dict[str, object]] | None = None,
+    useful_placement_rectangles: list[dict[str, float]] | None = None,
 ) -> tuple[object, ...]:
-    layered = _resolve_vertical_layers(reservations, design_top_z)
+    layered = _resolve_vertical_layers(
+        reservations,
+        design_top_z,
+        copy_reservations=False,
+    )
     reserved_prism_violation_count = (
         len(_reserved_prism_collision_ids(layered, placements, design_top_z))
         if require_reserved_prisms
@@ -1289,7 +1316,11 @@ def _automatic_layout_rank(
     material_fragment_violation_count = int(
         _material_fragment_certificate(
             layered,
-            _placement_material_rectangles(placements),
+            (
+                placement_material_rectangles
+                if placement_material_rectangles is not None
+                else _placement_material_rectangles(placements)
+            ),
             minimum_wall_mm=float(
                 _mapping(project["layout"])[
                     "default_wall_thickness_mm"
@@ -1322,6 +1353,7 @@ def _automatic_layout_rank(
             box=box,
             placements=placements,
             design_top_z=design_top_z,
+            useful_placement_rectangles=useful_placement_rectangles,
         )
         return (
             reserved_prism_violation_count,
@@ -1351,14 +1383,19 @@ def _automatic_layout_score_components(
     box: dict[str, float],
     placements: list[dict[str, object]],
     design_top_z: float,
+    useful_placement_rectangles: list[dict[str, float]] | None = None,
 ) -> dict[str, object]:
     rectangles = [
         _xy_rect(value["cut_origin_mm"], value["cut_size_mm"])
         for value in reservations
     ]
-    useful_rectangles = _useful_placement_rectangles(
-        placements,
-        design_top_z=design_top_z,
+    useful_rectangles = (
+        useful_placement_rectangles
+        if useful_placement_rectangles is not None
+        else _useful_placement_rectangles(
+            placements,
+            design_top_z=design_top_z,
+        )
     )
     useful_coverage_area = 0.0
     useful_center_distance = 0.0
@@ -2140,7 +2177,10 @@ def _automatic_layout_on_product_grid(
 
 
 def _resolve_vertical_layers(
-    resolved: list[dict[str, object]], design_top_z: float
+    resolved: list[dict[str, object]],
+    design_top_z: float,
+    *,
+    copy_reservations: bool = True,
 ) -> list[dict[str, object]]:
     """Compose the Z depth on exact XY cells, never on a global envelope.
 
@@ -2256,7 +2296,11 @@ def _resolve_vertical_layers(
             ),
             default=design_top_z,
         )
-        final = deepcopy(reservation)
+        final = (
+            deepcopy(reservation)
+            if copy_reservations
+            else dict(reservation)
+        )
         final.update(
             {
                 "level": index,

@@ -40,6 +40,13 @@
 - Un changement causal, testé, mesuré, documenté et intégré à la fois.
 - Aucun budget augmenté, aucune grille ou valeur physique modifiée.
 - Replays personnels strictement en lecture seule avec SHA avant/après.
+- Déduplication locale exacte des rangs plats : intégrée, digest autoritaire
+  conservé, `10,341 s` sur `CasLimite02+`, `9,288 s` sur
+  `CasLimite02++`.
+- Essai de fin de front Normal : rejeté malgré `6,618 s`, car digest divergent
+  `269f…009`.
+- Incrément suivant : première lane interne Approfondie avant SCIP, arrêt du
+  portfolio sur certification, SCIP en repli seulement.
 
 ### P64-L09U-R9-D — Candidate et gate finale
 

@@ -24,10 +24,15 @@
 - Le digest de placement autoritaire local est
   `a3ef2f44...8817bc46`. La variante Normal à environ `4 s` produit
   `3ca1d3d4...63e1696a` et a été refusée car sa disposition diverge.
-- ADR-0106 est acceptée pour R9-B : préfixe interne complet et borné, première
+- ADR-0106 est acceptée pour R9-B : préfixe interne exact, première
   lane certifiée comme autorité, SCIP seulement en repli, déduplication
   strictement locale des classements plats.
-- P64-L09U-R9-B est l'action courante. Elle doit maximiser la performance sous
+- Le premier incrément R9-C conserve le digest autoritaire et mesure
+  `10,341 s` sur `CasLimite02+`, `9,288 s` sur `CasLimite02++`.
+- La fin de front Normal à `6,618 s` est rejetée car elle produit
+  `269f…009` ; l'arrêt historique du beam reste inchangé.
+- P64-L09U-R9-C est l'action courante. Elle doit router ce préfixe avant SCIP
+  et maximiser la performance sous
   résultat fonctionnel constant, sans nouvelle valeur physique, sans dégrader
   la grille, sans gonfler les budgets et sans perdre de solution certifiée.
 - Les deux projets personnels restent strictement en lecture seule avec SHA

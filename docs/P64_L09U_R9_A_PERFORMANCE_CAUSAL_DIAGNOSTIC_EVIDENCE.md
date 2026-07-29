@@ -173,9 +173,22 @@ Sur la première lane seule :
 - 31 679 contrôles de collision avec les prismes réservés ;
 - 32 326 certificats de fragments de matière.
 
-Un cache expérimental exact des rangs, clé par géométrie et limité au run,
-conserve le digest autoritaire mais ne réduit la lane que de 13,363 s à
-11,852 s. Ce gain est réel mais insuffisant seul.
+Un premier cache expérimental global de diagnostic, exact mais non intégré,
+conserve le digest autoritaire et réduit la lane de 13,363 s à 11,852 s.
+
+L'incrément R9-B limite ensuite le cache à chaque appel de résolution, utilise
+la signature géométrique déjà autoritaire et évite les copies profondes
+strictement inutiles pendant le seul classement. Il conserve le digest
+autoritaire et mesure :
+
+| Projet | Avant | Après R9-B | Gain |
+|---|---:|---:|---:|
+| `CasLimite02+` | 13,363 s de référence | 10,341 s | au moins 22 % |
+| `CasLimite02++` | 13,363 s de référence | 9,288 s | 30 % |
+
+La recherche beam reste entre 2,29 et 2,30 s. Le coût résiduel reste dans les
+13 certifications et 15 résolutions de poses plates ; il n'est pas déplacé
+vers la finalisation ou la matérialisation.
 
 ## Mémoire
 
@@ -194,7 +207,8 @@ est du calcul répété.
 | voie 0.1.79 complète | 92,968 s local ; 87–91 s Fusion | digest autoritaire `a3ef…bc46` | trop lente |
 | projection interne Normal, puis recertification | 4,118 s (`+`) ; 3,902 s (`++`) | digest `3ca1…696a` | rapide mais disposition différente, refusée |
 | première lane interne Approfondie complète | 13,363 s | digest autoritaire `a3ef…bc46` | base fonctionnelle retenue |
-| première lane + cache exact de rang | 11,852 s | digest autoritaire | gain marginal seul |
+| première lane + déduplication locale exacte de rang | 10,341 s (`+`) ; 9,288 s (`++`) | digest autoritaire | incrément R9-B retenu |
+| front Normal terminé puis limité à six candidats | 6,618 s | digest `269f…009` | plus rapide mais ensemble de choix élargi, refusé |
 | optimisation SCIP seule | non retenue | premier témoin SCIP rejeté | mauvais chemin d'autorité |
 | hausse de budget ou de candidats | non mesurée | masquerait le coût | interdite |
 | grille ou epsilon modifiés | non mesurée | changerait le modèle physique | interdite |
@@ -206,8 +220,8 @@ Le chemin à optimiser est :
 1. exécuter d'abord la lane interne qui produit le résultat certifié
    autoritaire ;
 2. conserver les bornes existantes ;
-3. retenir les meilleurs complétions d'un même front sans augmenter leur
-   nombre publié ;
+3. conserver exactement l'arrêt historique du beam et son ensemble de
+   complétions ;
 4. arrêter le portfolio quand une lane possède une solution certifiée ayant
    autorité produit ;
 5. supprimer les classements et contrôles plats strictement répétés à

@@ -6,7 +6,8 @@
 Date : 2026-07-29.
 
 Statut : `P64-L09U-R8-V-human-positive-partial`,
-`P64-L09U-R9-A-complete`, `P64-L09U-R9-B-active`,
+`P64-L09U-R9-A-complete`, `P64-L09U-R9-B-complete`,
+`P64-L09U-R9-C-active`,
 `fusion-validated=false`,
 `print-validated=false`.
 
@@ -33,6 +34,11 @@ Statut : `P64-L09U-R8-V-human-positive-partial`,
   disposition.
 - ADR-0106 est acceptée ; R9-B implémente le préfixe interne certifié, l'arrêt
   sur sa première lane certifiée et SCIP seulement en repli.
+- Le premier incrément R9-C déduplique les rangs plats dans un seul appel :
+  `10,341 s` sur `CasLimite02+` et `9,288 s` sur `CasLimite02++`, avec digest
+  `a3ef…bc46` et SHA personnels inchangés.
+- La fin de front Normal est explicitement rejetée : elle atteint `6,618 s`
+  mais change le digest en `269f…009`.
 - Le GO autonome va jusqu'à une nouvelle candidate Fusion installée et une
   recette humaine finale.
 

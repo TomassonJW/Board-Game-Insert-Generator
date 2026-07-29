@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R9-B — préfixe interne certifié
+## Action courante : P64-L09U-R9-C — préfixe interne certifié
 
 Thomas confirme que le résultat, l'ordre et les dispositions de la candidate
 0.1.79 sont conformes. Le pipeline R8 est `human-positive` sur son contrat
@@ -20,17 +20,28 @@ R9-A est terminé :
 5. la voie Normal à environ `4 s` est refusée car elle produit une autre
    disposition.
 
-R9-B doit maintenant implémenter ADR-0106 par incréments :
+R9-B est terminé : ADR-0106 est acceptée et son premier incrément de
+déduplication locale des rangs plats est intégré.
 
-1. terminer le front interne déjà ouvert sans augmenter les budgets ni le
-   plafond de candidats publiés ;
-2. conserver les meilleures complétions selon les axes géométriques produit ;
-3. certifier le lot borné contre le projet complet ;
-4. arrêter sur la première lane certifiée ;
-5. lancer SCIP seulement si le préfixe interne échoue ;
-6. supprimer les classements plats strictement répétés dans un appel ;
-7. préserver le digest autoritaire, les deux SHA personnels et toute la
-   géométrie R8.
+L'essai de fin de front Normal est rejeté : `6,618 s`, mais digest divergent
+`269f…009`. L'arrêt historique du beam et les 12 candidats Approfondis restent
+donc inchangés.
+
+R9-C doit maintenant :
+
+1. exécuter d'abord la première lane interne Approfondie exacte ;
+2. arrêter le portfolio quand cette lane possède une solution certifiée ;
+3. lancer SCIP seulement si ce préfixe interne échoue ;
+4. préserver le digest autoritaire, les deux SHA personnels et toute la
+   géométrie R8 ;
+5. rejouer les deux projets de bout en bout et vérifier que la finalisation et
+   la matérialisation restent rapides.
+
+Premier gain acquis avant routage :
+
+- `CasLimite02+` : `10,341 s` ;
+- `CasLimite02++` : `9,288 s` ;
+- digest autoritaire `a3ef…bc46` conservé.
 
 Preuves :
 

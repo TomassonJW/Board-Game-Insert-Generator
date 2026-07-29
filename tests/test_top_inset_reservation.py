@@ -644,6 +644,13 @@ class TopInsetReservationTests(unittest.TestCase):
             )
         )
         self.assertEqual(result["total_flat_height_mm"], 3.0)
+        search = result["automatic_xy_search"]
+        self.assertGreater(search["automatic_rank_cache_hit_count"], 0)
+        self.assertEqual(
+            search["automatic_rank_request_count"],
+            search["automatic_rank_unique_count"]
+            + search["automatic_rank_cache_hit_count"],
+        )
 
     def test_center_collision_is_replaced_by_a_lateral_automatic_pose(self) -> None:
         value = project()
