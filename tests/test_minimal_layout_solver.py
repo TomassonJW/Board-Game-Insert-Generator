@@ -400,6 +400,11 @@ class MinimalLayoutSolverTests(unittest.TestCase):
         external_solver.assert_not_called()
         provenance = plan["minimal_layout"]["search_provenance"]
         self.assertTrue(provenance["first_certified_lane_authority"])
+        self.assertTrue(
+            provenance[
+                "first_certified_geometric_group_authority"
+            ]
+        )
         self.assertFalse(provenance["scip_fallback_invoked"])
         self.assertEqual(
             provenance["lane_prefix_ids"],
@@ -411,8 +416,14 @@ class MinimalLayoutSolverTests(unittest.TestCase):
         )
         self.assertEqual(
             provenance["selected"]["statement"],
-            "best_certified_proposal_from_first_certified_lane_within_budget",
+            "best_certified_proposal_from_first_geometric_group_of_first_lane_within_budget",
         )
+        lane = provenance["lanes"][0]
+        self.assertTrue(
+            lane["geometric_certification_group_authority"]
+        )
+        self.assertGreaterEqual(lane["geometric_rank_group_count"], 1)
+        self.assertTrue(lane["certified_geometric_group_key"])
 
     def test_deep_flat_prefix_failure_keeps_scip_as_honest_fallback(self) -> None:
         project = localized_reservation_project()

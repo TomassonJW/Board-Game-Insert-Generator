@@ -33,10 +33,13 @@
   `9,791 s` : une lane, zéro appel SCIP, digest `a3ef…bc46` inchangé.
 - Les bornes de collision plates préparées une fois par appel ramènent ensuite
   les temps à `8,916 s` et `8,240 s`, sans changement fonctionnel.
+- La certification des deux symétries du premier groupe géométrique ramène
+  enfin les temps à `3,874 s` et `4,052 s`, avec 12 complétions inchangées et
+  le digest `a3ef…bc46`.
 - La fin de front Normal à `6,618 s` est rejetée car elle produit
   `269f…009` ; l'arrêt historique du beam reste inchangé.
-- P64-L09U-R9-C est l'action courante. Elle doit fermer le coût plat résiduel
-  si un incrément exact reste raisonnable, puis valider de bout en bout sous
+- P64-L09U-R9-C est l'action courante. Le gain cible est atteint ; elle doit
+  maintenant valider de bout en bout sous
   résultat fonctionnel constant, sans nouvelle valeur physique, sans dégrader
   la grille, sans gonfler les budgets et sans perdre de solution certifiée.
 - Les deux projets personnels restent strictement en lecture seule avec SHA

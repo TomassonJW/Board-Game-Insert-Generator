@@ -53,6 +53,11 @@
   complète.
 - Bornes de collision et copies temporaires plates : intégré, `8,916 s` et
   `8,240 s`, digest autoritaire inchangé.
+- Premier groupe géométrique entièrement certifié : intégré, `3,874 s` et
+  `4,052 s`, 12 complétions beam inchangées, 2 candidats certifiés, digest
+  autoritaire inchangé.
+- Premier candidat seul : rejeté, car `CasLimite02+` choisit `cab1…9878`.
+- Incrément suivant : validation complète et fermeture R9-C.
 
 ### P64-L09U-R9-D — Candidate et gate finale
 

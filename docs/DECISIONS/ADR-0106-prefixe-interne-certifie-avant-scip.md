@@ -139,22 +139,34 @@ R9-B ne change donc ni :
 - `max_elapsed_ms` ;
 - la deadline globale.
 
-### 3. Classement avant certification
+### 3. Groupes géométriques avant certification
 
-Le préclassement utilise seulement des faits géométriques exacts déjà présents
-dans les placements :
+Les douze complétions historiques restent produites. Elles sont regroupées,
+sans digest arbitraire dans la clé de groupe, selon des faits géométriques
+exacts déjà présents dans les placements :
 
 - nombre de conteneurs élevés ;
 - somme des bases Z ;
 - volume élevé ;
 - empreinte, volume, vide interne et hauteur du cluster ;
 - fragmentation ;
-- contacts ;
 - support ;
-- digest déterministe.
 
-La compatibilité avec les éléments plats n'est jamais supposée. Le certificat
-complet reste l'unique autorité pour :
+Les groupes sont examinés dans cet ordre. Tous les membres du premier groupe
+qui contient au moins une solution certifiée sont certifiés ; les groupes
+géométriquement moins bons ne le sont pas.
+
+Une tentative de n'en certifier qu'un seul est explicitement rejetée :
+
+- `CasLimite02++` conservait `a3ef…bc46` en `3,369 s` ;
+- `CasLimite02+` choisissait la symétrie `cab1…9878` en `3,214 s`.
+
+Certifier les deux membres ex æquo du meilleur groupe permet au classement
+produit complet, digest compris, de conserver `a3ef…bc46` sur les deux
+projets.
+
+La compatibilité avec les éléments plats n'est jamais supposée par le
+préclassement. Le certificat complet reste l'unique autorité pour :
 
 - la pose automatique des éléments plats ;
 - les parois ;
@@ -164,24 +176,28 @@ complet reste l'unique autorité pour :
 - l'ordre de retrait ;
 - la géométrie soustractive.
 
-### 4. Arrêt sur la première lane certifiée
+### 4. Arrêt sur le premier groupe certifié de la première lane
 
-Une lane qui publie au moins une solution certifiée termine la recherche du
-run.
+Le premier groupe géométrique qui publie au moins une solution certifiée
+termine la certification de la lane. La première lane ainsi certifiée termine
+la recherche du run.
 
-Le résultat est le meilleur candidat certifié de cette lane selon le
-classement produit existant.
+Le résultat est le meilleur candidat certifié de ce groupe selon le classement
+produit complet existant.
 
 La télémétrie doit exposer :
 
 - `first_certified_lane_authority=true` ;
+- `first_certified_geometric_group_authority=true` ;
 - les limites inchangées ;
 - les complétions géométriques et les candidats certifiés ;
+- la clé du groupe certifié et le nombre de groupes moins bons non certifiés ;
 - les lanes non exécutées ;
 - l'absence ou la présence d'un repli SCIP.
 
 Le texte « best certified proposal found within budget » doit être précisé
-comme « best certified proposal from the first certified lane within budget ».
+comme « best certified proposal from the first geometric group of the first
+lane within budget ».
 
 ### 5. Déduplication locale des rangs plats
 
@@ -217,26 +233,29 @@ Restent autoritaires :
 - le travail certifiable devient prioritaire ;
 - le témoin SCIP rejeté ne monopolise plus le run ;
 - le candidat humain reste atteignable sans changer le front historique ;
+- les symétries exactes du meilleur groupe restent départagées par le
+  certificat et le classement produit complets ;
 - la stratégie est déterministe et testable ;
 - SCIP reste disponible pour les échecs internes réels.
 
 ### Coûts
 
 - la télémétrie et les tests de préfixe doivent être adaptés ;
-- le contrat de sélection passe du meilleur portfolio entier à la première
-  lane certifiée ;
+- le contrat de sélection passe du meilleur portfolio entier au premier groupe
+  géométrique certifié de la première lane ;
 - les digests de provenance changent même si la géométrie reste identique.
 
 ### Risques
 
 - un autre projet pourrait préférer un candidat d'une lane ultérieure ;
-- un préclassement incomplet pourrait écarter un candidat qui aurait mieux
-  interagi avec un élément plat ;
+- un groupe géométriquement moins bon pourrait mieux interagir avec un élément
+  plat ;
 - une mémorisation trop large pourrait devenir périmée.
 
 Ces risques sont fermés par :
 
 - le certificat complet avant publication ;
+- la certification de toutes les symétries du groupe gagnant ;
 - le plafond inchangé ;
 - la gate des deux digests autoritaires ;
 - la suite autorisée complète ;

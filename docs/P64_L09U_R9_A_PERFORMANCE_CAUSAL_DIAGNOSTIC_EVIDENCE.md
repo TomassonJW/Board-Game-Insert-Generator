@@ -215,6 +215,22 @@ chaque appel :
 - `CasLimite02++` : `8,240 s` ;
 - digest, métriques et SHA personnels inchangés.
 
+Le dernier incrément conserve les douze complétions historiques, les regroupe
+par rang géométrique exact et certifie tous les membres du premier groupe qui
+produit une solution. Sur les deux projets, le meilleur groupe contient deux
+symétries ; le classement produit complet conserve `a3ef…bc46`.
+
+Résultat orchestré final R9-C :
+
+| Projet | Calcul final | Complétions beam | Candidats certifiés | SCIP | Digest |
+|---|---:|---:|---:|---:|---|
+| `CasLimite02+` | 3,874 s | 12 | 2 + revalidation finale | 0 | `a3ef…bc46` |
+| `CasLimite02++` | 4,052 s | 12 | 2 + revalidation finale | 0 | `a3ef…bc46` |
+
+La tentative à un seul candidat est refusée : elle choisit `cab1…9878` sur
+`CasLimite02+`. Le gain final ne vient donc pas d'un tie-break supposé, mais de
+la certification complète des deux symétries du groupe autoritaire.
+
 ## Mémoire
 
 Le replay Normal passe d'environ 46,4 Mio à 54,0 Mio de working set, avec un
@@ -235,6 +251,8 @@ est du calcul répété.
 | première lane + déduplication locale exacte de rang | 10,341 s (`+`) ; 9,288 s (`++`) | digest autoritaire | incrément R9-B retenu |
 | routage orchestré du préfixe avant SCIP | 10,013 s (`+`) ; 9,791 s (`++`) | digest autoritaire, 0 SCIP, 1 lane | incrément R9-C retenu |
 | bornes de collision préparées une fois par appel | 8,916 s (`+`) ; 8,240 s (`++`) | digest autoritaire | incrément exact retenu |
+| premier groupe géométrique entièrement certifié | 3,874 s (`+`) ; 4,052 s (`++`) | 12 complétions, 2 certifiées, digest autoritaire | incrément final retenu |
+| premier candidat géométrique seul | 3,214 s (`+`) ; 3,369 s (`++`) | `cab1…9878` sur `+` | tie-break incomplet, refusé |
 | front Normal terminé puis limité à six candidats | 6,618 s | digest `269f…009` | plus rapide mais ensemble de choix élargi, refusé |
 | optimisation SCIP seule | non retenue | premier témoin SCIP rejeté | mauvais chemin d'autorité |
 | hausse de budget ou de candidats | non mesurée | masquerait le coût | interdite |

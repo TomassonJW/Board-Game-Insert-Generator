@@ -10,7 +10,8 @@
 - `C-MINIMAL-LAYOUT` : R9-A `complete-diagnostic`, R9-B
   `complete-architecture`, R9-C `active`. Le digest
   autoritaire `a3ef2f44...8817bc46` vient de la première lane interne
-  Approfondie et reste préservé après déduplication locale des rangs plats.
+  Approfondie et reste préservé après sélection du premier groupe géométrique
+  certifié : `3,874 s` et `4,052 s`.
 - `C-OBSERVABILITY` : attribution causale acquise. Deux appels SCIP identiques
   consomment environ `68,1 s`, le témoin natif est rejeté, puis le repli interne
   produit le résultat visible.

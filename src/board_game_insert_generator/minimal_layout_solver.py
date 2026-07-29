@@ -36,7 +36,9 @@ from board_game_insert_generator.free_3d_beam_solver import (
     PROPAGATION_RADIAL_COMPACT,
     Free3DBeamExecution,
     Free3DPlacement,
+    Free3DBeamSolution,
     VariantFree3DPlacement,
+    _placement_cluster_metrics,
     solve_free_3d_beam,
 )
 from board_game_insert_generator.free_3d_greedy_solver import (
@@ -103,7 +105,7 @@ from board_game_insert_generator.reserved_floor_stack_solver import (
 
 
 MINIMAL_LAYOUT_FAMILY_ID = "minimal_layout_portfolio"
-MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09u-r9-c-v1"
+MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09u-r9-c-v2"
 MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1 = "bgig.minimal_layout_portfolio.v1"
 _AXES = ("x", "y", "z")
 _EPSILON = 0.0001
@@ -1261,9 +1263,34 @@ def _solve_minimal_layout_once(
         )
         certified_before = len(proposals)
         lane_rejections: Counter[str] = Counter()
-        for solution_index, solution in enumerate(execution.solutions):
+        indexed_solutions = tuple(enumerate(execution.solutions))
+        ordered_solutions = (
+            tuple(
+                sorted(
+                    indexed_solutions,
+                    key=lambda value: (
+                        _geometric_certification_group_key(value[1]),
+                        value[1].candidate.digest,
+                    ),
+                )
+            )
+            if first_certified_lane_authority
+            else indexed_solutions
+        )
+        certified_geometric_group: tuple[object, ...] | None = None
+        processed_geometric_candidates = 0
+        for solution_index, solution in ordered_solutions:
             if deadline_reached_after_lane:
                 break
+            geometric_group = _geometric_certification_group_key(
+                solution
+            )
+            if (
+                certified_geometric_group is not None
+                and geometric_group != certified_geometric_group
+            ):
+                break
+            processed_geometric_candidates += 1
             placements = solution.placements
             if not internal_variants:
                 placements = _decorate_canonical_placements(
@@ -1297,6 +1324,12 @@ def _solve_minimal_layout_once(
                     "propagation_id": lane.propagation_id,
                     "search_variant": lane.search_variant,
                     "translation_id": translation_id,
+                    "geometric_certification_group_authority": (
+                        first_certified_lane_authority
+                    ),
+                    "geometric_certification_group_key": list(
+                        geometric_group
+                    ),
                     "frontier_source": frontier_source,
                     "ordered_frontier_digests": [
                         {"container_group_id": key, "digest": value}
@@ -1333,6 +1366,8 @@ def _solve_minimal_layout_once(
                         rank_key=_proposal_rank_key(certified),
                     )
                 )
+                if first_certified_lane_authority:
+                    certified_geometric_group = geometric_group
                 break
 
         deadline_reached_after_lane = (
@@ -1359,6 +1394,24 @@ def _solve_minimal_layout_once(
                 "telemetry": telemetry,
                 "geometric_solution_count": len(execution.solutions),
                 "certified_candidate_count": len(proposals) - certified_before,
+                "geometric_certification_group_authority": (
+                    first_certified_lane_authority
+                ),
+                "geometric_rank_group_count": len(
+                    {
+                        _geometric_certification_group_key(value)
+                        for value in execution.solutions
+                    }
+                ),
+                "certified_geometric_group_key": (
+                    list(certified_geometric_group)
+                    if certified_geometric_group is not None
+                    else []
+                ),
+                "geometric_candidate_count_skipped_after_authority": (
+                    len(ordered_solutions)
+                    - processed_geometric_candidates
+                ),
                 "rejection_code_counts": dict(sorted(lane_rejections.items())),
                 "deterministic_digest": execution.deterministic_digest,
             }
@@ -1446,6 +1499,9 @@ def _solve_minimal_layout_once(
         "first_certified_lane_authority": (
             first_certified_lane_authority
         ),
+        "first_certified_geometric_group_authority": (
+            first_certified_lane_authority
+        ),
         "skipped_lane_ids": list(skipped_lane_ids),
         "scip_fallback_invoked": bool(
             external_lane_report is not None
@@ -1464,7 +1520,7 @@ def _solve_minimal_layout_once(
                         "certified_witness_incumbent_preserved_after_lane_search"
                         if witness_selected
                         else (
-                            "first_certified_lane_completed"
+                            "first_certified_geometric_group_completed"
                             if first_certified_lane_authority
                             else "bounded_lane_prefix_completed"
                         )
@@ -1536,7 +1592,7 @@ def _solve_minimal_layout_once(
             "translation_id": selected.translation_id,
             "placement_digest": selected.certified.placement_digest,
             "statement": (
-                "best_certified_proposal_from_first_certified_lane_within_budget"
+                "best_certified_proposal_from_first_geometric_group_of_first_lane_within_budget"
                 if first_certified_lane_authority
                 else "best_certified_proposal_found_within_budget"
             ),
@@ -3104,6 +3160,49 @@ def _telemetry_payload(
             execution.remaining_best_participant_ids
         ),
     }
+
+
+def _geometric_certification_group_key(
+    solution: Free3DBeamSolution,
+) -> tuple[object, ...]:
+    """Rank exact beam geometries before any expensive flat certification."""
+
+    placements = solution.placements
+    metrics = _placement_cluster_metrics(placements)
+    floor_z = min(
+        (value.origin_mm[2] for value in placements),
+        default=0.0,
+    )
+    containers = tuple(
+        value for value in placements if value.role == "container"
+    )
+    elevated = tuple(
+        value
+        for value in containers
+        if value.origin_mm[2] > floor_z + _EPSILON
+    )
+    minimum_support = min(
+        (value.support_coverage_ratio for value in placements),
+        default=1.0,
+    )
+    return (
+        len(elevated),
+        _round(sum(value.origin_mm[2] for value in containers)),
+        _round(
+            sum(
+                value.world_size_mm[0]
+                * value.world_size_mm[1]
+                * value.world_size_mm[2]
+                for value in elevated
+            )
+        ),
+        _round(metrics["major_span_mm"] * metrics["minor_span_mm"]),
+        _round(metrics["volume_mm3"]),
+        _round(metrics["internal_gap_mm3"]),
+        _round(metrics["height_mm"]),
+        len(solution.empty_spaces),
+        -_round(minimum_support),
+    )
 
 
 def _proposal_rank_key(

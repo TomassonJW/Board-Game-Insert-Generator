@@ -42,6 +42,9 @@ Statut : `P64-L09U-R8-V-human-positive-partial`,
   inchangé.
 - La préparation unique des bornes de collision plates réduit encore ces
   temps à `8,916 s` et `8,240 s`, sans changement de résultat.
+- Le premier groupe géométrique entièrement certifié ramène finalement les
+  temps à `3,874 s` et `4,052 s` : 12 complétions beam inchangées, 2
+  candidats certifiés, zéro SCIP, digest `a3ef…bc46`.
 - La fin de front Normal est explicitement rejetée : elle atteint `6,618 s`
   mais change le digest en `269f…009`.
 - Le GO autonome va jusqu'à une nouvelle candidate Fusion installée et une

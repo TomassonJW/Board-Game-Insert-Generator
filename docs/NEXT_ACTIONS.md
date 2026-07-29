@@ -36,18 +36,16 @@ R9-C a maintenant intégré :
 
 Mesures orchestrées :
 
-- `CasLimite02+` : `8,916 s`, une lane, zéro SCIP ;
-- `CasLimite02++` : `8,240 s`, une lane, zéro SCIP ;
+- `CasLimite02+` : `3,874 s`, une lane, zéro SCIP ;
+- `CasLimite02++` : `4,052 s`, une lane, zéro SCIP ;
 - digest `a3ef…bc46` conservé.
 
 Action immédiate :
 
-1. fermer seulement le coût plat résiduel si un incrément exact reste
-   raisonnable ;
-2. rejouer les deux projets de bout en bout ;
-3. vérifier géométrie, finalisation, CAD IR, plan Fusion et matérialisation ;
-4. lancer la suite autorisée complète ;
-5. préparer et installer la candidate R9-D.
+1. rejouer les deux projets de bout en bout ;
+2. vérifier géométrie, finalisation, CAD IR, plan Fusion et matérialisation ;
+3. lancer la suite autorisée complète ;
+4. préparer et installer la candidate R9-D.
 
 Premier gain acquis avant routage :
 
