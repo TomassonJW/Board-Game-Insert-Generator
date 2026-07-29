@@ -26,10 +26,12 @@
   prouve `0 mm³`, `0` corps, `0` union, `0` support et `0` coupe positifs liés
   aux éléments plats ; toute compensation Z est rejetée.
 - `C-RELEASE` : 0.1.78 `human-KO`, `do-not-run`; R8-A `done-diagnostic`,
-  R8-B `done-architecture`, R8-C à R8-F `automated-validated`, R8-G `ready`.
+  R8-B `done-architecture`, R8-C à R8-F `automated-validated`; candidate
+  0.1.79 préparée mais pas encore installée.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : R8-G, suite autorisée, candidate et installation.
+Prochaine frontière : R8-G, suite autorisée, commit de candidate et
+installation.
 
 ### Historique R7 clôturé en human-KO
 

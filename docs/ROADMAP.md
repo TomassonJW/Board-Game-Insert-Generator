@@ -18,9 +18,10 @@ P64-L09U-R7-V human-KO 0.1.78
   -> R8-B ADR pipeline strictement soustractif [done]
   -> R8-C calcul minimal séparé [done]
   -> R8-D finalisation des conteneurs [done]
-  -> R8-E encastrements par coupes seulement [ready]
-  -> R8-F fidélité et régressions de bout en bout
-  -> R8-G candidate, installation et nouvelle gate humaine
+  -> R8-E encastrements par coupes seulement [done]
+  -> R8-F fidélité et régressions de bout en bout [done]
+  -> R8-G candidate 0.1.79 [prepared-not-installed]
+  -> P64-L09U-R8-V gate Fusion humaine
 ```
 
 Le futur placement manuel des plateaux/livrets reste compatible avec les

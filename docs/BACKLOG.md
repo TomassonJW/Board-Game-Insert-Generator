@@ -76,9 +76,13 @@
 
 ### P64-L09U-R8-G — Candidate et nouvelle gate humaine
 
-- Statut : `ready`.
-- Suite autorisée, intégration directe, installation automatique.
+- Statut : `in-progress-candidate-prepared-not-installed`.
+- Candidate 0.1.79, préflight et préparateur créés.
+- Préparateur à blanc `151/151`, deux replays personnels en lecture seule,
+  préflight `5c251f13...ac55a`.
+- Suite autorisée, intégration directe et installation automatique restantes.
 - La dernière validation reste humaine.
+- Preuve : `docs/P64_L09U_R8_0179_CORRECTIVE_EVIDENCE.md`.
 
 Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.

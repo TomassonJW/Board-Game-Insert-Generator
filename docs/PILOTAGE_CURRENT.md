@@ -63,8 +63,13 @@
 - `CasLimite02+` passe en lecture seule avec `20` opérations identiques ;
   `CasLimite02++` passe avec `23` opérations et `2/4/6 mm`.
 - Les SHA personnels restent inchangés ; la validation ciblée passe `302/302`.
-- R8-G est maintenant la mission unique `ready` : suite autorisée, candidate,
-  intégration, installation automatique et recette humaine finale.
+- R8-G est en cours : la candidate 0.1.79, son préflight et son préparateur
+  sont prêts, mais l’add-in n’est pas encore installé.
+- Le préparateur à blanc passe `151/151` tests ciblés et deux replays
+  personnels strictement en lecture seule ; le préflight vaut
+  `5c251f13...ac55a`.
+- Il reste à exécuter la suite autorisée, figer et intégrer le commit de
+  candidate, installer l’add-in automatiquement, puis ouvrir la gate humaine.
 - Les acquis R6/R7 restent à préserver : profondeurs, accès, parois minimales,
   ordre automatique, grille `0,1 mm`, BRep transitoire et projets personnels en
   lecture seule.
@@ -81,7 +86,9 @@ Autorités R8 :
 - `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md` ;
-- `docs/P64_L09U_R8_F_END_TO_END_FIDELITY_EVIDENCE.md`.
+- `docs/P64_L09U_R8_F_END_TO_END_FIDELITY_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_0179_CORRECTIVE_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_V_0179_FUSION_GATE_RECIPE.md`.
 
 ### Historique R7 clôturé en human-KO
 

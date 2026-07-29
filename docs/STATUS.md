@@ -10,7 +10,8 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
 `P64-L09U-R8-C-automated-validated`,
 `P64-L09U-R8-D-automated-validated`,
 `P64-L09U-R8-E-automated-validated`,
-`P64-L09U-R8-F-automated-validated`, `P64-L09U-R8-G-ready`,
+`P64-L09U-R8-F-automated-validated`,
+`P64-L09U-R8-G-candidate-prepared-not-installed`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.78 est `human-KO`, `do-not-run`.
@@ -70,7 +71,14 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
   tous les comptes aperçu/CAD IR/Fusion/BRep sont identiques.
 - Les SHA personnels sont inchangés avant/après.
 - Validation R8-F : `302/302` tests ciblés.
-- R8-G doit maintenant exécuter la suite autorisée et installer la candidate.
+- R8-G prépare la candidate 0.1.79 avec un préflight strict et un préparateur
+  automatique.
+- Préparateur à blanc : `151/151`, deux replays personnels en lecture seule,
+  SHA contrôlés avant/après, aucune écriture AppData.
+- Préflight : `5c251f13...ac55a`, plan CAD, certificat Fusion et intervalles
+  BRep identiques, compteurs positifs plats tous nuls.
+- La suite autorisée, le commit de candidate et l’installation restent à
+  exécuter avant la gate humaine.
 - Les acquis de profondeur, accès, parois, ordre, grille `0,1 mm` et BRep
   transitoire restent obligatoires.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
@@ -93,6 +101,8 @@ Preuve R8-E :
 `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md`.
 Preuve R8-F :
 `docs/P64_L09U_R8_F_END_TO_END_FIDELITY_EVIDENCE.md`.
+Preuve candidate :
+`docs/P64_L09U_R8_0179_CORRECTIVE_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

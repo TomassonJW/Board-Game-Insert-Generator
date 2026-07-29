@@ -8,6 +8,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 from time import perf_counter
+from typing import Mapping
 
 from board_game_insert_generator.contextual_local_analysis import (
     IncrementalLocalAnalysisEngine,
@@ -31,6 +32,18 @@ BASE_FILENAMES = {
     "case02_plus": "CasLimite02+.bgig.json",
     "case02_plus_plus": "CasLimite02++.bgig.json",
 }
+EXPECTED_SOURCE_SHA256 = {
+    "case02_plus": (
+        "5e84fe6f5c0b3e5f046201d442c414504dd95d4db8e711169a2624485466d7dc"
+    ),
+    "case02_plus_plus": (
+        "83e9e90a6bfd86b18d3a157077a0e63dc2f543ddab626adb2151e269e01d9743"
+    ),
+}
+EXPECTED_STRICT_LOCAL_DEPTHS_MM = {
+    "case02_plus": [4.0, 6.0],
+    "case02_plus_plus": [2.0, 4.0, 6.0],
+}
 
 
 def _file_digest(path: Path) -> str:
@@ -39,6 +52,24 @@ def _file_digest(path: Path) -> str:
 
 def _load_raw(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
+def _mapping(value: object, label: str) -> Mapping[str, object]:
+    if not isinstance(value, Mapping):
+        raise RuntimeError(f"{label} must be an object.")
+    return value
+
+
+def _mappings(value: object, label: str) -> tuple[Mapping[str, object], ...]:
+    if not isinstance(value, (list, tuple)):
+        raise RuntimeError(f"{label} must be a list.")
+    result = tuple(
+        _mapping(item, f"{label}[]")
+        for item in value
+    )
+    if len(result) != len(value):
+        raise RuntimeError(f"{label} contains an invalid item.")
+    return result
 
 
 def _run_case(
@@ -102,6 +133,128 @@ def _run_case(
         cad["cad_ir"],
         FUSION_GENERATION_MODE_COMPACT_ONLY,
     )
+    flat_plan = _mapping(
+        plan.get("flat_inset_subtraction_plan"),
+        f"{case_id}: flat inset subtraction plan",
+    )
+    flat_certificate = _mapping(
+        flat_plan.get("certificate"),
+        f"{case_id}: subtractive certificate",
+    )
+    flat_operations = _mappings(
+        flat_plan.get("operations"),
+        f"{case_id}: flat inset operations",
+    )
+    cad_ir = _mapping(cad.get("cad_ir"), f"{case_id}: CAD IR")
+    cad_metadata = _mapping(
+        cad_ir.get("metadata"),
+        f"{case_id}: CAD IR metadata",
+    )
+    cad_box_fill = _mapping(
+        cad_metadata.get("box_fill_plan"),
+        f"{case_id}: CAD IR box fill plan",
+    )
+    cad_flat_plan = _mapping(
+        cad_box_fill.get("flat_inset_subtraction_plan"),
+        f"{case_id}: CAD IR flat inset subtraction plan",
+    )
+    cad_flat_certificate = _mapping(
+        cad_box_fill.get("subtractive_flat_inset_certificate"),
+        f"{case_id}: CAD IR subtractive certificate",
+    )
+    fusion_flat_cuts = tuple(
+        value
+        for value in fusion.cavity_cuts
+        if value.cavity_source
+        in {"top_inset_reservation", "top_inset_grip"}
+    )
+    source_intervals = tuple(
+        sorted(
+            (
+                str(operation["id"]),
+                float(
+                    _mapping(
+                        operation.get("local_interval_z_mm"),
+                        f"{case_id}: source interval",
+                    )["bottom"]
+                ),
+                float(
+                    _mapping(
+                        operation.get("local_interval_z_mm"),
+                        f"{case_id}: source interval",
+                    )["top"]
+                ),
+            )
+            for operation in flat_operations
+        )
+    )
+    fusion_intervals = tuple(
+        sorted(
+            (
+                value.cavity_id,
+                float(value.local_interval_bottom_z_mm),
+                float(value.local_interval_top_z_mm),
+            )
+            for value in fusion_flat_cuts
+        )
+    )
+    brep_intervals = tuple(
+        sorted(
+            (
+                value.cavity_id,
+                float(
+                    value.to_dict()["brep_tool_interval_z_mm"]["bottom"]
+                ),
+                float(
+                    value.to_dict()["brep_tool_interval_z_mm"]["top"]
+                ),
+            )
+            for value in fusion_flat_cuts
+        )
+    )
+    strict_zero_fields = {
+        "flat_positive_volume_mm3": 0.0,
+        "flat_positive_body_count": 0,
+        "flat_positive_union_count": 0,
+        "flat_positive_operation_count": 0,
+        "new_printable_body_count_attributed_to_flat_items": 0,
+    }
+    if (
+        flat_certificate.get("certified") is not True
+        or flat_certificate.get("positive_geometry_unchanged") is not True
+        or any(
+            flat_certificate.get(field) != expected
+            for field, expected in strict_zero_fields.items()
+        )
+        or any(
+            operation.get("boolean_operation") != "difference"
+            or operation.get("creates_positive_geometry") is not False
+            or operation.get("creates_printable_body") is not False
+            or operation.get("creates_union") is not False
+            for operation in flat_operations
+        )
+        or cad_flat_plan != flat_plan
+        or cad_flat_certificate != flat_certificate
+        or fusion.subtractive_flat_inset_certificate
+        != flat_certificate
+        or source_intervals != fusion_intervals
+        or source_intervals != brep_intervals
+    ):
+        raise RuntimeError(
+            f"{case_id}: strict subtractive flat inset contract diverges"
+        )
+    expected_depths = EXPECTED_STRICT_LOCAL_DEPTHS_MM.get(case_id)
+    observed_depths = list(
+        flat_certificate.get(
+            "observed_combined_local_depths_mm",
+            (),
+        )
+    )
+    if expected_depths is not None and observed_depths != expected_depths:
+        raise RuntimeError(
+            f"{case_id}: expected strict local depths "
+            f"{expected_depths}, got {observed_depths}"
+        )
     if (
         certificate.get("certified") is not True
         or certificate.get("printable_residual_volume_mm3") != 0.0
@@ -250,6 +403,14 @@ def _run_case(
         "join_feature_batch_count": fusion.additive_prism_join_batch_count,
         "cut_count": len(fusion.cavity_cuts),
         "cut_feature_batch_count": fusion.cavity_cut_batch_count,
+        "strict_flat_inset_operation_count": len(flat_operations),
+        "strict_flat_inset_intervals_identical": True,
+        "strict_flat_inset_certificate": {
+            **strict_zero_fields,
+            "certified": True,
+            "positive_geometry_unchanged": True,
+            "observed_combined_local_depths_mm": observed_depths,
+        },
         "calculation_observed_ms": calculation_ms,
         "finishing_observed_ms": finishing_ms,
     }
@@ -285,6 +446,12 @@ def run_local_replay(
             "read_only": True,
         }
     before = {case_id: _file_digest(path) for case_id, path in paths.items()}
+    for case_id, digest in before.items():
+        expected = EXPECTED_SOURCE_SHA256.get(case_id)
+        if expected is not None and digest.lower() != expected:
+            raise RuntimeError(
+                f"{case_id}: unexpected personal source SHA-256 before replay"
+            )
     raw = {case_id: _load_raw(path) for case_id, path in paths.items()}
     cases = dict(raw)
     results = [
@@ -298,6 +465,12 @@ def run_local_replay(
     after = {case_id: _file_digest(path) for case_id, path in paths.items()}
     if before != after:
         raise RuntimeError("A local source project changed during replay.")
+    for case_id, digest in after.items():
+        expected = EXPECTED_SOURCE_SHA256.get(case_id)
+        if expected is not None and digest.lower() != expected:
+            raise RuntimeError(
+                f"{case_id}: unexpected personal source SHA-256 after replay"
+            )
     return {
         "schema_version": "bgig.p64_l09u_r4_local_replay.v2",
         "status": "passed",

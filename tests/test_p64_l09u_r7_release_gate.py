@@ -47,7 +47,7 @@ class P64L09UR7ReleaseGateTests(unittest.TestCase):
         preparer = (
             ROOT / "scripts/fusion/prepare_p64_l09u_r7v_gate.ps1"
         ).read_text(encoding="utf-8")
-        self.assertEqual(manifest["version"], "0.1.78")
+        self.assertEqual(manifest["version"], "0.1.79")
         for marker in (
             'expectedVersion -ne "0.1.78"',
             "p64_l09u_r7v_preflight.py",

@@ -34,6 +34,21 @@ candidate installée.
 
 `fusion-validated=false`, `print-validated=false`.
 
+## P64-L09U-R8-V — gate 0.1.79 en préparation
+
+Statut : `prepared-not-installed`, `do-not-run-yet`,
+`fusion-validated=false`, `print-validated=false`.
+
+La candidate 0.1.79 et sa recette sont prêtes. Le préparateur à blanc passe
+`151/151` tests ciblés, deux replays personnels en lecture seule et le
+préflight strict `5c251f13...ac55a`.
+
+La gate ne sera ouverte qu’après la suite globale autorisée, l’intégration du
+commit de candidate et la vérification de l’installation locale.
+
+Recette :
+`docs/P64_L09U_R8_V_0179_FUSION_GATE_RECIPE.md`.
+
 ### Préparation R7 historique
 
 ## P64-L09U-R7-V — préparation historique de la gate 0.1.78

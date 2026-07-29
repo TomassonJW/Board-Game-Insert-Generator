@@ -39,7 +39,7 @@ class P64L09SFEndToEndHardeningTests(unittest.TestCase):
         cls.manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
     def test_0166_is_distinct_from_frozen_human_ko_0165(self) -> None:
-        self.assertEqual(self.manifest["version"], "0.1.78")
+        self.assertEqual(self.manifest["version"], "0.1.79")
         self.assertEqual(self.summary["addin_version"], "0.1.69")
         self.assertIn('expectedVersion -ne "0.1.69"', self.preparer)
         self.assertIn("calculate in Normal", self.preparer)

@@ -75,12 +75,14 @@ R8-F est terminée :
 - les deux SHA personnels restent inchangés ;
 - validation ciblée `302/302`.
 
-R8-G est la seule mission `ready` :
+R8-G est en cours :
 
-- exécuter exactement la suite autorisée en excluant les douze modules
-  interdits documentés ;
-- construire et vérifier la nouvelle candidate Fusion ;
-- intégrer et pousser `main` ;
+- candidate 0.1.79, préflight et préparateur créés ;
+- préparateur à blanc `151/151`, deux replays personnels en lecture seule ;
+- préflight `5c251f13...ac55a`, compteurs positifs plats tous nuls ;
+- exécuter exactement la suite autorisée en excluant avant import les douze
+  modules nommés dans la preuve corrective ;
+- figer le commit de candidate, intégrer et pousser `main` ;
 - installer automatiquement l’add-in et ses réglages locaux ;
 - livrer uniquement la recette humaine finale.
 
@@ -93,7 +95,8 @@ Preuves :
 - `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md` ;
-- `docs/P64_L09U_R8_F_END_TO_END_FIDELITY_EVIDENCE.md`.
+- `docs/P64_L09U_R8_F_END_TO_END_FIDELITY_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_0179_CORRECTIVE_EVIDENCE.md`.
 
 Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
