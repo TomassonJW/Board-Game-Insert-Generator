@@ -1,41 +1,46 @@
 # Next Actions
 
 <!-- P64-L09W-NEXT -->
-## Action courante : P64-L09W-B — générateur produit et oracles
+## Action courante : P64-L09W-C — campagne de référence ouverte
 
 R9-V est close en `human-positive` sur Fusion 0.1.80.
 `fusion-validated=true`, `print-validated=false`.
 
-P64-L09W-A est terminée. Sa baseline autoritative mesure 19 solutions certifiées
-sur 101 vérités positives reconstructibles. Les anciennes fixtures ne couvrent
-aucun élément plat sous la sémantique 0.1.80, les anciens holdouts sont consommés
-et les contrôles négatifs historiques ne sont pas exprimables sans ambiguïté de
-rotation.
+P64-L09W-B est terminée et automatisée-validée :
+
+- 400 positifs ouverts : 240 `discovery/common`, 160 `tuning/stress` ;
+- 400 positifs privés : 240 `common`, 160 `stress` ;
+- 40 contrôles impossibles à borne formelle ;
+- minima pairwise satisfaits et splits disjoints ;
+- holdout scellé, `opening_count=0`, `solver_invocation_count=0`.
 
 Action immédiate unique :
 
-1. implémenter ADR-0107 sans modifier le solveur ;
-2. générer des positifs faisables par construction puis recertifier leur témoin
-   avec le certificat produit ;
-3. générer séparément des contrôles impossibles dont la preuve reste valide
-   avec les rotations réellement exposées ;
-4. couvrir les densités 30 %, 65 %, 85 % et 95 %, les cardinalités demandées,
-   0 à 10 éléments plats, les couches et les séquences d’édition ;
-5. publier les splits régression, discovery et tuning ;
-6. construire et sceller le nouveau holdout sans l’exécuter ;
-7. tester les invariants de reproductibilité, de vérité, de non-chevauchement
-   et d’absence de fuite du holdout.
+1. définir le résultat unitaire et les checkpoints de campagne sans changer le
+   solveur ;
+2. adapter le runner reprenable existant au parcours produit courant ;
+3. exécuter 0.1.80 uniquement sur les 400 cas ouverts, jamais sur le holdout ;
+4. publier les statuts honnêtes, temps, mémoire, routes, compteurs, certificat,
+   finalisation et CAD IR séparément ;
+5. agréger taux et `p50/p95/p99` par strate et par axe sans masquer les cas
+   censurés ;
+6. attribuer les pertes par cause mesurée et comparer les hypothèses selon
+   simplicité, maintenance, testabilité, gain probable et risque fonctionnel ;
+7. sélectionner au plus une première optimisation causale pour P64-L09W-D, ou
+   conclure honnêtement qu’aucun changement n’est justifié.
 
-P64-L09W-C ne commence qu’après cette preuve. Aucun seuil de réussite ne peut
-être revendiqué depuis la baseline A.
+Le holdout privé reste fermé jusqu’à P64-L09W-E. Aucun seuil 95 % ou 99 % ne
+peut être revendiqué depuis les splits ouverts.
 
 Handoff :
 `docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md`.
 
-Contrat et preuve A :
+Contrats et preuves :
 
 - `docs/P64_L09W_A_SOLVER_ROBUSTNESS_MEASUREMENT_CONTRACT.md` ;
 - `docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md` ;
+- `docs/P64_L09W_B_PRODUCT_CORPUS_CONTRACT.md` ;
+- `docs/P64_L09W_B_PRODUCT_CORPUS_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md`.
 
 ### Historique R9-V clos positivement

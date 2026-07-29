@@ -43,7 +43,9 @@ class P64L09WGeneralSolverRobustnessHandoffTests(unittest.TestCase):
         self.assertIn("Il est interdit", handoff)
         self.assertIn("tous les cas possibles", handoff)
 
-    def test_current_pilotage_prioritizes_audit_before_optimization(self) -> None:
+    def test_current_pilotage_prioritizes_open_campaign_before_optimization(
+        self,
+    ) -> None:
         pilotage = {
             path: (ROOT / path).read_text(encoding="utf-8")
             for path in (
@@ -59,13 +61,18 @@ class P64L09WGeneralSolverRobustnessHandoffTests(unittest.TestCase):
 
         for text in pilotage.values():
             self.assertIn("P64-L09W", text)
-        self.assertIn("P64-L09W-A", pilotage["docs/NEXT_ACTIONS.md"])
+        self.assertIn("P64-L09W-B", pilotage["docs/NEXT_ACTIONS.md"])
+        self.assertIn("P64-L09W-C", pilotage["docs/NEXT_ACTIONS.md"])
+        self.assertIn(
+            "jamais sur le holdout",
+            pilotage["docs/NEXT_ACTIONS.md"],
+        )
         self.assertIn(
             "aucune gate humaine ouverte",
             pilotage["docs/HUMAN_GATES.md"],
         )
         self.assertIn(
-            "sans changement solveur",
+            "Le nouveau holdout reste fermé",
             pilotage["docs/CAPABILITY_MAP.md"],
         )
 

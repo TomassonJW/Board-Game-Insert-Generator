@@ -3,10 +3,11 @@
 <!-- P64-L09W-STATUS -->
 ## P64-L09W — robustesse générale du solveur
 
-Date : 2026-07-29.
+Date : 2026-07-30.
 
 Statut : `priority-active`, `P64-L09W-A-complete`,
-`P64-L09W-B-ready`, `automated-baseline-observed`.
+`P64-L09W-B-complete`, `P64-L09W-C-ready`,
+`automated-baseline-observed`, `holdout-sealed`.
 
 - R9-V est `human-positive` sur Fusion 0.1.80 :
   `fusion-validated=true`, `print-validated=false`.
@@ -38,15 +39,29 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
   courantes. Ces seuils ne promettent rien hors du domaine déclaré.
 - Validation A : gate réelle Python 3.14 + SCIP 10.0.2, puis 1 044 tests
   autorisés passés avec 1 skip prévu.
-- Aucune optimisation n’est sélectionnée depuis cette baseline. P64-L09W-B est
-  la seule mission `ready`.
+- P64-L09W-B construit 400 positifs ouverts, 400 positifs privés et
+  40 contrôles négatifs sans appeler le solveur évalué.
+- Les minima pairwise ouverts et privés sont satisfaits ; les digests de
+  recette, projet, témoin et édition sont disjoints entre les splits.
+- Le manifest public référence la baseline `regression` A et vaut
+  `04dd2bf5...5840`. Le sidecar privé vaut
+  `18bd4010...ec5a`, reste à `opening_count=0` et n’est pas intégré dans Git.
+- Validation B : test de reprise `1/1`, suite ciblée `10/10`, gate L09W
+  `21/21`, documents `11/11`, vérification finale des engagements et suite
+  complète `1054/1054` passées avec `1` skip prévu.
+- Aucune optimisation n’est encore sélectionnée. P64-L09W-C est la seule
+  mission `ready` ; le holdout reste fermé jusqu’à E.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.
 
-Contrat :
-`docs/P64_L09W_A_SOLVER_ROBUSTNESS_MEASUREMENT_CONTRACT.md`.
+Contrats :
 
-Preuve :
-`docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md`.
+- `docs/P64_L09W_A_SOLVER_ROBUSTNESS_MEASUREMENT_CONTRACT.md` ;
+- `docs/P64_L09W_B_PRODUCT_CORPUS_CONTRACT.md`.
+
+Preuves :
+
+- `docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md` ;
+- `docs/P64_L09W_B_PRODUCT_CORPUS_EVIDENCE.md`.
 
 ### Historique R9 clos positivement
 

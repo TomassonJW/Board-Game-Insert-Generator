@@ -19,16 +19,18 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-B — Générateur produit, oracles et holdout neuf
 
-- Statut : `ready`, dépendance P64-L09W-A terminée.
+- Statut : `done`, `automated-validated`, dépendance P64-L09W-A terminée.
 - Cas positifs faisables par construction et témoins recertifiés.
 - Cas négatifs avec preuve formelle séparée.
 - Densités proches de 30 %, 65 %, 85 % et 95 %, cardinalités variées,
   dimensions hétérogènes et 0 à 10 plateaux/livrets.
 - Splits régression, discovery, tuning et holdout fermé.
+- Preuve :
+  `docs/P64_L09W_B_PRODUCT_CORPUS_EVIDENCE.md`.
 
 ### P64-L09W-C — Campagne de référence
 
-- Statut : `planned`, dépend de P64-L09W-B.
+- Statut : `ready`, dépendance P64-L09W-B terminée.
 - Runner borné, reprenable, déterministe et sans double exécution.
 - Taux de succès et temps p50/p95/p99 par strate.
 - Calcul, certification, finalisation, CAD IR et matérialisation séparés.

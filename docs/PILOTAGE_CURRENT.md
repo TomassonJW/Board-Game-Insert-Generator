@@ -26,9 +26,15 @@
 - La seule correction produit de A stabilise le digest SCIP en retirant le
   temps restant volatil de la charge certifiable. Elle ne change ni recherche,
   ni budget, ni géométrie, ni valeur physique.
-- P64-L09W-B est l’unique mission `ready` : construire le générateur produit,
-  les oracles indépendants, les contrôles négatifs compatibles avec le produit,
-  les splits ouverts et le holdout neuf fermé définis par ADR-0107.
+- P64-L09W-B est terminée : 400 positifs ouverts, 400 positifs privés et
+  40 contrôles négatifs sont reconstructibles, les minima pairwise sont
+  satisfaits et les splits sont disjoints.
+- Le holdout neuf est scellé sous l’engagement
+  `18bd4010...ec5a`, sans recette privée dans le manifest public,
+  `opening_count=0` et `solver_invocation_count=0`.
+- P64-L09W-C est l’unique mission `ready` : construire le runner produit
+  borné, exécuter seulement `discovery` et `tuning` sur 0.1.80, mesurer les
+  phases aval séparément et attribuer les pertes avant toute optimisation.
 - Le GO autonome reste acquis. Aucune gate humaine n’est ouverte avant une
   éventuelle candidate produit en P64-L09W-F.
 
@@ -36,6 +42,8 @@ Autorités :
 
 - `docs/P64_L09W_A_SOLVER_ROBUSTNESS_MEASUREMENT_CONTRACT.md` ;
 - `docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md` ;
+- `docs/P64_L09W_B_PRODUCT_CORPUS_CONTRACT.md` ;
+- `docs/P64_L09W_B_PRODUCT_CORPUS_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
 - `docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md` ;
 - `docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md` ;
