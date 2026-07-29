@@ -8,27 +8,35 @@
   `print-validated=false`.
 - Les résultats fonctionnels et la récupération de performance R9 sont acquis.
   Aucun temps humain séparé n’a été fourni ; ne pas en inventer.
-- La nouvelle limite prioritaire est la robustesse générale : des projets
-  réalisables mais différents des deux cas R9 peuvent rester sans solution
-  après une modification de paramètres.
-- P64-L09W passe avant P64-L10 et la roadmap d’origine.
-- Le dépôt possède déjà des corpus, oracles, runners et campagnes L05D à L08.
-  Les anciens holdouts sont consommés et ne constituent pas un nouveau contrôle
-  fermé.
-- La première mission unique est P64-L09W-A : auditer la couverture existante,
-  définir le domaine supporté et les strates, puis mesurer la baseline 0.1.80
-  sur les fixtures déjà versionnées.
-- Aucun code solveur, nouveau corpus massif ou seuil de succès ne doit être
-  choisi avant cette attribution.
-- Le futur objectif `95 %` ou `99 %` doit être préenregistré sur un domaine,
-  une distribution et des limites déclarés. Il ne vaut jamais promesse sur
-  tous les placements 3D possibles.
-- Le GO autonome est acquis. La tâche neuve crée immédiatement un Goal Codex,
-  sans budget de tokens inventé, puis commence R9W-A sans redemander
-  d’autorisation.
+- P64-L09W-A est terminée : domaine, strates et gates sont préenregistrés,
+  la couverture historique est auditée et la baseline 0.1.80 est versionnée.
+- Sur 101 vérités positives reconstructibles, 19 solutions sont certifiées,
+  79 restent `bounded_unknown` et 3 sont non supportées. Ce taux de 18,8119 %
+  décrit uniquement les anciennes fixtures consommées ; il ne prédit pas le
+  futur domaine supporté.
+- Les 147 projets produit reconstructibles possèdent tous zéro élément plat.
+  Les 165 autres entrées ont dérivé sous la sémantique courante, principalement
+  à cause des réservations contraignantes historiques.
+- Les 42 contrôles historiquement impossibles ne sont pas exécutables comme
+  preuves négatives : leur oracle suppose une rotation interdite que
+  `project.v1` ne sait pas exprimer.
+- Parmi 21 calculs certifiés et recertifiés, 2 seulement atteignent une CAD IR ;
+  19 sont refusés immédiatement par la finalisation, sans timeout ni preuve
+  d’impossibilité.
+- La seule correction produit de A stabilise le digest SCIP en retirant le
+  temps restant volatil de la charge certifiable. Elle ne change ni recherche,
+  ni budget, ni géométrie, ni valeur physique.
+- P64-L09W-B est l’unique mission `ready` : construire le générateur produit,
+  les oracles indépendants, les contrôles négatifs compatibles avec le produit,
+  les splits ouverts et le holdout neuf fermé définis par ADR-0107.
+- Le GO autonome reste acquis. Aucune gate humaine n’est ouverte avant une
+  éventuelle candidate produit en P64-L09W-F.
 
 Autorités :
 
+- `docs/P64_L09W_A_SOLVER_ROBUSTNESS_MEASUREMENT_CONTRACT.md` ;
+- `docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
 - `docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md` ;
 - `docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md` ;
 - `docs/P64_L06B_BENCHMARK_CORPUS_CONTRACT.md` ;

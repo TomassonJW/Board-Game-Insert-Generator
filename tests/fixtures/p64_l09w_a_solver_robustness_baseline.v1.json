@@ -1,0 +1,1537 @@
+{
+  "bindings": {
+    "baseline_checkpoint_digest": "bb2c8fb4c8d00667b67147c73828e559ecaf32b6fd8b64e3f5743877a6a1eb79",
+    "baseline_report_digest": "26aed0b36c47396ed54291193e89913c680f603c02090936fc4932e311987105",
+    "coverage_audit_digest": "5853a79412c8bb3341f34014131c299cdfaf2500b162a96c7e40891559f881cb",
+    "downstream_report_digest": "925fa00b22f6d9648a2ed3f52c80c381abbc937457d68dd94314337d2cefc15c",
+    "scip_integration_receipt_digest": "f218a566e8d033d49b0e89c4bb478837b5815e5334e3bda5d07c36ea99d9f2df"
+  },
+  "candidate": {
+    "attribution_fix": "stable_scip_model_digest_excludes_remaining_deadline",
+    "code_bundle_digest": "3c27badb9727071e38f9031b8a0435b00a85b2ec8236cef09d65bd3fd2c671bc",
+    "release_baseline": "0.1.80",
+    "runtime_artifact_digest": "be3b02bfe9591c72b7a25367e4b55aae8b08462ba543eff9a70d552229aff54a"
+  },
+  "core_only": {
+    "by_family": {
+      "access": {
+        "case_count": 4,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 4
+        }
+      },
+      "fragmentation": {
+        "case_count": 4,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 4
+        }
+      },
+      "layers": {
+        "case_count": 4,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 4
+        }
+      },
+      "many-assets": {
+        "case_count": 4,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 4
+        }
+      },
+      "many-containers": {
+        "case_count": 4,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 4
+        }
+      },
+      "mixed-extreme": {
+        "case_count": 4,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 4
+        }
+      },
+      "real-anonymized": {
+        "case_count": 5,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 4,
+          "unsupported": 1
+        }
+      },
+      "reservations": {
+        "case_count": 4,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 4
+        }
+      },
+      "support": {
+        "case_count": 4,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 4
+        }
+      },
+      "variants": {
+        "case_count": 4,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 4
+        }
+      }
+    },
+    "by_tier": {
+      "large": {
+        "case_count": 10,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 10
+        }
+      },
+      "negative": {
+        "case_count": 10,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 10
+        }
+      },
+      "reviewed-real": {
+        "case_count": 1,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "unsupported": 1
+        }
+      },
+      "small": {
+        "case_count": 10,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 10
+        }
+      },
+      "xl": {
+        "case_count": 10,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 10
+        }
+      }
+    },
+    "case_count": 41,
+    "product_path_complete": false,
+    "status_counts": {
+      "bounded_unknown": 40,
+      "unsupported": 1
+    },
+    "truth_pass_count": 10
+  },
+  "coverage": {
+    "audit_digest": "5853a79412c8bb3341f34014131c299cdfaf2500b162a96c7e40891559f881cb",
+    "box_axis_range_mm": [
+      5.1,
+      350.4
+    ],
+    "change_kinds": {
+      "full_rebuild": 20,
+      "internal_modification": 20,
+      "new_container": 20,
+      "none": 283
+    },
+    "container_count_range": [
+      1,
+      50
+    ],
+    "content_axis_range_mm": [
+      2.165,
+      162.5
+    ],
+    "content_quantity_range": [
+      2,
+      431
+    ],
+    "content_record_count_range": [
+      1,
+      189
+    ],
+    "density_targets": {
+      "ample": 108,
+      "dense": 108,
+      "missing": 23,
+      "nearly_saturated": 104
+    },
+    "direct_case_count_with_duplicates": 343,
+    "execution_modes": {
+      "cold": 313,
+      "incremental": 30
+    },
+    "family_counts": {
+      "few_containers_many_contents": 65,
+      "historical-regression": 23,
+      "incremental_then_cold": 60,
+      "many_containers_many_contents": 65,
+      "many_containers_one_content": 65,
+      "mixed_dense_simple_heterogeneous": 65
+    },
+    "feasible_outer_load_ratio_by_density": {
+      "ample": [
+        0.0,
+        0.451857798
+      ],
+      "dense": [
+        0.0,
+        0.788192315
+      ],
+      "nearly_saturated": [
+        0.0,
+        0.831362261
+      ]
+    },
+    "flat_item_count_distribution": {
+      "0": 172,
+      "1": 168,
+      "2": 3
+    },
+    "flat_item_count_range": [
+      0,
+      2
+    ],
+    "l06_generator_drift": {
+      "case_count": 192,
+      "changed_field_counts": {
+        "previous_project_digest": 18,
+        "project_digest": 94
+      },
+      "drifted_by_reservation_mode": {
+        "constraining": 94
+      },
+      "drifted_by_split": {
+        "discovery": 30,
+        "holdout": 30,
+        "tuning": 34
+      },
+      "drifted_case_count": 94
+    },
+    "l07_generator_drift": {
+      "case_count": 128,
+      "changed_field_counts": {
+        "previous_project_digest": 12,
+        "project_digest": 68
+      },
+      "drifted_by_reservation_mode": {
+        "constraining": 68
+      },
+      "drifted_by_split": {
+        "discovery": 34,
+        "tuning": 34
+      },
+      "drifted_case_count": 68
+    },
+    "l08_core_only": {
+      "case_count": 41,
+      "expected": {
+        "bounded_unknown": 1,
+        "feasible": 30,
+        "infeasible": 10
+      },
+      "families": {
+        "access": 4,
+        "fragmentation": 4,
+        "layers": 4,
+        "many-assets": 4,
+        "many-containers": 4,
+        "mixed-extreme": 4,
+        "real-anonymized": 5,
+        "reservations": 4,
+        "support": 4,
+        "variants": 4
+      },
+      "product_path_complete": false,
+      "splits": {
+        "discovery": 30,
+        "regression": 1,
+        "tuning": 10
+      },
+      "tiers": {
+        "large": 10,
+        "negative": 10,
+        "reviewed-real": 1,
+        "small": 10,
+        "xl": 10
+      }
+    },
+    "layer_targets": {
+      "1": 108,
+      "2": 125,
+      "3": 87,
+      "missing": 23
+    },
+    "minimum_body_axis_range_mm": [
+      3.4,
+      166.1
+    ],
+    "oracle_kinds": {
+      "feasible_by_construction": 233,
+      "historical": 23,
+      "proven_impossible_small_exact": 87
+    },
+    "reservation_modes": {
+      "absent": 158,
+      "constraining": 162,
+      "missing": 23
+    },
+    "rotation_policies": {
+      "forbidden_by_benchmark": 158,
+      "missing": 23,
+      "permitted": 162
+    },
+    "source_counts": {
+      "L05": 7,
+      "L06": 200,
+      "L07": 136
+    },
+    "split_counts": {
+      "discovery": 128,
+      "holdout": 64,
+      "regression": 23,
+      "tuning": 128
+    },
+    "unique_project_digest_count": 298
+  },
+  "date": "2026-07-29",
+  "discarded_measurement": {
+    "authoritative": false,
+    "reasons": [
+      "request identity differed between functional replays",
+      "finalization did not use the product default normal profile"
+    ],
+    "report_digest": "1ccda13782f859bb5122014f1824e5eec02a3eb749bbcc2f314c7b291b9a9c49"
+  },
+  "downstream": {
+    "cad_ir_attempt_count": 2,
+    "cad_ir_success_count": 2,
+    "calculation_recertified_count": 21,
+    "case_count": 21,
+    "finalization_deadline_reached_count": 0,
+    "finalization_proof_of_impossibility_count": 0,
+    "finalization_status_counts": {
+      "no_solution_within_budget": 19,
+      "solution_found": 2
+    },
+    "finalization_stop_reason_counts": {
+      "flat_inset_subtraction_plan_rejected": 19,
+      "validated_complete_proposal": 2
+    },
+    "materialization_measurement_count": 0,
+    "placement_match_count": 21
+  },
+  "evidence_digest": "f7be893292a64879cc752eba9b55902956a7479a9012610e0ffaa4d21101ec89",
+  "execution": {
+    "checkpoint_digest": "bb2c8fb4c8d00667b67147c73828e559ecaf32b6fd8b64e3f5743877a6a1eb79",
+    "core_result_count": 41,
+    "materialization_measured": false,
+    "platform": "win32",
+    "product_result_count": 147,
+    "python_version": "3.14.0",
+    "repeat_count": 2
+  },
+  "invariants": {
+    "epsilon_changed": false,
+    "fusion_materialization_invocation_count": 0,
+    "fusion_validated": true,
+    "grid_changed": false,
+    "historical_semantic_drift_executed": false,
+    "old_holdout_used_as_new_holdout": false,
+    "physical_value_changed": false,
+    "print_validated": false,
+    "r9_v_result_preserved": true,
+    "solver_budget_changed": false
+  },
+  "mission": "P64-L09W-A",
+  "preregistered_targets": {
+    "common_case_count": 240,
+    "common_certified_minimum": 238,
+    "common_certified_rate_minimum": 0.991667,
+    "false_impossible_maximum": 0,
+    "global_certified_minimum": 380,
+    "global_certified_rate_minimum": 0.95,
+    "new_holdout_positive_case_count": 400,
+    "uncertified_solution_maximum": 0
+  },
+  "product": {
+    "by_container_count": {
+      "1": {
+        "case_count": 2,
+        "certified_count": 2,
+        "certified_rate": 1.0,
+        "status_counts": {
+          "certified_solution": 2
+        }
+      },
+      "12": {
+        "case_count": 31,
+        "certified_count": 4,
+        "certified_rate": 0.129032,
+        "status_counts": {
+          "bounded_unknown": 16,
+          "certified_solution": 4,
+          "unsupported": 11
+        }
+      },
+      "18": {
+        "case_count": 19,
+        "certified_count": 2,
+        "certified_rate": 0.105263,
+        "status_counts": {
+          "bounded_unknown": 12,
+          "certified_solution": 2,
+          "unsupported": 5
+        }
+      },
+      "2": {
+        "case_count": 42,
+        "certified_count": 3,
+        "certified_rate": 0.071429,
+        "status_counts": {
+          "bounded_unknown": 25,
+          "certified_solution": 3,
+          "unsupported": 14
+        }
+      },
+      "30": {
+        "case_count": 6,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 4,
+          "unsupported": 2
+        }
+      },
+      "4": {
+        "case_count": 16,
+        "certified_count": 3,
+        "certified_rate": 0.1875,
+        "status_counts": {
+          "bounded_unknown": 8,
+          "certified_solution": 3,
+          "unsupported": 5
+        }
+      },
+      "50": {
+        "case_count": 7,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 5,
+          "unsupported": 2
+        }
+      },
+      "8": {
+        "case_count": 24,
+        "certified_count": 7,
+        "certified_rate": 0.291667,
+        "status_counts": {
+          "bounded_unknown": 11,
+          "certified_solution": 7,
+          "unsupported": 6
+        }
+      }
+    },
+    "by_contents_per_container_maximum": {
+      "1": {
+        "case_count": 38,
+        "certified_count": 9,
+        "certified_rate": 0.236842,
+        "status_counts": {
+          "bounded_unknown": 19,
+          "certified_solution": 9,
+          "unsupported": 10
+        }
+      },
+      "16": {
+        "case_count": 10,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 5,
+          "unsupported": 5
+        }
+      },
+      "2": {
+        "case_count": 16,
+        "certified_count": 5,
+        "certified_rate": 0.3125,
+        "status_counts": {
+          "bounded_unknown": 11,
+          "certified_solution": 5
+        }
+      },
+      "32": {
+        "case_count": 37,
+        "certified_count": 3,
+        "certified_rate": 0.081081,
+        "status_counts": {
+          "bounded_unknown": 21,
+          "certified_solution": 3,
+          "unsupported": 13
+        }
+      },
+      "4": {
+        "case_count": 18,
+        "certified_count": 1,
+        "certified_rate": 0.055556,
+        "status_counts": {
+          "bounded_unknown": 17,
+          "certified_solution": 1
+        }
+      },
+      "8": {
+        "case_count": 28,
+        "certified_count": 3,
+        "certified_rate": 0.107143,
+        "status_counts": {
+          "bounded_unknown": 8,
+          "certified_solution": 3,
+          "unsupported": 17
+        }
+      }
+    },
+    "by_density": {
+      "ample": {
+        "case_count": 49,
+        "certified_count": 17,
+        "certified_rate": 0.346939,
+        "status_counts": {
+          "bounded_unknown": 21,
+          "certified_solution": 17,
+          "unsupported": 11
+        }
+      },
+      "dense": {
+        "case_count": 45,
+        "certified_count": 1,
+        "certified_rate": 0.022222,
+        "status_counts": {
+          "bounded_unknown": 22,
+          "certified_solution": 1,
+          "unsupported": 22
+        }
+      },
+      "historical": {
+        "case_count": 4,
+        "certified_count": 2,
+        "certified_rate": 0.5,
+        "status_counts": {
+          "bounded_unknown": 2,
+          "certified_solution": 2
+        }
+      },
+      "nearly_saturated": {
+        "case_count": 49,
+        "certified_count": 1,
+        "certified_rate": 0.020408,
+        "status_counts": {
+          "bounded_unknown": 36,
+          "certified_solution": 1,
+          "unsupported": 12
+        }
+      }
+    },
+    "by_execution_mode": {
+      "cold": {
+        "case_count": 132,
+        "certified_count": 18,
+        "certified_rate": 0.136364,
+        "status_counts": {
+          "bounded_unknown": 69,
+          "certified_solution": 18,
+          "unsupported": 45
+        }
+      },
+      "incremental": {
+        "case_count": 15,
+        "certified_count": 3,
+        "certified_rate": 0.2,
+        "status_counts": {
+          "bounded_unknown": 12,
+          "certified_solution": 3
+        }
+      }
+    },
+    "by_family": {
+      "few_containers_many_contents": {
+        "case_count": 32,
+        "certified_count": 1,
+        "certified_rate": 0.03125,
+        "status_counts": {
+          "bounded_unknown": 17,
+          "certified_solution": 1,
+          "unsupported": 14
+        }
+      },
+      "historical-regression": {
+        "case_count": 4,
+        "certified_count": 2,
+        "certified_rate": 0.5,
+        "status_counts": {
+          "bounded_unknown": 2,
+          "certified_solution": 2
+        }
+      },
+      "incremental_then_cold": {
+        "case_count": 15,
+        "certified_count": 3,
+        "certified_rate": 0.2,
+        "status_counts": {
+          "bounded_unknown": 12,
+          "certified_solution": 3
+        }
+      },
+      "many_containers_many_contents": {
+        "case_count": 32,
+        "certified_count": 5,
+        "certified_rate": 0.15625,
+        "status_counts": {
+          "bounded_unknown": 16,
+          "certified_solution": 5,
+          "unsupported": 11
+        }
+      },
+      "many_containers_one_content": {
+        "case_count": 32,
+        "certified_count": 5,
+        "certified_rate": 0.15625,
+        "status_counts": {
+          "bounded_unknown": 17,
+          "certified_solution": 5,
+          "unsupported": 10
+        }
+      },
+      "mixed_dense_simple_heterogeneous": {
+        "case_count": 32,
+        "certified_count": 5,
+        "certified_rate": 0.15625,
+        "status_counts": {
+          "bounded_unknown": 17,
+          "certified_solution": 5,
+          "unsupported": 10
+        }
+      }
+    },
+    "by_flat_item_count": {
+      "0": {
+        "case_count": 147,
+        "certified_count": 21,
+        "certified_rate": 0.142857,
+        "status_counts": {
+          "bounded_unknown": 81,
+          "certified_solution": 21,
+          "unsupported": 45
+        }
+      }
+    },
+    "by_layer": {
+      "1": {
+        "case_count": 49,
+        "certified_count": 17,
+        "certified_rate": 0.346939,
+        "status_counts": {
+          "bounded_unknown": 21,
+          "certified_solution": 17,
+          "unsupported": 11
+        }
+      },
+      "2": {
+        "case_count": 59,
+        "certified_count": 2,
+        "certified_rate": 0.033898,
+        "status_counts": {
+          "bounded_unknown": 34,
+          "certified_solution": 2,
+          "unsupported": 23
+        }
+      },
+      "3": {
+        "case_count": 35,
+        "certified_count": 0,
+        "certified_rate": 0.0,
+        "status_counts": {
+          "bounded_unknown": 24,
+          "unsupported": 11
+        }
+      },
+      "historical": {
+        "case_count": 4,
+        "certified_count": 2,
+        "certified_rate": 0.5,
+        "status_counts": {
+          "bounded_unknown": 2,
+          "certified_solution": 2
+        }
+      }
+    },
+    "by_source": {
+      "L05": {
+        "case_count": 4,
+        "certified_count": 2,
+        "certified_rate": 0.5,
+        "status_counts": {
+          "bounded_unknown": 2,
+          "certified_solution": 2
+        }
+      },
+      "L06": {
+        "case_count": 89,
+        "certified_count": 11,
+        "certified_rate": 0.123596,
+        "status_counts": {
+          "bounded_unknown": 50,
+          "certified_solution": 11,
+          "unsupported": 28
+        }
+      },
+      "L07": {
+        "case_count": 54,
+        "certified_count": 8,
+        "certified_rate": 0.148148,
+        "status_counts": {
+          "bounded_unknown": 29,
+          "certified_solution": 8,
+          "unsupported": 17
+        }
+      }
+    },
+    "case_count": 147,
+    "certified_feasible_count": 19,
+    "certified_feasible_rate": 0.188119,
+    "deterministic_replay_count": 105,
+    "deterministic_replay_pass_count": 101,
+    "downstream": {
+      "cad_ir_attempt_count": 2,
+      "cad_ir_success_count": 2,
+      "finalization_attempt_count": 21,
+      "finalization_success_count": 2,
+      "materialization_measurement_count": 0
+    },
+    "false_impossible_count": 0,
+    "feasible_case_count": 101,
+    "negative_contradictions": [],
+    "negative_control_count": 42,
+    "negative_oracle_contradiction_count": 0,
+    "nondeterministic_cases": [
+      "L06:holdout-d-034",
+      "L06:holdout-e-005",
+      "L07:l07-v2-discovery-c-028",
+      "L07:l07-v2-tuning-e-035"
+    ],
+    "positive_losses": [
+      {
+        "baseline_case_id": "L06:discovery-a-021",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:discovery-a-051",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L06:discovery-b-012",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:discovery-b-022",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:discovery-b-052",
+        "family": "few_containers_many_contents",
+        "status": "unsupported",
+        "stop_reason": "input_validation_failed"
+      },
+      {
+        "baseline_case_id": "L06:discovery-c-013",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:discovery-c-043",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:discovery-d-024",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L06:discovery-d-054",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:discovery-e-025",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_without_candidate"
+      },
+      {
+        "baseline_case_id": "L06:discovery-e-045",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:holdout-a-001",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_without_candidate"
+      },
+      {
+        "baseline_case_id": "L06:holdout-a-011",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:holdout-a-031",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:holdout-a-041",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L06:holdout-a-061",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:holdout-b-002",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:holdout-b-022",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:holdout-b-032",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:holdout-b-052",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:holdout-b-062",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:holdout-c-013",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:holdout-c-023",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_without_candidate"
+      },
+      {
+        "baseline_case_id": "L06:holdout-c-043",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:holdout-c-053",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L06:holdout-d-004",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:holdout-d-014",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L06:holdout-d-034",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L06:holdout-d-044",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:holdout-d-064",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:holdout-e-005",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_without_candidate"
+      },
+      {
+        "baseline_case_id": "L06:holdout-e-025",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:holdout-e-045",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L06:tuning-a-006",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:tuning-a-026",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_without_candidate"
+      },
+      {
+        "baseline_case_id": "L06:tuning-a-036",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_without_candidate"
+      },
+      {
+        "baseline_case_id": "L06:tuning-a-056",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_without_candidate"
+      },
+      {
+        "baseline_case_id": "L06:tuning-b-017",
+        "family": "few_containers_many_contents",
+        "status": "unsupported",
+        "stop_reason": "input_validation_failed"
+      },
+      {
+        "baseline_case_id": "L06:tuning-b-027",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:tuning-b-047",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:tuning-b-057",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:tuning-c-008",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:tuning-c-018",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:tuning-c-038",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:tuning-c-048",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:tuning-d-009",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:tuning-d-029",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L06:tuning-d-039",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L06:tuning-d-059",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L06:tuning-e-015",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L06:tuning-e-035",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L06:tuning-e-055",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-a-006",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-a-036",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-b-007",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-b-027",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-b-037",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-b-057",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-c-028",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-c-058",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-d-009",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-d-039",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-e-015",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-discovery-e-055",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-a-006",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-a-026",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_without_candidate"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-a-036",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-a-056",
+        "family": "many_containers_one_content",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-b-017",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-b-027",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-b-047",
+        "family": "few_containers_many_contents",
+        "status": "unsupported",
+        "stop_reason": "input_validation_failed"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-b-057",
+        "family": "few_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-c-008",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-c-018",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-c-038",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-c-048",
+        "family": "many_containers_many_contents",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-d-009",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-d-029",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "hard_budget_reached"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-d-039",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-d-059",
+        "family": "mixed_dense_simple_heterogeneous",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_before_external_search"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-e-015",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "bounded_portfolio_exhausted"
+      },
+      {
+        "baseline_case_id": "L07:l07-v2-tuning-e-035",
+        "family": "incremental_then_cold",
+        "status": "bounded_unknown",
+        "stop_reason": "global_deadline_reached_without_candidate"
+      }
+    ],
+    "status_counts": {
+      "bounded_unknown": 81,
+      "certified_solution": 21,
+      "unsupported": 45
+    },
+    "timings_and_memory": {
+      "cad_ir_ms": {
+        "p50": 0.761,
+        "p95": 1.132,
+        "p99": 1.132,
+        "sample_count": 2
+      },
+      "calculation_ms": {
+        "p50": 374.59,
+        "p95": 20448.376,
+        "p99": 20552.029,
+        "sample_count": 105
+      },
+      "certification_ms": {
+        "p50": 0.0,
+        "p95": 0.754,
+        "p99": 1.325,
+        "sample_count": 105
+      },
+      "finalization_ms": {
+        "p50": 17.776,
+        "p95": 47.684,
+        "p99": 64.07,
+        "sample_count": 21
+      },
+      "peak_working_set_bytes": {
+        "p50": 241270784.0,
+        "p95": 281198592.0,
+        "p99": 345317376.0,
+        "sample_count": 105
+      },
+      "preparation_ms": {
+        "p50": 58.59,
+        "p95": 276.949,
+        "p99": 299.158,
+        "sample_count": 105
+      },
+      "time_to_first_certified_ms": {
+        "p50": 188.117,
+        "p95": 403.673,
+        "p99": 724.343,
+        "sample_count": 21
+      }
+    }
+  },
+  "reconstructibility": {
+    "bindings": {
+      "l05_corpus_digest": "409c75095c47c4ca85a6dda469e986d36d67d460bf308ac9a96e1d3898ac26cf",
+      "l06_manifest_digest": "53db786793dee3a26128f4db28cc830f68dde394262cd7ffbfad27cb895a85ee",
+      "l07_manifest_digest": "828c4df787b07b35040a6026db0cfd43efa20c5b9c01f42eefd63a3607a48c9c",
+      "l08_manifest_digest": "d4324eebbc0412b02b7ed6bdbd16eacf1b90146a9a45ed8ad6bff542e19fc0f9"
+    },
+    "class_counts": {
+      "current-reconstructible": 162,
+      "historical-semantic-drift": 165
+    },
+    "core_only_case_count": 41,
+    "core_only_expected_counts": {
+      "bounded_unknown": 1,
+      "feasible": 30,
+      "infeasible": 10
+    },
+    "drift_by_reservation_mode": {
+      "constraining": 162,
+      "historical": 3
+    },
+    "drift_by_source": {
+      "L05": 3,
+      "L06": 94,
+      "L07": 68
+    },
+    "drift_samples": [
+      {
+        "case_id": "continuous-closure-normal",
+        "changed_fields": [
+          "project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "source": "L05"
+      },
+      {
+        "case_id": "dense-11x34-quick",
+        "changed_fields": [
+          "project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "source": "L05"
+      },
+      {
+        "case_id": "localized-reservation-normal",
+        "changed_fields": [
+          "project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "source": "L05"
+      },
+      {
+        "case_id": "l07-v2-discovery-a-001",
+        "changed_fields": [
+          "project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "reservation_mode": "constraining",
+        "source": "L07",
+        "source_split": "discovery"
+      },
+      {
+        "case_id": "l07-v2-discovery-b-002",
+        "changed_fields": [
+          "project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "reservation_mode": "constraining",
+        "source": "L07",
+        "source_split": "discovery"
+      },
+      {
+        "case_id": "l07-v2-discovery-c-003",
+        "changed_fields": [
+          "project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "reservation_mode": "constraining",
+        "source": "L07",
+        "source_split": "discovery"
+      },
+      {
+        "case_id": "l07-v2-discovery-d-004",
+        "changed_fields": [
+          "project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "reservation_mode": "constraining",
+        "source": "L07",
+        "source_split": "discovery"
+      },
+      {
+        "case_id": "l07-v2-discovery-e-005",
+        "changed_fields": [
+          "project_digest",
+          "previous_project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "reservation_mode": "constraining",
+        "source": "L07",
+        "source_split": "discovery"
+      },
+      {
+        "case_id": "l07-v2-discovery-e-010",
+        "changed_fields": [
+          "project_digest",
+          "previous_project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "reservation_mode": "constraining",
+        "source": "L07",
+        "source_split": "discovery"
+      },
+      {
+        "case_id": "l07-v2-discovery-a-011",
+        "changed_fields": [
+          "project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "reservation_mode": "constraining",
+        "source": "L07",
+        "source_split": "discovery"
+      },
+      {
+        "case_id": "l07-v2-discovery-b-012",
+        "changed_fields": [
+          "project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "reservation_mode": "constraining",
+        "source": "L07",
+        "source_split": "discovery"
+      },
+      {
+        "case_id": "l07-v2-discovery-c-013",
+        "changed_fields": [
+          "project_digest"
+        ],
+        "fixture_class": "historical-semantic-drift",
+        "reservation_mode": "constraining",
+        "source": "L07",
+        "source_split": "discovery"
+      }
+    ],
+    "generated_current_duplicate_count": 15,
+    "invariants": {
+      "historical_manifests_rewritten": false,
+      "l08_counted_as_product_path": false,
+      "old_holdout_counted_as_new_holdout": false,
+      "semantic_drift_executed": false
+    },
+    "inventory_digest": "98e3865b9f66d05cfba3893482ef988b8af7853b000e5e53204f0c7f571f0dcb",
+    "product_case_count": 147,
+    "product_expected_counts": {
+      "feasible": 101,
+      "historical": 4,
+      "impossible": 42
+    },
+    "schema_version": "bgig.p64_l09w_a_fixture_inventory.v1"
+  },
+  "runtime_attribution": {
+    "counter_scope": "first run only; top-level solver counters plus lane telemetry",
+    "counter_totals_first_run": {
+      "admitted_complete_solutions": 280,
+      "backtrack_node_count": 0,
+      "candidate_count": 16,
+      "candidate_count_after_deduplication": 21,
+      "candidate_count_before_deduplication": 21,
+      "certificate_rejections": 1432,
+      "certified_candidates_after_deduplication": 21,
+      "certified_candidates_before_deduplication": 21,
+      "certified_complete_solutions": 0,
+      "completed_item_count": 56,
+      "completions_with_printable_residual": 284,
+      "deduplicated_candidate_count": 0,
+      "external_lane_certified_candidate_count": 12,
+      "external_lane_invocation_count": 12,
+      "external_lane_selected": 12,
+      "feasible_options": 5786,
+      "geometric_completions": 284,
+      "item_count": 96,
+      "lane_count": 137,
+      "maximum_beam_width_retained": 528,
+      "maximum_depth_reached": 334,
+      "maximum_empty_spaces_retained": 1021,
+      "maximum_extreme_points_retained": 1388,
+      "order_attempts": 76,
+      "pack_attempt_count": 909,
+      "pareto_candidate_count": 21,
+      "pareto_candidates": 21,
+      "placement_trials": 350129,
+      "retained_state_count": 5120,
+      "search_expansion_count": 252013,
+      "search_states": 5519,
+      "states_deduplicated": 0,
+      "states_generated": 5519,
+      "states_pruned_by_space_limit": 0,
+      "states_pruned_by_width": 3420,
+      "warm_start_accepted": 3,
+      "warm_start_selected": 3
+    },
+    "executed_case_count": 105,
+    "external_invocation_count_first_run": 59,
+    "internal_lane_count_distribution_first_run": {
+      "0": 53,
+      "1": 7,
+      "2": 5,
+      "3": 40
+    },
+    "negative_control_executed_count": 0,
+    "negative_status_counts": {
+      "unsupported": 42
+    },
+    "not_executed_case_count": 42,
+    "positive_status_counts": {
+      "bounded_unknown": 79,
+      "certified_solution": 19,
+      "unsupported": 3
+    },
+    "route_counts": {
+      "certified_witness|certified_witness_incumbent|not_available": 3,
+      "external_scip_real_3d|external_scip_real_3d|solution_found": 12,
+      "not_available|not_available|bounded_unknown": 19,
+      "not_available|not_available|certificate_rejected": 28,
+      "not_available|not_available|not_available": 37,
+      "portfolio_lane|canonical_floor_maxrects|not_available": 6
+    },
+    "scheduled_case_count": 147,
+    "solver_stop_reason_counts": {
+      "bounded_portfolio_exhausted": 25,
+      "global_deadline_reached_before_external_search": 32,
+      "global_deadline_reached_without_candidate": 9,
+      "hard_budget_reached": 15,
+      "historical_negative_rotation_constraint_not_exposed_by_project_v1": 42,
+      "input_validation_failed": 3,
+      "minimal_placement_certified": 21
+    }
+  },
+  "schema_version": "bgig.p64_l09w_a_solver_robustness_evidence.v1",
+  "scip_determinism_gate": {
+    "python_version": "3.14.0",
+    "repeat_count": 2,
+    "runs_identical": true,
+    "runtime_artifact_digest": "be3b02bfe9591c72b7a25367e4b55aae8b08462ba543eff9a70d552229aff54a"
+  },
+  "status": "complete"
+}

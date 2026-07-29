@@ -139,7 +139,7 @@ class AnonymizedSolverCaseCorpusBuilderTests(unittest.TestCase):
         )
         self.assertTrue(
             report["cases"][0]["comparison"]["checks"][
-                "required_lane_suffix_exact"
+                "early_certified_solution_allowed"
             ]
         )
         self.assertIn(

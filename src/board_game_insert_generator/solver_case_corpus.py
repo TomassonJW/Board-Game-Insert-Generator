@@ -687,9 +687,16 @@ def _compare_case(
 def _validate_case(value: Mapping[str, object]) -> dict[str, object]:
     if not isinstance(value, Mapping):
         raise SolverCaseCorpusError("Every corpus case must be an object.")
-    return build_solver_case(
+    stored_project = _stored_project_snapshot(value.get("project"))
+    supplied_project_digest = value.get("project_digest")
+    if (
+        not _is_digest(supplied_project_digest)
+        or canonical_digest(stored_project) != supplied_project_digest
+    ):
+        raise SolverCaseCorpusError("Corpus case project digest mismatch.")
+    rebuilt = build_solver_case(
         str(value.get("case_id", "")),
-        value.get("project"),
+        stored_project,
         solver_settings=_mapping(
             value.get("solver_settings"),
             "case.solver_settings",
@@ -705,6 +712,34 @@ def _validate_case(value: Mapping[str, object]) -> dict[str, object]:
         baseline=_mapping_or_empty(value.get("baseline")),
         source=_mapping(value.get("source"), "case.source"),
     )
+    # A solver corpus is immutable evidence.  Current project normalization may
+    # deliberately migrate historical manual flat origins to automatic
+    # placement, but validating the old receipt must not rewrite that receipt.
+    rebuilt["project"] = stored_project
+    rebuilt["project_digest"] = str(supplied_project_digest)
+    return rebuilt
+
+
+def _stored_project_snapshot(value: object) -> dict[str, object]:
+    stored = deepcopy(_mapping(value, "case.project"))
+    normalized = normalize_project_draft(stored).project
+    if stored == normalized:
+        return stored
+
+    migrated_flat_origins = deepcopy(stored)
+    flat_items = migrated_flat_origins.get("flat_items")
+    if not isinstance(flat_items, list):
+        raise SolverCaseCorpusError("Corpus case project is not canonical.")
+    changed = False
+    for index, raw_item in enumerate(flat_items):
+        item = _mapping(raw_item, "case.project.flat_items[]")
+        if item.get("origin_mm") is not None:
+            item["origin_mm"] = None
+            flat_items[index] = item
+            changed = True
+    if not changed or migrated_flat_origins != normalized:
+        raise SolverCaseCorpusError("Corpus case project is not canonical.")
+    return stored
 
 
 def _solver_settings(value: Mapping[str, object]) -> dict[str, str]:

@@ -1,14 +1,15 @@
 # Human Gates
 
 <!-- P64-L09W-GATE -->
-## P64-L09W — aucune gate humaine ouverte pendant l’audit
+## P64-L09W — aucune gate humaine ouverte avant la candidate finale
 
 P64-L09U-R9-V est close en `human-positive` sur Fusion 0.1.80 :
 `fusion-validated=true`, `print-validated=false`.
 
-Le GO autonome de P64-L09W est acquis. P64-L09W-A à E portent sur l’audit, les
-oracles, la campagne, les optimisations mesurées et le holdout ; aucune nouvelle
-observation de Thomas n’est requise entre ces missions atomiques normales.
+Le GO autonome de P64-L09W est acquis. P64-L09W-A est terminée et n’ouvre
+aucune gate. P64-L09W-B à E portent sur les oracles, la campagne, les
+optimisations mesurées et le holdout ; aucune nouvelle observation de Thomas
+n’est requise entre ces missions atomiques normales.
 
 Une nouvelle gate humaine n’est ouverte que si une candidate produit réellement
 modifiée est préparée et installée en P64-L09W-F, ou si une décision
@@ -19,6 +20,9 @@ Preuve R9-V :
 
 Handoff :
 `docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md`.
+
+Preuve A :
+`docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md`.
 
 ### Historique R9-V clos positivement
 

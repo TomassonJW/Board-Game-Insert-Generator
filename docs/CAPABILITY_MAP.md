@@ -1,25 +1,29 @@
 # Capability Map
 
 <!-- P64-L09W-CAPABILITY -->
-## P64-L09W — robustesse générale à démontrer
+## P64-L09W — baseline générale établie, campagne produit à construire
 
 - `C-FUSION` : 0.1.80 `human-positive`, `fusion-validated=true`.
 - `C-STAGED-CALCULATION` : performance R9 validée sur les deux cas
-  autoritaires, mais généralisation à une diversité de projets non démontrée.
+  autoritaires ; baseline A à 19/101 positifs certifiés sur les fixtures
+  reconstructibles consommées, sans extrapolation au futur domaine.
 - `C-GLOBAL-LAYOUT` et `C-MINIMAL-LAYOUT` : solutions certifiées et résultat R9
-  conservés ; taux de récupération par densité, cardinalité et famille encore
-  inconnu.
-- `C-OBSERVABILITY` : télémétrie R9 disponible, à étendre à une campagne
-  produit commune du calcul à la matérialisation.
-- `C-QUALITY` : corpus et runners L05D à L08 réutilisables ; anciens holdouts
-  consommés, nouveau domaine et nouveau holdout requis.
-- `C-FINALIZATION`, `C-CAD-IR` et `C-MATERIALIZATION` : conformes sur R9, mais
-  leurs taux de succès et percentiles sur les nouvelles strates restent à
-  mesurer séparément.
+  conservés ; récupération historiquement faible sur dense et presque saturé.
+- `C-OBSERVABILITY` : attribution calcul, certificat, finalisation, CAD IR,
+  routes, compteurs, temps et mémoire versionnée ; matérialisation hors ligne
+  explicitement non mesurée.
+- `C-QUALITY` : 165 dérives sémantiques isolées, holdouts anciens consommés,
+  reçus historiques validés sans réécriture, preuve compacte auto-certifiée et
+  ADR-0107 acceptée. Le nouveau holdout reste fermé et non exécuté.
+- `C-FINALIZATION` : 21 calculs certifiés recertifiés ; 2 réussites et 19 refus
+  immédiats par stratégie aval, sans timeout.
+- `C-CAD-IR` : 2/2 plans finalisés prêts pour Fusion.
+- `C-MATERIALIZATION` : `not-measured-offline`.
 - `C-PRODUCT-GRID` : `0,1 mm`, inchangée ; epsilon `0,0001 mm` distinct.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : P64-L09W-A, audit et baseline sans changement solveur.
+Prochaine frontière : P64-L09W-B, générateur produit, vérités indépendantes,
+splits ouverts et holdout neuf scellé sans changement solveur.
 
 ### Historique R9 clos positivement
 

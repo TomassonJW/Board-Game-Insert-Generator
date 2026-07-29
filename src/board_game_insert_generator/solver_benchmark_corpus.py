@@ -372,12 +372,12 @@ def validate_materialized_benchmark_case(case: object) -> dict[str, object]:
     """Vérifie le projet, le témoin construit ou la preuve négative exacte."""
 
     value = _mapping(case, "materialized benchmark case")
-    project = normalize_project_draft(value.get("project")).project
+    project = _normalize_historical_benchmark_project(value.get("project"))
     if canonical_digest(project) != value.get("project_digest"):
         raise SolverBenchmarkCorpusError("Materialized project digest mismatch.")
     previous = value.get("previous_project")
     if previous is not None:
-        previous_project = normalize_project_draft(previous).project
+        previous_project = _normalize_historical_benchmark_project(previous)
         if canonical_digest(previous_project) != value.get("previous_project_digest"):
             raise SolverBenchmarkCorpusError("Previous project digest mismatch.")
     oracle = _mapping(value.get("oracle"), "materialized benchmark case.oracle")
@@ -625,7 +625,7 @@ def _materialize_recipe(
         seed=seed,
         recipe=recipe,
     )
-    normalized = normalize_project_draft(project).project
+    normalized = _normalize_historical_benchmark_project(project)
     previous_project: dict[str, object] | None = None
     previous_digest: str | None = None
     if family == FAMILY_INCREMENTAL_COLD:
@@ -634,7 +634,9 @@ def _materialize_recipe(
             seed=seed,
             recipe=recipe,
         )
-        previous_project = normalize_project_draft(previous_raw).project
+        previous_project = _normalize_historical_benchmark_project(
+            previous_raw
+        )
         previous_digest = canonical_digest(previous_project)
         if previous_digest == canonical_digest(normalized):
             raise SolverBenchmarkCorpusError("Incremental sequence must change the project.")
@@ -691,6 +693,39 @@ def _materialize_recipe(
         },
     }
     return result
+
+
+def _normalize_historical_benchmark_project(
+    raw_project: object,
+) -> dict[str, object]:
+    """Rebuild one immutable L06 receipt under its original flat semantics."""
+
+    raw = _mapping(raw_project, "historical benchmark project")
+    normalized = normalize_project_draft(raw).project
+    raw_flat_items = raw.get("flat_items")
+    if not isinstance(raw_flat_items, list):
+        return normalized
+    normalized_by_id = {
+        str(item["id"]): item for item in normalized["flat_items"]
+    }
+    for raw_value in raw_flat_items:
+        raw_item = _mapping(
+            raw_value,
+            "historical benchmark project.flat_items[]",
+        )
+        origin = raw_item.get("origin_mm")
+        if origin is None:
+            continue
+        identifier = str(raw_item.get("id", ""))
+        target = normalized_by_id.get(identifier)
+        if target is None:
+            raise SolverBenchmarkCorpusError(
+                "Historical flat item is missing after normalization."
+            )
+        target["origin_mm"] = deepcopy(
+            _mapping(origin, "historical flat item origin")
+        )
+    return normalized
 
 
 def _build_previous_project(

@@ -21,6 +21,9 @@ from board_game_insert_generator.free_3d_plan_adapter import (
 from board_game_insert_generator.incremental_project_state import canonical_digest
 from board_game_insert_generator.minimal_layout_solver import solve_minimal_layout
 from board_game_insert_generator.project_v1 import normalize_project_draft
+from board_game_insert_generator.solver_benchmark_corpus import (
+    validate_materialized_benchmark_case,
+)
 from board_game_insert_generator.solver_contract import (
     PlacementSnapshot,
     SolverBudget,
@@ -765,7 +768,17 @@ def _normalize_case(case: object) -> dict[str, object]:
     case_id = str(value.get("case_id", ""))
     if not case_id:
         raise SolverBenchmarkAdapterError("Benchmark case_id is required.")
-    normalized = normalize_project_draft(value.get("project")).project
+    generated = isinstance(value.get("features"), Mapping) and isinstance(
+        value.get("recipe"), Mapping
+    )
+    if generated:
+        try:
+            accepted = validate_materialized_benchmark_case(value)
+        except ValueError as exc:
+            raise SolverBenchmarkAdapterError(str(exc)) from exc
+        normalized = deepcopy(accepted["project"])
+    else:
+        normalized = normalize_project_draft(value.get("project")).project
     digest = str(value.get("project_digest", ""))
     if canonical_digest(normalized) != digest:
         raise SolverBenchmarkAdapterError("Benchmark project digest mismatch.")
@@ -775,9 +788,6 @@ def _normalize_case(case: object) -> dict[str, object]:
     effort = str(settings.get("effort", ""))
     if effort not in {"quick", "normal", "deep"}:
         raise SolverBenchmarkAdapterError("Unsupported benchmark effort profile.")
-    generated = isinstance(value.get("features"), Mapping) and isinstance(
-        value.get("recipe"), Mapping
-    )
     value["project"] = normalized
     value["generated_case"] = generated
     value["split"] = str(value.get("split", "regression"))

@@ -5,27 +5,48 @@
 
 Date : 2026-07-29.
 
-Statut : `priority-active`, `P64-L09W-A-ready`,
-`ready-for-autonomous-goal`, `no-product-code-yet`.
+Statut : `priority-active`, `P64-L09W-A-complete`,
+`P64-L09W-B-ready`, `automated-baseline-observed`.
 
 - R9-V est `human-positive` sur Fusion 0.1.80 :
   `fusion-validated=true`, `print-validated=false`.
 - La récupération de performance et le résultat fonctionnel R9 sont acquis.
-- Une lacune produit distincte est reconnue : la réussite sur les deux projets
-  R9 ne démontre pas la robustesse après changement de paramètres ou sur des
-  designs réalisables très différents.
-- Les corpus L06 à L08 couvrent déjà des vérités construites, des familles 3D
-  et des campagnes reprenables, mais leurs holdouts sont consommés et leur
-  couverture ne vaut pas preuve de bout en bout pour le produit 0.1.80.
-- P64-L09W-A doit d’abord auditer, définir le domaine mesurable et établir une
-  baseline. Aucune optimisation n’est encore sélectionnée.
+- P64-L09W-A audite 343 entrées historiques, 298 projets distincts, 162 entrées
+  reconstructibles et 165 dérives sémantiques.
+- La baseline produit dédupliquée contient 147 projets : 101 vérités positives,
+  42 contrôles impossibles historiques et 4 régressions historiques.
+- Résultat positif : 19 `certified_solution`, 79 `bounded_unknown`,
+  3 `unsupported`, soit 18,8119 % sur ce corpus ancien consommé.
+- Zéro faux impossible et zéro solution non certifiée sont publiés. Les
+  42 contrôles négatifs restent non exécutés car leur preuve de rotation n’est
+  pas exprimable dans `project.v1`.
+- Les 147 projets reconstructibles contiennent zéro élément plat. La couverture
+  historique de 1 ou 2 éléments plats a dérivé et ne prouve pas 0.1.80.
+- Sur 21 calculs certifiés et recertifiés, 2 finalisations réussissent et
+  19 sont refusées immédiatement par
+  `flat_inset_subtraction_plan_rejected` ; 2 CAD IR sont prêtes pour Fusion.
+- L08 reste une mesure `core-only` séparée : 40 `bounded_unknown` et
+  1 `unsupported`, sans contribution au taux produit.
+- Le digest du modèle SCIP engage désormais la limite publique stable, pas le
+  temps restant volatil. Le temps réel reste appliqué à l’exécution ; aucun
+  budget, algorithme, placement ou paramètre physique ne change.
+- La validation L05/L06 conserve les reçus historiques bit à bit et tolère
+  uniquement la migration connue des origines plates. Leur intégrité ne les
+  requalifie pas en vérités produit courantes.
+- ADR-0107 préenregistre le domaine, les vérités reconstructibles, les splits,
+  le holdout fermé de 400 positifs et les gates 95 % global / 99 % familles
+  courantes. Ces seuils ne promettent rien hors du domaine déclaré.
+- Validation A : gate réelle Python 3.14 + SCIP 10.0.2, puis 1 044 tests
+  autorisés passés avec 1 skip prévu.
+- Aucune optimisation n’est sélectionnée depuis cette baseline. P64-L09W-B est
+  la seule mission `ready`.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.
 
-Handoff :
-`docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md`.
+Contrat :
+`docs/P64_L09W_A_SOLVER_ROBUSTNESS_MEASUREMENT_CONTRACT.md`.
 
-Preuve humaine :
-`docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md`.
+Preuve :
+`docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md`.
 
 ### Historique R9 clos positivement
 

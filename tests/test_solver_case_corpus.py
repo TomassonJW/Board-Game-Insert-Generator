@@ -65,6 +65,25 @@ class SolverCaseCorpusTests(unittest.TestCase):
         with self.assertRaisesRegex(SolverCaseCorpusError, "unique"):
             build_solver_case_corpus([case, case])
 
+    def test_historical_corpus_receipt_preserves_manual_flat_origins(self) -> None:
+        path = (
+            Path(__file__).resolve().parent
+            / "fixtures"
+            / "p64_l05d_solver_case_corpus.v1.json"
+        )
+        corpus = json.loads(path.read_text(encoding="utf-8"))
+
+        validated = validate_solver_case_corpus(corpus)
+        manual_origins = [
+            item["origin_mm"]
+            for case in validated["cases"]
+            for item in case["project"]["flat_items"]
+            if item["origin_mm"] is not None
+        ]
+
+        self.assertEqual(validated, corpus)
+        self.assertTrue(manual_origins)
+
     def test_bundle_import_validates_every_digest_and_drops_trace_values(self) -> None:
         project = simple_success_project()
         engine = IncrementalLocalAnalysisEngine(project, effort_profile="quick")
@@ -275,7 +294,7 @@ class SolverCaseCorpusTests(unittest.TestCase):
         )
         self.assertEqual(
             report["functional_digest"],
-            "ac956bd573f942816118e82c0072e449ef84e157b3edebc33899f1b5f87156aa",
+            "a70416930781a9ad4f7bc356336878824347dde3a431b1ae0b2b8b7f27de040d",
         )
         self.assertTrue(report["summary"]["all_expectations_met"])
         self.assertEqual(report["summary"]["executed_case_count"], 5)

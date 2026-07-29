@@ -7,17 +7,19 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-A — Audit, domaine et baseline
 
-- Statut : `ready`, `no-product-code-yet`.
+- Statut : `done`, `baseline-observed`, `P64-L09W-B-ready`.
 - Auditer les corpus, oracles, runners, holdouts consommés, solveurs et
   métriques L05D à L09U.
 - Définir le domaine rectangulaire V0.1, les strates et les critères
   préenregistrés.
 - Mesurer 0.1.80 sur les fixtures déjà versionnées.
 - Ne choisir aucune optimisation avant l’attribution causale.
+- Preuve :
+  `docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md`.
 
 ### P64-L09W-B — Générateur produit, oracles et holdout neuf
 
-- Statut : `planned`, dépend de P64-L09W-A.
+- Statut : `ready`, dépendance P64-L09W-A terminée.
 - Cas positifs faisables par construction et témoins recertifiés.
 - Cas négatifs avec preuve formelle séparée.
 - Densités proches de 30 %, 65 %, 85 % et 95 %, cardinalités variées,

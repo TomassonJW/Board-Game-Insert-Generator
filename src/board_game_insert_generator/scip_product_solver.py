@@ -200,7 +200,8 @@ def solve_scip_product_3d(
     cancel_check: Callable[[], bool] | None = None,
     wall_seconds: float | None = None,
 ) -> ScipProductExecution:
-    limits = scip_product_limits(effort_profile)
+    declared_limits = scip_product_limits(effort_profile)
+    limits = declared_limits
     if wall_seconds is not None:
         limits = replace(limits, wall_seconds=max(0.001, float(wall_seconds)))
     if _configured_runtime_root is None:
@@ -257,7 +258,7 @@ def solve_scip_product_3d(
         {
             "artifact_digest": SCIP_PRODUCT_ARTIFACT_DIGEST,
             "problem_digest": prepared.problem_digest,
-            "limits": limits.to_dict(),
+            "limits": declared_limits.to_dict(),
             "model": SCIP_PRODUCT_MODEL,
         }
     )

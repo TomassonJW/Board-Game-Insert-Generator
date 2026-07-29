@@ -1,39 +1,42 @@
 # Next Actions
 
 <!-- P64-L09W-NEXT -->
-## Action courante : P64-L09W-A — audit du domaine et baseline 0.1.80
+## Action courante : P64-L09W-B — générateur produit et oracles
 
 R9-V est close en `human-positive` sur Fusion 0.1.80.
 `fusion-validated=true`, `print-validated=false`.
 
-P64-L09W devient prioritaire avant P64-L10 et la roadmap d’origine. Son but est
-de mesurer puis d’améliorer la capacité du solveur à trouver rapidement des
-solutions certifiées sur une diversité représentative de projets réalisables,
-sans se limiter aux deux cas R9.
+P64-L09W-A est terminée. Sa baseline autoritative mesure 19 solutions certifiées
+sur 101 vérités positives reconstructibles. Les anciennes fixtures ne couvrent
+aucun élément plat sous la sémantique 0.1.80, les anciens holdouts sont consommés
+et les contrôles négatifs historiques ne sont pas exprimables sans ambiguïté de
+rotation.
 
 Action immédiate unique :
 
-1. créer un Goal Codex sans budget de tokens inventé ;
-2. auditer les corpus, générateurs, oracles, runners, holdouts consommés,
-   solveurs et métriques L05D à L09U ;
-3. définir le domaine rectangulaire V0.1 réellement supporté et les strates de
-   densité, cardinalité, dimensions, éléments plats et modifications ;
-4. mesurer la baseline 0.1.80 sur les fixtures déjà versionnées, sans créer
-   encore un corpus massif ;
-5. publier les lacunes, causes et critères préenregistrés avant tout changement
-   produit ;
-6. créer une ADR seulement si la stratégie de génération, de sélection ou de
-   solveur devient structurante.
+1. implémenter ADR-0107 sans modifier le solveur ;
+2. générer des positifs faisables par construction puis recertifier leur témoin
+   avec le certificat produit ;
+3. générer séparément des contrôles impossibles dont la preuve reste valide
+   avec les rotations réellement exposées ;
+4. couvrir les densités 30 %, 65 %, 85 % et 95 %, les cardinalités demandées,
+   0 à 10 éléments plats, les couches et les séquences d’édition ;
+5. publier les splits régression, discovery et tuning ;
+6. construire et sceller le nouveau holdout sans l’exécuter ;
+7. tester les invariants de reproductibilité, de vérité, de non-chevauchement
+   et d’absence de fuite du holdout.
 
-Le futur taux `95 %` ou `99 %` sera mesuré sur un holdout neuf, faisable par
-construction et fermé. Il ne sera jamais présenté comme une garantie sur tous
-les cas possibles.
+P64-L09W-C ne commence qu’après cette preuve. Aucun seuil de réussite ne peut
+être revendiqué depuis la baseline A.
 
 Handoff :
 `docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md`.
 
-Preuve R9-V :
-`docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md`.
+Contrat et preuve A :
+
+- `docs/P64_L09W_A_SOLVER_ROBUSTNESS_MEASUREMENT_CONTRACT.md` ;
+- `docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md`.
 
 ### Historique R9-V clos positivement
 

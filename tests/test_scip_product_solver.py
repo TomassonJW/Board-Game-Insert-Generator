@@ -155,6 +155,49 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertEqual({value.memory_mebibytes for value in limits}, {1024})
         self.assertEqual({value.seed for value in limits}, {6408})
 
+    def test_model_digest_excludes_volatile_remaining_deadline(self) -> None:
+        preparation = prepare_free_3d_problem(_stacking_project())
+        self.assertEqual(preparation.status, "ready")
+        configure_scip_product_runtime(ROOT)
+        observed_wall_seconds: list[float] = []
+
+        def fake_worker(_prepared, limits):
+            observed_wall_seconds.append(limits.wall_seconds)
+            return {
+                "status": "unknown",
+                "proof_status": "bounded",
+                "engine_status": "timelimit",
+                "placements": [],
+                "worker_invocation_count": 1,
+            }
+
+        with (
+            patch.object(scip_product_module, "_runtime_error", return_value=None),
+            patch.object(
+                scip_product_module,
+                "_invoke_worker",
+                side_effect=fake_worker,
+            ),
+        ):
+            first = solve_scip_product_3d(
+                preparation.problem.participants,
+                preparation.problem,
+                effort_profile="quick",
+                wall_seconds=2.125,
+            )
+            second = solve_scip_product_3d(
+                preparation.problem.participants,
+                preparation.problem,
+                effort_profile="quick",
+                wall_seconds=2.875,
+            )
+
+        self.assertEqual(observed_wall_seconds, [2.125, 2.875])
+        self.assertEqual(first.status, STATUS_BOUNDED_UNKNOWN)
+        self.assertEqual(second.status, STATUS_BOUNDED_UNKNOWN)
+        self.assertNotEqual(first.limits.wall_seconds, second.limits.wall_seconds)
+        self.assertEqual(first.model_digest, second.model_digest)
+
     def test_product_model_preserves_variants_and_exact_clearances(self) -> None:
         project = _stacking_project()
         base_problem = prepare_free_3d_problem(project).problem
