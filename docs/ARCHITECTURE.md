@@ -5,8 +5,9 @@
 
 Le calcul minimal ne produit que les enveloppes, poses et réservations
 virtuelles. La finalisation construit ensuite la géométrie positive des
-conteneurs et la fige dans `bgig.finalized_container_geometry.v1`. Une passe
-ultérieure applique les éléments plats uniquement par soustraction.
+conteneurs et la fige dans `bgig.finalized_container_geometry.v1`. La passe
+`bgig.flat_inset_subtraction_plan.v1` applique ensuite les éléments plats
+uniquement par soustraction.
 
 Un nouveau composite utilise `bgig.xy_composite_container_body.v3` :
 
@@ -17,10 +18,17 @@ Un nouveau composite utilise `bgig.xy_composite_container_body.v3` :
   `container_finalization` ;
 - le digest positif exclut cavités, accès et encastrements.
 
-`partition_cad.py` refuse un artefact finalisé si ce digest diverge ou si un
-corps, une union, une opération ou un volume positif est attribué à un plateau
-ou à un livret. Les anciens schémas composites v1/v2 restent lisibles pour les
-artefacts historiques, sans être produits par R8.
+Chaque opération plate est un volume négatif `difference`, lié à un prisme
+positif cible et à un intervalle Z exact. Son certificat impose zéro volume,
+corps, union ou opération positive, zéro nouveau corps imprimable et un digest
+positif inchangé.
+
+`partition_cad.py` reconstruit l’artefact pur et refuse un plan, un certificat
+ou un digest divergent. Il consomme le plan top-level comme seule autorité ;
+les coupes recopiées dans les placements restent un miroir de compatibilité.
+La CAD IR, Fusion et le BRep ne recalculent ensuite ni profondeur ni position.
+Les anciens schémas composites v1/v2 restent lisibles pour les artefacts
+historiques, sans être produits par R8.
 
 <!-- P64-L09T-ARCHITECTURE -->
 ## Frontiere P64-L09T

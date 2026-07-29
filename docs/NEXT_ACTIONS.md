@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R8-E — passe d’encastrement soustractive
+## Action courante : P64-L09U-R8-F — fidélité et régressions
 
 0.1.78 est `human-KO`, `do-not-run`.
 
@@ -54,16 +54,25 @@ R8-D est terminée :
 - la CAD IR refuse un certificat positif plat non nul ;
 - validation ciblée `90/90`.
 
-R8-E est la seule mission `ready` :
+R8-E est terminée :
 
 - extraire `bgig.flat_inset_subtraction_plan.v1` ;
-- produire uniquement des opérations négatives après la finalisation ;
-- appliquer exactement les profondeurs locales `4/2/6 mm` ;
-- garantir les cavités creusées, ouvertes et accessibles ;
-- prouver que le digest positif R8-D ne change pas ;
-- ne créer aucun corps, support, union ou volume positif plat.
+- toutes les opérations plates sont des volumes négatifs `difference` ;
+- les profondeurs locales `2/4/6 mm` sont certifiées ;
+- le digest positif R8-D reste identique avant et après la passe ;
+- corps, support, union, opération et volume positifs plats valent zéro ;
+- CAD IR, plan Fusion et BRep partagent le même intervalle `[bottom, top]` ;
+- validation ciblée `207/207`.
 
-R8-F et R8-G restent `blocked-by-R8-E`.
+R8-F est la seule mission `ready` :
+
+- faire de l’aperçu et du résultat lisible des projections du plan canonique ;
+- prouver la même opération de l’aperçu jusqu’au BRep ;
+- préserver cavités, accès, parois, ordre, grille et rollback ;
+- rejouer `CasLimite02+` et `CasLimite02++` strictement en lecture seule ;
+- préparer la matrice de régression qui autorisera R8-G.
+
+R8-G reste `blocked-by-R8-F`.
 
 Preuves :
 
@@ -72,7 +81,8 @@ Preuves :
 - `docs/DECISIONS/ADR-0105-conteneurs-finalises-et-encastrements-strictement-soustractifs.md` ;
 - `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md` ;
-- `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md`.
+- `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md`.
 
 Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.

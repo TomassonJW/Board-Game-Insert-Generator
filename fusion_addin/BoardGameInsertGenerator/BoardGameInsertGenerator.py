@@ -3407,6 +3407,32 @@ def _create_boolean_rectangular_blank(
                 f"{join_plan.operation_id}."
             )
     for cut_plan in cut_plans:
+        if cut_plan.boolean_operation != "difference":
+            raise RuntimeError(
+                "Fusion transient cuts accept difference operations only."
+            )
+        if cut_plan.cavity_source in {
+            "top_inset_reservation",
+            "top_inset_grip",
+        }:
+            if (
+                cut_plan.local_interval_bottom_z_mm is None
+                or cut_plan.local_interval_top_z_mm is None
+                or abs(
+                    cut_plan.cut_origin_mm.z
+                    - cut_plan.local_interval_top_z_mm
+                )
+                > 0.0001
+                or abs(
+                    cut_plan.cut_origin_mm.z
+                    - cut_plan.cut_size_mm.z
+                    - cut_plan.local_interval_bottom_z_mm
+                )
+                > 0.0001
+            ):
+                raise RuntimeError(
+                    "Fusion flat-inset BRep tool diverges from its exact interval."
+                )
         local_cut_origin = _relative_vector(
             cut_plan.cut_origin_mm,
             body_origin_mm,

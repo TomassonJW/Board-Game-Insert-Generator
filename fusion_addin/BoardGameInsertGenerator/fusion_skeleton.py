@@ -568,6 +568,9 @@ class FusionCavityCutPlan:
     operation_kind: str = CAVITY_CUT_OPERATION_KIND
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
     cavity_source: str = "cad_ir_cavity"
+    boolean_operation: str = "difference"
+    geometry_attribution: str = ""
+    positive_geometry_digest: str = ""
     policy: str | None = None
     flat_item_id: str = ""
     local_region_id: str = ""
@@ -599,7 +602,24 @@ class FusionCavityCutPlan:
             "retained_floor_mm": self.retained_floor_mm,
             "validation_status": self.validation_status,
             "cavity_source": self.cavity_source,
+            "boolean_operation": self.boolean_operation,
         }
+        if self.geometry_attribution:
+            payload["geometry_attribution"] = self.geometry_attribution
+        if self.positive_geometry_digest:
+            payload["positive_geometry_digest"] = (
+                self.positive_geometry_digest
+            )
+        if self.cavity_source in {
+            "top_inset_reservation",
+            "top_inset_grip",
+        }:
+            payload["brep_tool_interval_z_mm"] = {
+                "bottom": (
+                    self.cut_origin_mm.z - self.cut_size_mm.z
+                ),
+                "top": self.cut_origin_mm.z,
+            }
         if self.policy is not None:
             payload["policy"] = self.policy
         if self.flat_item_id:
@@ -725,6 +745,7 @@ class FusionGenerationPlan:
     finger_notch_cuts: tuple[FusionFingerNotchCutPlan, ...] = ()
     artifact_identity: dict[str, object] | None = None
     final_material_envelope_certificate: dict[str, object] | None = None
+    subtractive_flat_inset_certificate: dict[str, object] | None = None
     generation_mode: str = DEFAULT_FUSION_GENERATION_MODE
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
 
@@ -810,6 +831,9 @@ class FusionGenerationPlan:
             "artifact_identity": self.artifact_identity,
             "final_material_envelope_certificate": (
                 self.final_material_envelope_certificate
+            ),
+            "subtractive_flat_inset_certificate": (
+                self.subtractive_flat_inset_certificate
             ),
             "generation_mode": self.generation_mode,
             "validation_status": self.validation_status,
@@ -2946,9 +2970,88 @@ def generation_plan_from_cad_ir(
     metadata = validated_payload.get("metadata", {})
     artifact_identity = _artifact_identity_from_metadata(metadata)
     final_material_envelope_certificate = None
+    subtractive_flat_inset_certificate = None
     if isinstance(metadata, dict):
         box_fill_plan = metadata.get("box_fill_plan")
         if isinstance(box_fill_plan, dict):
+            raw_subtractive_certificate = box_fill_plan.get(
+                "subtractive_flat_inset_certificate"
+            )
+            if isinstance(raw_subtractive_certificate, dict):
+                positive_before = str(
+                    raw_subtractive_certificate.get(
+                        "positive_geometry_digest_before",
+                        "",
+                    )
+                )
+                positive_after = str(
+                    raw_subtractive_certificate.get(
+                        "positive_geometry_digest_after",
+                        "",
+                    )
+                )
+                if (
+                    raw_subtractive_certificate.get("schema_version")
+                    != "bgig.subtractive_flat_inset_certificate.v1"
+                    or raw_subtractive_certificate.get("certified")
+                    is not True
+                    or int(
+                        raw_subtractive_certificate.get(
+                            "flat_positive_body_count",
+                            -1,
+                        )
+                    )
+                    != 0
+                    or int(
+                        raw_subtractive_certificate.get(
+                            "flat_positive_union_count",
+                            -1,
+                        )
+                    )
+                    != 0
+                    or int(
+                        raw_subtractive_certificate.get(
+                            "flat_positive_operation_count",
+                            -1,
+                        )
+                    )
+                    != 0
+                    or int(
+                        raw_subtractive_certificate.get(
+                            "new_printable_body_count_attributed_to_flat_items",
+                            -1,
+                        )
+                    )
+                    != 0
+                    or int(
+                        raw_subtractive_certificate.get(
+                            "positive_operations_after_subtraction_start",
+                            -1,
+                        )
+                    )
+                    != 0
+                    or raw_subtractive_certificate.get(
+                        "positive_geometry_unchanged"
+                    )
+                    is not True
+                    or abs(
+                        float(
+                            raw_subtractive_certificate.get(
+                                "flat_positive_volume_mm3",
+                                -1.0,
+                            )
+                        )
+                    )
+                    > 0.0001
+                    or not positive_before
+                    or positive_before != positive_after
+                ):
+                    raise FusionSkeletonError(
+                        "CAD IR subtractive flat-inset certificate is invalid."
+                    )
+                subtractive_flat_inset_certificate = deepcopy(
+                    raw_subtractive_certificate
+                )
             composite_certificate = box_fill_plan.get(
                 "composite_materialization_certificate"
             )
@@ -3119,6 +3222,51 @@ def generation_plan_from_cad_ir(
             _finger_notch_cut_plans(component_id, component_name, blank, body, operations)
         )
 
+    if subtractive_flat_inset_certificate is not None:
+        flat_cuts = [
+            value
+            for value in cavity_cuts
+            if value.cavity_source
+            in {"top_inset_reservation", "top_inset_grip"}
+        ]
+        positive_digest = str(
+            subtractive_flat_inset_certificate[
+                "positive_geometry_digest_before"
+            ]
+        )
+        if (
+            len(flat_cuts)
+            != int(
+                subtractive_flat_inset_certificate.get(
+                    "operation_count",
+                    -1,
+                )
+            )
+            or any(
+                value.boolean_operation != "difference"
+                or value.geometry_attribution
+                not in {"flat_inset", "flat_grip"}
+                or value.positive_geometry_digest != positive_digest
+                or value.local_interval_bottom_z_mm is None
+                or value.local_interval_top_z_mm is None
+                or abs(
+                    value.cut_origin_mm.z
+                    - value.local_interval_top_z_mm
+                )
+                > 0.0001
+                or abs(
+                    value.cut_origin_mm.z
+                    - value.cut_size_mm.z
+                    - value.local_interval_bottom_z_mm
+                )
+                > 0.0001
+                for value in flat_cuts
+            )
+        ):
+            raise FusionSkeletonError(
+                "Fusion flat-inset plans diverge from the subtractive certificate."
+            )
+
     grid_positioned_blanks, rejected_grid_modules = _grid_positioned_asset_blanks_from_metadata(
         metadata if isinstance(metadata, dict) else {},
         reference_box,
@@ -3150,6 +3298,9 @@ def generation_plan_from_cad_ir(
         artifact_identity=artifact_identity,
         final_material_envelope_certificate=(
             final_material_envelope_certificate
+        ),
+        subtractive_flat_inset_certificate=(
+            subtractive_flat_inset_certificate
         ),
         generation_mode=generation_mode,
     )
@@ -4114,56 +4265,111 @@ def _cavity_cut_plans(
             )
         local_interval_bottom_z_mm: float | None = None
         local_interval_top_z_mm: float | None = None
+        boolean_operation = str(
+            parameters.get("boolean_operation", "difference")
+        )
+        geometry_attribution = str(
+            parameters.get("geometry_attribution", "")
+        )
+        positive_geometry_digest = str(
+            parameters.get("positive_geometry_digest", "")
+        )
         if is_top_inset:
             if parameters.get("non_perforating") is not True:
                 raise FusionSkeletonError(
                     f"Top inset {cavity_id!r} for {blank.body_name!r} must be marked non_perforating."
                 )
             raw_interval = parameters.get("local_interval_z_mm")
-            if isinstance(raw_interval, Mapping):
-                local_interval_bottom_z_mm = float(
-                    raw_interval.get("bottom", -1.0)
-                )
-                local_interval_top_z_mm = float(
-                    raw_interval.get("top", -1.0)
-                )
-            raw_overlap_ids = parameters.get(
-                "overlapping_reservation_ids",
-                (),
-            )
-            stacked_local_interval = bool(
-                isinstance(raw_interval, Mapping)
-                and isinstance(raw_overlap_ids, (list, tuple))
-                and len(raw_overlap_ids) > 1
-                and abs(
-                    float(raw_interval.get("bottom", -1.0))
-                    - (geometry_origin.z + local_origin.z)
-                )
-                <= 0.0001
-                and abs(
-                    float(raw_interval.get("top", -1.0))
-                    - (
-                        geometry_origin.z
-                        + local_origin.z
-                        + cavity_size.z
-                    )
-                )
-                <= 0.0001
-            )
             if (
-                abs(
-                    local_origin.z
-                    + cavity_size.z
-                    - geometry_size.z
+                not isinstance(raw_interval, Mapping)
+                or isinstance(raw_interval.get("bottom"), bool)
+                or not isinstance(
+                    raw_interval.get("bottom"),
+                    (int, float),
                 )
-                > 0.0001
-                and not stacked_local_interval
+                or isinstance(raw_interval.get("top"), bool)
+                or not isinstance(
+                    raw_interval.get("top"),
+                    (int, float),
+                )
             ):
                 raise FusionSkeletonError(
-                    f"Top inset {cavity_id!r} for {blank.body_name!r} must open on the top face or join a certified local stack."
+                    f"Top inset {cavity_id!r} must declare one exact local Z interval."
                 )
-            if stacked_local_interval:
-                retained_floor_mm = local_origin.z
+            local_interval_bottom_z_mm = _product_grid_mm(
+                float(raw_interval["bottom"])
+            )
+            local_interval_top_z_mm = _product_grid_mm(
+                float(raw_interval["top"])
+            )
+            expected_world_bottom = _product_grid_mm(
+                geometry_origin.z + local_origin.z
+            )
+            expected_world_top = _product_grid_mm(
+                expected_world_bottom + cavity_size.z
+            )
+            declared_cut_plane = _product_grid_mm(
+                float(
+                    parameters.get(
+                        "cut_plane_world_z_mm",
+                        -1.0,
+                    )
+                )
+            )
+            expected_attribution = (
+                "flat_grip"
+                if operation_kind == TOP_INSET_GRIP_OPERATION_KIND
+                else "flat_inset"
+            )
+            if (
+                boolean_operation != "difference"
+                or geometry_attribution != expected_attribution
+                or parameters.get("creates_positive_geometry") is not False
+                or parameters.get("creates_printable_body") is not False
+                or parameters.get("creates_union") is not False
+                or not positive_geometry_digest
+                or not str(parameters.get("target_prism_id", ""))
+                or not str(
+                    parameters.get(
+                        "owner_positive_geometry_digest",
+                        "",
+                    )
+                )
+            ):
+                raise FusionSkeletonError(
+                    f"Top inset {cavity_id!r} is not a certified difference operation."
+                )
+            if (
+                local_interval_top_z_mm
+                <= local_interval_bottom_z_mm + 0.0001
+                or abs(
+                    local_interval_bottom_z_mm
+                    - expected_world_bottom
+                )
+                > 0.0001
+                or abs(
+                    local_interval_top_z_mm - expected_world_top
+                )
+                > 0.0001
+                or abs(
+                    local_interval_top_z_mm
+                    - local_interval_bottom_z_mm
+                    - cavity_size.z
+                )
+                > 0.0001
+                or abs(
+                    declared_cut_plane - local_interval_top_z_mm
+                )
+                > 0.0001
+                or local_origin.z < -0.0001
+                or local_origin.z + cavity_size.z
+                > geometry_size.z + 0.0001
+            ):
+                raise FusionSkeletonError(
+                    f"Top inset {cavity_id!r} interval, origin and depth diverge."
+                )
+            cut_plane_world_z = local_interval_top_z_mm
+            retained_floor_mm = local_origin.z
             declared_retained = float(parameters.get("retained_body_below_mm", -1.0))
             if abs(declared_retained - retained_floor_mm) > 0.0001:
                 raise FusionSkeletonError(
@@ -4208,7 +4414,14 @@ def _cavity_cut_plans(
                 retained_floor_mm=retained_floor_mm,
                 operation_kind=str(operation_kind),
                 cavity_source=cavity_source,
-                policy="localized_top_inset_v1" if is_top_inset else None,
+                boolean_operation=boolean_operation,
+                geometry_attribution=geometry_attribution,
+                positive_geometry_digest=positive_geometry_digest,
+                policy=(
+                    "strictly_subtractive_flat_inset_v1"
+                    if is_top_inset
+                    else None
+                ),
                 flat_item_id=str(parameters.get("flat_item_id", "")),
                 local_region_id=str(
                     parameters.get(

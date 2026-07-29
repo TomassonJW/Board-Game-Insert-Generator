@@ -9,9 +9,15 @@ aucun support de plateau ou de livret : elle matérialise seulement les prismes
 `final_*` déjà décidés et certifiés par le cœur Python.
 
 Le squelette Fusion vérifie toujours l’ordre topologique et les vraies attaches
-X/Y. Il ne recalcule aucune dimension. Les opérations plates devront arriver
-ensuite comme soustractions distinctes ; R8-D ne modifie pas encore leur
-traduction Z ni l’exécuteur BRep.
+X/Y. Il ne recalcule aucune dimension. Les opérations plates arrivent ensuite
+depuis `bgig.flat_inset_subtraction_plan.v1`, uniquement comme différences
+attribuées à `flat_inset` ou `flat_grip`.
+
+Pour un intervalle certifié `[bottom, top]`, le plan Fusion impose
+`cut_origin.z=top` et `cut_size.z=top-bottom`. L’exécuteur BRep transitoire
+construit exactement cet outil, refuse toute opération autre que `difference`,
+puis conserve la BaseFeature unique et le rollback existants. Une coupe
+enterrée n’est jamais translatée vers la face supérieure du corps.
 
 Les politiques historiques `bounded_xy_composite_v1` et
 `hybrid_xy_composite_v2` restent acceptées pour relire d’anciens artefacts,

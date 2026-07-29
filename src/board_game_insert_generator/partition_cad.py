@@ -24,6 +24,11 @@ from board_game_insert_generator.cad_ir import (
     CadSceneMetadata,
 )
 from board_game_insert_generator.models import Dimension3D, Point3D
+from board_game_insert_generator.flat_inset_subtraction import (
+    FlatInsetSubtractionError,
+    assert_flat_inset_subtraction_plan,
+    operations_for_owner,
+)
 from board_game_insert_generator.incremental_project_state import canonical_digest
 from board_game_insert_generator.partition_solver import PARTITION_PLAN_SCHEMA_V1, solve_partition_plan
 from board_game_insert_generator.project_v1 import normalize_project_draft
@@ -202,6 +207,9 @@ def build_partition_cad(
                 "score_breakdown": plan.get("score_breakdown"),
                 "volume_conservation": plan.get("validation"),
                 "top_inset_reservations": plan.get("top_inset_reservations"),
+                "flat_inset_subtraction_plan": plan.get(
+                    "flat_inset_subtraction_plan"
+                ),
                 "composite_materialization_certificate": (
                     _mapping(plan.get("finalization"), "partition.finalization").get(
                         "composite_materialization_certificate"
@@ -216,6 +224,25 @@ def build_partition_cad(
                     ).get("finalized_container_geometry_certificate")
                     if isinstance(plan.get("finalization"), dict)
                     else None
+                ),
+                "subtractive_flat_inset_certificate": (
+                    deepcopy(
+                        plan["flat_inset_subtraction_plan"].get(
+                            "certificate"
+                        )
+                    )
+                    if isinstance(
+                        plan.get("flat_inset_subtraction_plan"),
+                        Mapping,
+                    )
+                    else (
+                        _mapping(
+                            plan.get("finalization"),
+                            "partition.finalization",
+                        ).get("subtractive_flat_inset_certificate")
+                        if isinstance(plan.get("finalization"), dict)
+                        else None
+                    )
                 ),
                 "invariants": plan.get("invariants"),
                 "free_regions_materialized": False,
@@ -276,7 +303,26 @@ def build_partition_cad(
             "component_count_matches_plan": True,
             "cavities_from_p55_only": True,
             "top_insets_are_reservations_not_cavities": True,
-            "top_inset_cut_count_matches_plan": top_inset_cut_count == len(_mappings(_mapping(plan.get("top_inset_reservations"), "partition.top_inset_reservations").get("cuts", []), "partition.top_inset_reservations.cuts")),
+            "top_inset_cut_count_matches_plan": top_inset_cut_count
+            == len(
+                _mappings(
+                    (
+                        _mapping(
+                            plan.get("flat_inset_subtraction_plan"),
+                            "partition.flat_inset_subtraction_plan",
+                        ).get("operations", [])
+                        if isinstance(
+                            plan.get("flat_inset_subtraction_plan"),
+                            Mapping,
+                        )
+                        else _mapping(
+                            plan.get("top_inset_reservations"),
+                            "partition.top_inset_reservations",
+                        ).get("cuts", [])
+                    ),
+                    "partition.flat_inset_subtraction_plan.operations",
+                )
+            ),
             "composite_owners_are_single_user_components": (
                 composite_owner_count == 0
                 or composite_owner_count == sum(
@@ -454,18 +500,108 @@ def _assert_finalized_container_geometry_certificate(
             "Le certificat de geometrie positive des conteneurs "
             "finalises est absent ou invalide."
         )
+    top_insets = _mapping(
+        plan.get("top_inset_reservations"),
+        "partition.top_inset_reservations",
+    )
+    reservations = _mappings(
+        top_insets.get("reservations", []),
+        "partition.top_inset_reservations.reservations",
+    )
+    flat_plan = _mapping(
+        plan.get("flat_inset_subtraction_plan"),
+        "partition.flat_inset_subtraction_plan",
+    )
+    finalization = _mapping(
+        plan.get("finalization"),
+        "partition.finalization",
+    )
+    if (
+        finalization.get("flat_inset_subtraction_plan_digest")
+        != flat_plan.get("deterministic_digest")
+        or finalization.get("subtractive_flat_inset_certificate")
+        != flat_plan.get("certificate")
+    ):
+        raise PartitionCadBuildError(
+            "Le certificat final et le plan d encastrement "
+            "soustractif ne racontent pas le meme contrat."
+        )
+    positive_body_divergence = any(
+        isinstance(placement.get("composite_body"), Mapping)
+        and placement["composite_body"].get("schema_version")
+        == COMPOSITE_BODY_SCHEMA_V3
+        and str(
+            placement["composite_body"].get(
+                "positive_geometry_digest",
+                "",
+            )
+        )
+        != canonical_digest(
+            _composite_positive_geometry_payload(
+                placement["composite_body"]
+            )
+        )
+        for placement in placements
+    )
+    if positive_body_divergence:
+        # The component builder reports the pre-existing, owner-specific
+        # positive-digest blocker.  No CAD IR is published in either case.
+        return
+    try:
+        assert_flat_inset_subtraction_plan(
+            flat_plan,
+            placements,
+            reservations,
+            design_top_z_mm=float(
+                top_insets.get("design_top_z_mm", 0.0)
+            ),
+            positive_geometry_certificate=certificate,
+        )
+    except FlatInsetSubtractionError as exc:
+        raise PartitionCadBuildError(
+            "Le plan d encastrement soustractif diverge de la "
+            "geometrie positive figee."
+        ) from exc
 
 
 def _components(project: dict[str, object], plan: dict[str, object]) -> _BuildResult:
     layout = _mapping(project["layout"], "project.layout")
     components: list[CadComponent] = []
     blockers: list[str] = []
+    flat_plan = plan.get("flat_inset_subtraction_plan")
     for index, value in enumerate(_mappings(plan["placements"], "partition.placements")):
         try:
+            flat_inset_operations = (
+                operations_for_owner(
+                    flat_plan,
+                    str(value.get("id", "")),
+                )
+                if isinstance(flat_plan, Mapping)
+                else tuple(
+                    deepcopy(item)
+                    for item in _mappings(
+                        value.get("top_inset_cuts", []),
+                        f"placement[{index}].top_inset_cuts",
+                    )
+                )
+            )
             if value["role"] == "container":
-                components.append(_container_component(value, index))
+                components.append(
+                    _container_component(
+                        value,
+                        index,
+                        flat_inset_operations=flat_inset_operations,
+                    )
+                )
             elif value["role"] == "explicit_complement":
-                components.append(_complement_component(value, layout, index))
+                components.append(
+                    _complement_component(
+                        value,
+                        layout,
+                        index,
+                        flat_inset_operations=flat_inset_operations,
+                    )
+                )
             else:
                 raise PartitionCadBuildError(f"Role de placement P59 inconnu : {value.get('role')!r}.")
         except PartitionCadBuildError as exc:
@@ -473,7 +609,12 @@ def _components(project: dict[str, object], plan: dict[str, object]) -> _BuildRe
     return _BuildResult(tuple(components), tuple(blockers))
 
 
-def _container_component(placement: dict[str, object], index: int) -> CadComponent:
+def _container_component(
+    placement: dict[str, object],
+    index: int,
+    *,
+    flat_inset_operations: tuple[dict[str, object], ...] = (),
+) -> CadComponent:
     body_size = _dimension(placement["world_size_mm"], f"placement[{index}].world_size_mm")
     body_origin = _dimension(placement["origin_mm"], f"placement[{index}].origin_mm")
     final_local = _dimension(placement["final_outer_dimensions_mm"], f"placement[{index}].final_outer_dimensions_mm")
@@ -602,10 +743,17 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
             "automatic": False,
         },
         composite_body=composite_body,
+        flat_inset_operations=flat_inset_operations,
     )
 
 
-def _complement_component(placement: dict[str, object], layout: dict[str, object], index: int) -> CadComponent:
+def _complement_component(
+    placement: dict[str, object],
+    layout: dict[str, object],
+    index: int,
+    *,
+    flat_inset_operations: tuple[dict[str, object], ...] = (),
+) -> CadComponent:
     size = _dimension(placement["world_size_mm"], f"placement[{index}].world_size_mm")
     origin = _dimension(placement["origin_mm"], f"placement[{index}].origin_mm")
     kind = str(placement.get("complement_kind", ""))
@@ -642,6 +790,7 @@ def _complement_component(placement: dict[str, object], layout: dict[str, object
             "requested_complement_id": placement.get("requested_complement_id"),
             "complement_kind": kind, "automatic": False,
         },
+        flat_inset_operations=flat_inset_operations,
     )
 
 
@@ -695,6 +844,7 @@ def _component(
     *, placement: dict[str, object], index: int, functional_type: str,
     origin: dict[str, float], size: dict[str, float], cavities: tuple[CadCavity, ...],
     metadata: dict[str, object], composite_body: dict[str, object] | None = None,
+    flat_inset_operations: tuple[dict[str, object], ...] = (),
 ) -> CadComponent:
     instance_id = str(placement["id"])
     body_id = f"body:{instance_id}"
@@ -888,7 +1038,7 @@ def _component(
             ),
             *tuple(
                 _top_inset_operation(body_id, cut)
-                for cut in _mappings(placement.get("top_inset_cuts", []), f"placement[{index}].top_inset_cuts")
+                for cut in flat_inset_operations
             ),
         ),
     )
@@ -1343,10 +1493,83 @@ def _top_inset_operation(body_id: str, cut: dict[str, object]) -> CadOperation:
     cut_kind = str(cut.get("kind", ""))
     if cut_kind == TOP_INSET_CUT_KIND:
         operation_kind = TOP_INSET_OPERATION_KIND
+        expected_attribution = "flat_inset"
     elif cut_kind == TOP_INSET_GRIP_CUT_KIND:
         operation_kind = TOP_INSET_GRIP_OPERATION_KIND
+        expected_attribution = "flat_grip"
     else:
         raise PartitionCadBuildError(f"Type de coupe superieure inconnu : {cut_kind!r}.")
+    interval = _mapping(
+        cut.get("local_interval_z_mm"),
+        f"flat inset {cut.get('id')}.local_interval_z_mm",
+    )
+    size = _mapping(
+        cut.get("size_mm"),
+        f"flat inset {cut.get('id')}.size_mm",
+    )
+    boolean_operation = str(
+        cut.get("boolean_operation", "difference")
+    )
+    geometry_attribution = str(
+        cut.get("geometry_attribution", expected_attribution)
+    )
+    creates_positive_geometry = cut.get(
+        "creates_positive_geometry",
+        False,
+    )
+    creates_printable_body = cut.get(
+        "creates_printable_body",
+        False,
+    )
+    creates_union = cut.get("creates_union", False)
+    positive_geometry_digest = str(
+        cut.get("positive_geometry_digest", "")
+        or canonical_digest(
+            {
+                "schema_version": "bgig.legacy_rectangular_positive_body.v1",
+                "body_id": body_id,
+            }
+        )
+    )
+    owner_positive_geometry_digest = str(
+        cut.get(
+            "owner_positive_geometry_digest",
+            positive_geometry_digest,
+        )
+    )
+    target_prism_id = str(
+        cut.get("target_prism_id", body_id)
+    )
+    cut_plane_world_z_mm = float(
+        cut.get(
+            "cut_plane_world_z_mm",
+            interval["top"],
+        )
+    )
+    if (
+        boolean_operation != "difference"
+        or geometry_attribution != expected_attribution
+        or creates_positive_geometry is not False
+        or creates_printable_body is not False
+        or creates_union is not False
+        or not positive_geometry_digest
+        or abs(
+            float(size["z"])
+            - (
+                float(interval["top"])
+                - float(interval["bottom"])
+            )
+        )
+        > _EPSILON
+        or abs(
+            cut_plane_world_z_mm
+            - float(interval["top"])
+        )
+        > _EPSILON
+    ):
+        raise PartitionCadBuildError(
+            f"La coupe plate {cut.get('id')!r} n est pas strictement soustractive."
+        )
     return CadOperation(
         id=f"{body_id}:{cut['id']}:{operation_kind}",
         kind=operation_kind,
@@ -1354,6 +1577,12 @@ def _top_inset_operation(body_id: str, cut: dict[str, object]) -> CadOperation:
         parameters={
             "cut_id": cut["id"],
             "cut_kind": cut_kind,
+            "boolean_operation": boolean_operation,
+            "geometry_attribution": geometry_attribution,
+            "geometry_role": "negative_volume",
+            "creates_positive_geometry": creates_positive_geometry,
+            "creates_printable_body": creates_printable_body,
+            "creates_union": creates_union,
             "reservation_id": cut["reservation_id"],
             "flat_item_id": cut["flat_item_id"],
             "local_region_id": cut.get("local_region_id", ""),
@@ -1361,7 +1590,13 @@ def _top_inset_operation(body_id: str, cut: dict[str, object]) -> CadOperation:
                 cut.get("overlapping_reservation_ids", [])
             ),
             "local_interval_z_mm": deepcopy(
-                cut.get("local_interval_z_mm")
+                interval
+            ),
+            "cut_plane_world_z_mm": cut_plane_world_z_mm,
+            "target_prism_id": target_prism_id,
+            "positive_geometry_digest": positive_geometry_digest,
+            "owner_positive_geometry_digest": (
+                owner_positive_geometry_digest
             ),
             "removal_order": cut["removal_order"],
             "local_origin_mm": deepcopy(cut["local_origin_mm"]),

@@ -10,14 +10,15 @@
 - `C-STAGED-CALCULATION` : `human-KO`, diagnostiqué. Le calcul minimal exige
   jusqu'à `90,991 s`; Normal et Long épuisent chacun une invocation SCIP sans
   candidat sur `CasLimite02+`.
-- `C-FINALIZATION` : R8-D `automated-validated`. Le composite v3 distingue la
-  fermeture de la géométrie positive du conteneur finalisé et supprime les
-  champs exécutables `cad_*`.
-- `C-CAD-IR` : R8-D `automated-validated` sur la frontière positive. Le digest
-  positif est figé avant les soustractions et la CAD IR refuse tout compteur
-  positif plat non nul.
-- `C-FUSION` : `human-KO`, cause mesurée. Trois coupes livret sont décalées de
-  `+4 mm`; la BRep laisse `31 209,20 mm³` du vide demandé non retiré.
+- `C-FINALIZATION` : R8-E `automated-validated`. Le composite v3 fige le
+  conteneur positif, puis une passe séparée publie uniquement des différences
+  plates.
+- `C-CAD-IR` : R8-E `automated-validated`. Le plan soustractif est reconstruit
+  et son digest, son certificat et ses intervalles sont contrôlés.
+- `C-FUSION` : R8-E `automated-validated`, `fusion-validated=false`. Les trois
+  coupes livret ne sont plus décalées de `+4 mm` dans le plan automatisé et le
+  BRep utilise l’intervalle exact ; une nouvelle observation humaine reste
+  nécessaire après R8-G.
 - `C-PRODUCT-GRID` : acquis automatisé à préserver, résolution `0,1 mm`.
 - `C-ARCHITECTURE` : ADR-0105 acceptée. Les conteneurs finalisés figent toute
   géométrie positive avant une passe plate uniquement soustractive.
@@ -25,10 +26,10 @@
   prouve `0 mm³`, `0` corps, `0` union, `0` support et `0` coupe positifs liés
   aux éléments plats ; toute compensation Z est rejetée.
 - `C-RELEASE` : 0.1.78 `human-KO`, `do-not-run`; R8-A `done-diagnostic`,
-  R8-B `done-architecture`, R8-C et R8-D `automated-validated`, R8-E `ready`.
+  R8-B `done-architecture`, R8-C à R8-E `automated-validated`, R8-F `ready`.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : R8-E, passe plate distincte et uniquement soustractive.
+Prochaine frontière : R8-F, fidélité de l’aperçu à la BRep et régressions.
 
 ### Historique R7 clôturé en human-KO
 

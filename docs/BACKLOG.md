@@ -56,13 +56,17 @@
 
 ### P64-L09U-R8-E — Passe d’encastrement soustractive
 
-- Statut : `ready`.
+- Statut : `done-automated-validated`.
 - Profondeurs locales exactes `4/2/6 mm`.
 - Zéro union, zéro corps et zéro volume positif attribuables aux éléments plats.
+- Résultat : plan négatif canonique, digest positif inchangé, intervalles CAD
+  IR/Fusion/BRep identiques et validation ciblée `207/207`.
+- Preuve :
+  `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md`.
 
 ### P64-L09U-R8-F — Fidélité et régressions
 
-- Statut : `blocked-by-R8-E`.
+- Statut : `ready`.
 - Prouver aperçu, CAD IR, plan Fusion et BRep identiques.
 - Préserver R6, parois, ordre automatique et grille `0,1 mm`.
 

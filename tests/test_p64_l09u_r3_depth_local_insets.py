@@ -421,6 +421,97 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
             },
         )
 
+    def test_subtractive_plan_fusion_and_brep_share_exact_intervals(
+        self,
+    ) -> None:
+        subtraction_plan = self.stepped_plan[
+            "flat_inset_subtraction_plan"
+        ]
+        certificate = subtraction_plan["certificate"]
+        cad_operations = [
+            operation
+            for component in self.stepped_cad["cad_ir"]["components"]
+            for operation in component["body"]["operations"]
+            if operation["kind"]
+            in {
+                "subtract_top_inset_reservation",
+                "subtract_top_inset_grip",
+            }
+        ]
+        fusion_cuts = [
+            value
+            for value in self.stepped_fusion.cavity_cuts
+            if value.cavity_source
+            in {"top_inset_reservation", "top_inset_grip"}
+        ]
+
+        self.assertEqual(
+            subtraction_plan["schema_version"],
+            "bgig.flat_inset_subtraction_plan.v1",
+        )
+        self.assertEqual(
+            certificate["schema_version"],
+            "bgig.subtractive_flat_inset_certificate.v1",
+        )
+        self.assertTrue(certificate["certified"])
+        self.assertEqual(certificate["flat_positive_volume_mm3"], 0.0)
+        self.assertEqual(certificate["flat_positive_body_count"], 0)
+        self.assertEqual(certificate["flat_positive_union_count"], 0)
+        self.assertEqual(
+            certificate["positive_geometry_digest_before"],
+            certificate["positive_geometry_digest_after"],
+        )
+        self.assertEqual(
+            self.stepped_fusion.subtractive_flat_inset_certificate,
+            certificate,
+        )
+        self.assertEqual(
+            len(cad_operations),
+            len(subtraction_plan["operations"]),
+        )
+        self.assertEqual(len(fusion_cuts), len(cad_operations))
+        self.assertTrue(
+            all(
+                operation["parameters"]["boolean_operation"]
+                == "difference"
+                and operation["parameters"]["geometry_attribution"]
+                in {"flat_inset", "flat_grip"}
+                for operation in cad_operations
+            )
+        )
+        for cut in fusion_cuts:
+            interval = {
+                "bottom": cut.local_interval_bottom_z_mm,
+                "top": cut.local_interval_top_z_mm,
+            }
+            self.assertEqual(cut.boolean_operation, "difference")
+            self.assertIn(
+                cut.geometry_attribution,
+                {"flat_inset", "flat_grip"},
+            )
+            self.assertEqual(
+                cut.policy,
+                "strictly_subtractive_flat_inset_v1",
+            )
+            self.assertEqual(cut.cut_origin_mm.z, interval["top"])
+            self.assertEqual(
+                cut.cut_size_mm.z,
+                interval["top"] - interval["bottom"],
+            )
+            self.assertEqual(
+                cut.to_dict()["brep_tool_interval_z_mm"],
+                interval,
+            )
+        buried_booklet_cut = next(
+            value
+            for value in fusion_cuts
+            if value.flat_item_id == "upper-booklet"
+            and value.local_interval_bottom_z_mm == 54.6
+            and value.local_interval_top_z_mm == 57.6
+        )
+        self.assertEqual(buried_booklet_cut.cut_origin_mm.z, 57.6)
+        self.assertNotEqual(buried_booklet_cut.cut_origin_mm.z, 59.6)
+
     def test_closure_guard_uses_exact_local_regions_not_global_stack(
         self,
     ) -> None:
@@ -696,6 +787,34 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         with self.assertRaisesRegex(
             FusionSkeletonError,
             "without intermediate material",
+        ):
+            generation_plan_from_cad_ir(
+                cad_ir,
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+            )
+
+    def test_fusion_refuses_a_shifted_flat_interval(self) -> None:
+        cad_ir = deepcopy(self.stepped_cad["cad_ir"])
+        cad_ir["metadata"].pop("artifact_identity", None)
+        top_operation = next(
+            operation
+            for component in cad_ir["components"]
+            for operation in component["body"]["operations"]
+            if operation["kind"] == "subtract_top_inset_reservation"
+            and operation["parameters"]["flat_item_id"]
+            == "upper-booklet"
+            and operation["parameters"]["local_interval_z_mm"]
+            == {"bottom": 54.6, "top": 57.6}
+        )
+        top_operation["parameters"]["local_interval_z_mm"] = {
+            "bottom": 58.6,
+            "top": 61.6,
+        }
+        top_operation["parameters"]["cut_plane_world_z_mm"] = 61.6
+
+        with self.assertRaisesRegex(
+            FusionSkeletonError,
+            "interval, origin and depth diverge",
         ):
             generation_plan_from_cad_ir(
                 cad_ir,

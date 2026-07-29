@@ -49,8 +49,16 @@
 - Corps, unions, opérations et volume positifs liés aux éléments plats valent
   zéro ; la CAD IR refuse toute divergence du certificat ou de son digest.
 - La validation ciblée R8-D passe `90/90`.
-- R8-E est maintenant la mission unique `ready`. Elle doit extraire une passe
-  d’encastrement uniquement négative et conserver le digest positif R8-D.
+- R8-E est terminée : `bgig.flat_inset_subtraction_plan.v1` publie uniquement
+  des différences négatives et certifie les profondeurs locales `2/4/6 mm`.
+- Le digest positif R8-D reste identique avant et après la passe ; corps,
+  unions, opérations, nouveaux corps imprimables et volume positifs plats
+  valent zéro.
+- CAD IR, plan Fusion et BRep utilisent le même intervalle `[bottom, top]`.
+  Une coupe livret enterrée n’est plus déplacée vers le sommet du corps.
+- La validation ciblée R8-E passe `207/207`.
+- R8-F est maintenant la mission unique `ready` : fidélité de l’aperçu à la
+  BRep, régressions complètes et replays personnels en lecture seule.
 - Les acquis R6/R7 restent à préserver : profondeurs, accès, parois minimales,
   ordre automatique, grille `0,1 mm`, BRep transitoire et projets personnels en
   lecture seule.
@@ -65,7 +73,8 @@ Autorités R8 :
 - `docs/DECISIONS/ADR-0105-conteneurs-finalises-et-encastrements-strictement-soustractifs.md` ;
 - `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md` ;
-- `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md`.
+- `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

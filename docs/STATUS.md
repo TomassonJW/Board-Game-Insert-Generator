@@ -8,7 +8,8 @@ Date : 2026-07-29.
 Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
 `P64-L09U-R8-A-done-diagnostic`, `P64-L09U-R8-B-done-architecture`,
 `P64-L09U-R8-C-automated-validated`,
-`P64-L09U-R8-D-automated-validated`, `P64-L09U-R8-E-ready`,
+`P64-L09U-R8-D-automated-validated`,
+`P64-L09U-R8-E-automated-validated`, `P64-L09U-R8-F-ready`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.78 est `human-KO`, `do-not-run`.
@@ -53,8 +54,16 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
 - Les compteurs plats restent à `0 corps / 0 union / 0 opération / 0 mm³`.
 - Validation R8-D : `90/90` tests ciblés, compilation Python et
   `git diff --check` OK.
-- R8-E doit maintenant construire et appliquer la passe d’encastrement
-  uniquement soustractive sans modifier le digest positif.
+- R8-E publie `bgig.flat_inset_subtraction_plan.v1` et son certificat
+  strictement soustractif.
+- Toutes les opérations plates sont des différences négatives ; les
+  profondeurs locales `2/4/6 mm` sont exactes.
+- Le digest positif reste inchangé et les compteurs plats valent
+  `0 corps / 0 union / 0 opération / 0 nouveau corps / 0 mm³`.
+- CAD IR, plan Fusion et BRep consomment le même intervalle `[bottom, top]`.
+- Validation R8-E : `207/207` tests ciblés et compilation Python OK.
+- R8-F doit maintenant fermer la fidélité de l’aperçu à la BRep et rejouer les
+  deux projets personnels en lecture seule.
 - Les acquis de profondeur, accès, parois, ordre, grille `0,1 mm` et BRep
   transitoire restent obligatoires.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
@@ -73,6 +82,8 @@ Preuve R8-C :
 `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md`.
 Preuve R8-D :
 `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md`.
+Preuve R8-E :
+`docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

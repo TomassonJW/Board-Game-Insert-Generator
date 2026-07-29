@@ -275,6 +275,60 @@ class FusionMaterializationBatchTests(unittest.TestCase):
         )
         self.assertEqual(len(component.features.combineFeatures.inputs), 0)
 
+    def test_buried_flat_inset_brep_tool_uses_declared_interval(self) -> None:
+        component = _component()
+        manager = _TemporaryBRepManager()
+        solid = SimpleNamespace(
+            origin_mm=FusionVectorMm(0.0, 0.0, 0.0),
+            size_mm=FusionVectorMm(50.0, 30.0, 69.8),
+            component_name="A",
+            body_name="A body",
+        )
+        cut = FusionCavityCutPlan(
+            component_id="component:a",
+            component_name="A",
+            target_body_id="body:a",
+            target_body_name="A body",
+            operation_id="cut:buried-booklet",
+            cavity_id="booklet:buried",
+            cut_origin_mm=FusionVectorMm(0.0, 0.0, 65.8),
+            cut_size_mm=FusionVectorMm(10.0, 10.0, 2.0),
+            requested_local_origin_mm=FusionVectorMm(
+                0.0,
+                0.0,
+                63.8,
+            ),
+            retained_floor_mm=63.8,
+            cavity_source="top_inset_reservation",
+            boolean_operation="difference",
+            geometry_attribution="flat_inset",
+            positive_geometry_digest="positive-digest",
+            local_interval_bottom_z_mm=63.8,
+            local_interval_top_z_mm=65.8,
+        )
+
+        with patch.object(
+            fusion_entrypoint,
+            "adsk",
+            _fake_adsk(manager),
+        ):
+            fusion_entrypoint._create_boolean_rectangular_blank(
+                component,
+                solid,
+                (),
+                (cut,),
+                body_origin_mm=FusionVectorMm(0.0, 0.0, 0.0),
+            )
+
+        self.assertEqual(len(manager.boxes), 2)
+        tool_obb = manager.boxes[1].box
+        self.assertAlmostEqual(tool_obb[0][2], 6.48)
+        self.assertAlmostEqual(tool_obb[5], 0.2)
+        self.assertEqual(
+            cut.to_dict()["brep_tool_interval_z_mm"],
+            {"bottom": 63.8, "top": 65.8},
+        )
+
     def test_failed_generation_cleanup_reports_clean_and_incomplete_rollbacks(self) -> None:
         class _Registry:
             def __init__(self, clear_result: dict[str, object]) -> None:

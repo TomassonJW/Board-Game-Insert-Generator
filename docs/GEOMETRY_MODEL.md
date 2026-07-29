@@ -24,6 +24,23 @@ Les profondeurs locales restent la somme exacte des épaisseurs couvrantes. Une
 cellule couverte par `4 mm` et `2 mm` doit donc recevoir une soustraction de
 `6 mm`, sans reboucher une cavité existante.
 
+Le plan soustractif découpe l’espace XY selon les frontières des régions
+locales. Pour chaque cellule, les couches Z doivent être contiguës,
+non superposées et attribuées exactement aux éléments couvrants. Les
+profondeurs observables sont donc `2 mm`, `4 mm` ou `6 mm`.
+
+Pour toute opération, l’intervalle `[bottom, top]` est l’autorité :
+
+```text
+origine Z de l’outil = top
+hauteur de l’outil   = top - bottom
+volume BRep          = [bottom, top]
+```
+
+La somme des volumes négatifs égale leur union, car deux opérations ne peuvent
+pas retirer le même volume. La grille produit `0,1 mm` quantifie toutes les
+coordonnées ; l’epsilon `0,0001 mm` sert seulement aux comparaisons numériques.
+
 <!-- P64-L09T-GEOMETRY -->
 ## Geometrie figee et annexes hybrides
 

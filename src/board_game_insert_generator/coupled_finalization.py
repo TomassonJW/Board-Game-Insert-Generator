@@ -42,6 +42,11 @@ from board_game_insert_generator.free_3d_greedy_solver import (
     Free3DPlacement,
     TopInsetZone,
 )
+from board_game_insert_generator.flat_inset_subtraction import (
+    FlatInsetSubtractionError,
+    build_flat_inset_subtraction_plan,
+    operations_for_owner,
+)
 from board_game_insert_generator.incremental_project_state import canonical_digest
 from board_game_insert_generator.minimal_layout_solver import (
     _minimal_budget,
@@ -58,7 +63,7 @@ from board_game_insert_generator.top_inset_reservation import (
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v14"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v15"
 COUPLED_FINALIZATION_POLICY = (
     "global_rectangular_then_vertical_first_continuous_then_bounded_xy_composite"
 )
@@ -949,6 +954,92 @@ def _finalized_plan(
         if composite_closure is not None
         else None
     )
+    finalized_container_geometry_certificate = (
+        _certify_finalized_container_geometry(
+            plan.get("placements"),
+        )
+    )
+    if composite_closure is None:
+        raw_top_insets = plan.get("top_inset_reservations")
+        if not isinstance(raw_top_insets, Mapping):
+            raise CoupledFinalizationError(
+                "Le contrat des reservations plates est absent.",
+                {
+                    "schema_version": COUPLED_FINALIZATION_SCHEMA_V1,
+                    "status": "rejected",
+                    "stop_reason": "flat_inset_reservation_contract_missing",
+                    "partial_plan_published": False,
+                    "materializable": False,
+                },
+            )
+        raw_reservations = raw_top_insets.get("reservations", ())
+        if not isinstance(raw_reservations, (list, tuple)):
+            raise CoupledFinalizationError(
+                "Les reservations plates finales sont invalides.",
+                {
+                    "schema_version": COUPLED_FINALIZATION_SCHEMA_V1,
+                    "status": "rejected",
+                    "stop_reason": "flat_inset_reservations_invalid",
+                    "partial_plan_published": False,
+                    "materializable": False,
+                },
+            )
+        try:
+            flat_inset_subtraction_plan = (
+                build_flat_inset_subtraction_plan(
+                    [
+                        value
+                        for value in plan.get("placements", ())
+                        if isinstance(value, Mapping)
+                    ],
+                    [
+                        value
+                        for value in raw_reservations
+                        if isinstance(value, Mapping)
+                    ],
+                    design_top_z_mm=float(
+                        raw_top_insets.get("design_top_z_mm", 0.0)
+                    ),
+                    positive_geometry_certificate=(
+                        finalized_container_geometry_certificate
+                    ),
+                )
+            )
+        except FlatInsetSubtractionError as exc:
+            raise CoupledFinalizationError(
+                "La passe d encastrement strictement soustractive est invalide.",
+                {
+                    "schema_version": COUPLED_FINALIZATION_SCHEMA_V1,
+                    "status": "rejected",
+                    "stop_reason": "flat_inset_subtraction_plan_rejected",
+                    "detail": str(exc),
+                    "partial_plan_published": False,
+                    "materializable": False,
+                },
+            ) from exc
+        plan["flat_inset_subtraction_plan"] = (
+            flat_inset_subtraction_plan
+        )
+        for placement in plan.get("placements", ()):
+            if not isinstance(placement, dict):
+                continue
+            placement["top_inset_cuts"] = list(
+                operations_for_owner(
+                    flat_inset_subtraction_plan,
+                    str(placement.get("id", "")),
+                )
+            )
+            placement["top_inset_cut_source"] = (
+                "bgig.flat_inset_subtraction_plan.v1"
+            )
+    flat_inset_subtraction_plan = plan.get(
+        "flat_inset_subtraction_plan"
+    )
+    subtractive_flat_inset_certificate = (
+        flat_inset_subtraction_plan.get("certificate")
+        if isinstance(flat_inset_subtraction_plan, Mapping)
+        else None
+    )
     cavity_anchor_certificate = (
         composite_certificate.get("cavity_anchor_certificate")
         if isinstance(composite_certificate, Mapping)
@@ -956,11 +1047,6 @@ def _finalized_plan(
             plan,
             frozen_cavities=frozen_cavities,
             project=project,
-        )
-    )
-    finalized_container_geometry_certificate = (
-        _certify_finalized_container_geometry(
-            plan.get("placements"),
         )
     )
     if (
@@ -1016,6 +1102,85 @@ def _finalized_plan(
                 "materializable": False,
             },
         )
+    if (
+        not isinstance(subtractive_flat_inset_certificate, Mapping)
+        or subtractive_flat_inset_certificate.get("certified") is not True
+        or subtractive_flat_inset_certificate.get(
+            "positive_geometry_digest_before"
+        )
+        != finalized_container_geometry_certificate.get(
+            "positive_geometry_digest"
+        )
+        or subtractive_flat_inset_certificate.get(
+            "positive_geometry_digest_after"
+        )
+        != finalized_container_geometry_certificate.get(
+            "positive_geometry_digest"
+        )
+        or int(
+            subtractive_flat_inset_certificate.get(
+                "flat_positive_body_count",
+                -1,
+            )
+        )
+        != 0
+        or int(
+            subtractive_flat_inset_certificate.get(
+                "flat_positive_union_count",
+                -1,
+            )
+        )
+        != 0
+        or int(
+            subtractive_flat_inset_certificate.get(
+                "flat_positive_operation_count",
+                -1,
+            )
+        )
+        != 0
+        or int(
+            subtractive_flat_inset_certificate.get(
+                "new_printable_body_count_attributed_to_flat_items",
+                -1,
+            )
+        )
+        != 0
+        or int(
+            subtractive_flat_inset_certificate.get(
+                "positive_operations_after_subtraction_start",
+                -1,
+            )
+        )
+        != 0
+        or subtractive_flat_inset_certificate.get(
+            "positive_geometry_unchanged"
+        )
+        is not True
+        or abs(
+            float(
+                subtractive_flat_inset_certificate.get(
+                    "flat_positive_volume_mm3",
+                    -1.0,
+                )
+            )
+        )
+        > 0.0001
+    ):
+        raise CoupledFinalizationError(
+            "Le certificat des encastrements soustractifs est invalide.",
+            {
+                "schema_version": COUPLED_FINALIZATION_SCHEMA_V1,
+                "status": "rejected",
+                "stop_reason": (
+                    "subtractive_flat_inset_certificate_rejected"
+                ),
+                "subtractive_flat_inset_certificate": (
+                    subtractive_flat_inset_certificate
+                ),
+                "partial_plan_published": False,
+                "materializable": False,
+            },
+        )
     objective_iterations = objective_closure.iterations if objective_closure is not None else 0
     objective_candidates = (
         objective_closure.candidates_evaluated if objective_closure is not None else 0
@@ -1049,6 +1214,14 @@ def _finalized_plan(
         "composite_materialization_certificate": composite_certificate,
         "finalized_container_geometry_certificate": (
             finalized_container_geometry_certificate
+        ),
+        "flat_inset_subtraction_plan_digest": (
+            flat_inset_subtraction_plan["deterministic_digest"]
+            if isinstance(flat_inset_subtraction_plan, Mapping)
+            else ""
+        ),
+        "subtractive_flat_inset_certificate": deepcopy(
+            subtractive_flat_inset_certificate
         ),
         "cavity_anchor_certificate": deepcopy(
             cavity_anchor_certificate
@@ -1151,6 +1324,10 @@ def _finalized_plan(
                     "certified"
                 )
                 is True
+                and subtractive_flat_inset_certificate.get(
+                    "certified"
+                )
+                is True
             ),
             "checks": [
                 {
@@ -1187,6 +1364,18 @@ def _finalized_plan(
                     ),
                     "passed": (
                         finalized_container_geometry_certificate.get(
+                            "certified"
+                        )
+                        is True
+                    ),
+                    "rejection_code": None,
+                }
+            ]
+            + [
+                {
+                    "name": "strictly_subtractive_flat_inset_plan",
+                    "passed": (
+                        subtractive_flat_inset_certificate.get(
                             "certified"
                         )
                         is True
@@ -1268,6 +1457,25 @@ def _finalized_plan(
                     "positive_geometry_frozen_before_flat_subtractions"
                 )
                 is True
+            ),
+            "flat_inset_subtraction_plan_is_separate": True,
+            "flat_inset_operations_are_difference_only": (
+                subtractive_flat_inset_certificate.get(
+                    "operation_attribution_complete"
+                )
+                is True
+            ),
+            "flat_inset_positive_geometry_digest_unchanged": (
+                subtractive_flat_inset_certificate.get(
+                    "positive_geometry_unchanged"
+                )
+                is True
+            ),
+            "flat_inset_new_printable_body_count": int(
+                subtractive_flat_inset_certificate.get(
+                    "new_printable_body_count_attributed_to_flat_items",
+                    -1,
+                )
             ),
             "modular_harmonization_applied": False,
         }
@@ -1457,28 +1665,6 @@ def _attach_xy_composite_geometry(
                     "attachment_axis": prism["attachment_axis"],
                 }
             )
-            cuts = _composite_cell_cuts(
-                owner_id,
-                prism["prism_id"],
-                closure_origin,
-                closure_size,
-                finalized_size,
-                reservations,
-                design_top,
-                source_placement_origin,
-                owner_frozen,
-            )
-            for cut in cuts:
-                cut_volume = _mapping_size_volume(cut["size_mm"])
-                total_cut_volume += cut_volume
-                total_subtraction_intersection_with_closure += (
-                    _subtraction_intersection_with_closure_volume(
-                        cut,
-                        closure_origin,
-                        closure_size,
-                    )
-                )
-                placement_cuts.append(cut)
         total_join_count += max(0, len(finalized_prisms) - 1)
         all_owners_connected = bool(
             all_owners_connected
@@ -1559,20 +1745,116 @@ def _attach_xy_composite_geometry(
             component_upper[index] - component_origin[index]
             for index in range(3)
         )
-        for cut in (*placement_cuts, *placement_access_cuts):
-            world_origin = tuple(
-                float(_mapping_value(cut["world_origin_mm"], axis))
-                for axis in ("x", "y", "z")
-            )
-            cut["local_origin_mm"] = _xyz_payload(
-                tuple(
-                    world_origin[index] - component_origin[index]
-                    for index in range(3)
-                )
-            )
-            cut["retained_body_below_mm"] = round(
-                world_origin[2] - component_origin[2],
+        composite_body = {
+            "schema_version": XY_COMPOSITE_CONTAINER_BODY_SCHEMA_V3,
+            "policy": "finalized_container_union_v3",
+            "certified": True,
+            "owner_id": owner_id,
+            "geometry_role": "finalized_container",
+            "positive_geometry_source": "container_finalization",
+            "core_prism_id": finalized_prisms[0]["prism_id"],
+            "prisms": finalized_prisms,
+            "source_owner_certificate": deepcopy(owner.certificate),
+            "source_composite_digest": composite.deterministic_digest,
+            "frozen_cavity_pose_digests": [],
+            "frozen_cavity_access_cuts": [],
+            "operation_order": [
+                "create_core_prism",
+                "join_xy_annexes",
+                "subtract_content_cavities",
+                "subtract_frozen_cavity_access",
+            ],
+        }
+        positive_geometry_payload = _composite_positive_geometry_payload(
+            composite_body
+        )
+        composite_body["positive_geometry_digest"] = canonical_digest(
+            positive_geometry_payload
+        )
+        placement["composite_body"] = composite_body
+        positive_body_record = {
+            "owner_id": owner_id,
+            "body_schema_version": (
+                XY_COMPOSITE_CONTAINER_BODY_SCHEMA_V3
+            ),
+            "positive_geometry_digest": composite_body[
+                "positive_geometry_digest"
+            ],
+            "positive_geometry_digest_valid": True,
+            "closure_volume_mm3": round(
+                sum(
+                    _mapping_size_volume(value["closure_size_mm"])
+                    for value in finalized_prisms
+                ),
                 6,
+            ),
+            "finalized_positive_volume_mm3": round(
+                sum(
+                    _mapping_size_volume(value["final_size_mm"])
+                    for value in finalized_prisms
+                ),
+                6,
+            ),
+            "positive_operation_count": len(finalized_prisms),
+            "container_positive_union_count": max(
+                0,
+                len(finalized_prisms) - 1,
+            ),
+            "positive_geometry_attribution": "container_finalization",
+            "flat_attributed_positive_operation_count": 0,
+            "ambiguous_cad_geometry_field_count": 0,
+        }
+        owner_positive_certificate = (
+            _finalized_container_geometry_certificate_from_records(
+                [positive_body_record],
+                expected_owner_ids={owner_id},
+            )
+        )
+        try:
+            owner_subtraction_plan = build_flat_inset_subtraction_plan(
+                [placement],
+                reservations,
+                design_top_z_mm=design_top,
+                positive_geometry_certificate=owner_positive_certificate,
+                require_complete_reservation_coverage=False,
+            )
+        except FlatInsetSubtractionError:
+            return _rejected_composite_materialization(
+                "flat_inset_subtraction_plan_rejected"
+            )
+        placement_cuts = list(
+            operations_for_owner(owner_subtraction_plan, owner_id)
+        )
+        prisms_by_id = {
+            str(value["prism_id"]): value
+            for value in finalized_prisms
+        }
+        for cut in placement_cuts:
+            target_prism = prisms_by_id[str(cut["target_prism_id"])]
+            cut_volume = _mapping_size_volume(cut["size_mm"])
+            total_cut_volume += cut_volume
+            total_subtraction_intersection_with_closure += (
+                _subtraction_intersection_with_closure_volume(
+                    cut,
+                    tuple(
+                        float(
+                            _mapping_value(
+                                target_prism["closure_origin_mm"],
+                                axis,
+                            )
+                        )
+                        for axis in ("x", "y", "z")
+                    ),
+                    tuple(
+                        float(
+                            _mapping_value(
+                                target_prism["closure_size_mm"],
+                                axis,
+                            )
+                        )
+                        for axis in ("x", "y", "z")
+                    ),
+                )
             )
         placement["origin_mm"] = _xyz_payload(component_origin)
         placement["world_size_mm"] = _xyz_payload(component_size)
@@ -1664,74 +1946,18 @@ def _attach_xy_composite_geometry(
                     ),
                 )
             )
-        composite_body = {
-            "schema_version": XY_COMPOSITE_CONTAINER_BODY_SCHEMA_V3,
-            "policy": "finalized_container_union_v3",
-            "certified": True,
-            "owner_id": owner_id,
-            "geometry_role": "finalized_container",
-            "positive_geometry_source": "container_finalization",
-            "core_prism_id": finalized_prisms[0]["prism_id"],
-            "prisms": finalized_prisms,
-            "source_owner_certificate": deepcopy(owner.certificate),
-            "source_composite_digest": composite.deterministic_digest,
-            "frozen_cavity_pose_digests": [
-                str(value["pose_digest"])
-                for value in placement["frozen_cavities_v1"]
-            ],
-            "frozen_cavity_access_cuts": placement_access_cuts,
-            "operation_order": [
-                "create_core_prism",
-                "join_xy_annexes",
-                "subtract_content_cavities",
-                "subtract_frozen_cavity_access",
-                "subtract_exact_top_insets",
-            ],
-        }
-        positive_geometry_payload = _composite_positive_geometry_payload(
-            composite_body
-        )
-        composite_body["positive_geometry_digest"] = canonical_digest(
-            positive_geometry_payload
+        composite_body["frozen_cavity_pose_digests"] = [
+            str(value["pose_digest"])
+            for value in placement["frozen_cavities_v1"]
+        ]
+        composite_body["frozen_cavity_access_cuts"] = (
+            placement_access_cuts
         )
         composite_body["geometry_digest"] = canonical_digest(
             composite_body
         )
         placement["composite_body"] = composite_body
-        finalized_container_body_records.append(
-            {
-                "owner_id": owner_id,
-                "body_schema_version": (
-                    XY_COMPOSITE_CONTAINER_BODY_SCHEMA_V3
-                ),
-                "positive_geometry_digest": composite_body[
-                    "positive_geometry_digest"
-                ],
-                "positive_geometry_digest_valid": True,
-                "closure_volume_mm3": round(
-                    sum(
-                        _mapping_size_volume(value["closure_size_mm"])
-                        for value in finalized_prisms
-                    ),
-                    6,
-                ),
-                "finalized_positive_volume_mm3": round(
-                    sum(
-                        _mapping_size_volume(value["final_size_mm"])
-                        for value in finalized_prisms
-                    ),
-                    6,
-                ),
-                "positive_operation_count": len(finalized_prisms),
-                "container_positive_union_count": max(
-                    0,
-                    len(finalized_prisms) - 1,
-                ),
-                "positive_geometry_attribution": "container_finalization",
-                "flat_attributed_positive_operation_count": 0,
-                "ambiguous_cad_geometry_field_count": 0,
-            }
-        )
+        finalized_container_body_records.append(positive_body_record)
 
     certified_composite_volume = float(
         composite.certificate.get("composite_body_volume_mm3", 0.0)
@@ -1774,13 +2000,73 @@ def _attach_xy_composite_geometry(
             expected_owner_ids=set(owners),
         )
     )
+    try:
+        flat_inset_subtraction_plan = (
+            build_flat_inset_subtraction_plan(
+                [
+                    value
+                    for value in placements
+                    if isinstance(value, Mapping)
+                ],
+                reservations,
+                design_top_z_mm=design_top,
+                positive_geometry_certificate=(
+                    finalized_container_geometry_certificate
+                ),
+            )
+        )
+    except FlatInsetSubtractionError:
+        return _rejected_composite_materialization(
+            "flat_inset_subtraction_plan_rejected"
+        )
+    plan["flat_inset_subtraction_plan"] = (
+        flat_inset_subtraction_plan
+    )
+    for placement in placements:
+        if not isinstance(placement, dict):
+            continue
+        owner_id = str(placement.get("id", ""))
+        placement["top_inset_cuts"] = list(
+            operations_for_owner(
+                flat_inset_subtraction_plan,
+                owner_id,
+            )
+        )
+        placement["top_inset_cut_source"] = (
+            "bgig.flat_inset_subtraction_plan.v1"
+        )
+        composite_body = placement.get("composite_body")
+        if isinstance(composite_body, dict):
+            composite_body["flat_inset_subtraction_plan_digest"] = (
+                flat_inset_subtraction_plan["deterministic_digest"]
+            )
+            composite_body["geometry_digest"] = canonical_digest(
+                {
+                    key: deepcopy(value)
+                    for key, value in composite_body.items()
+                    if key != "geometry_digest"
+                }
+            )
     all_top_cuts_are_exact = all(
         isinstance(cut, dict)
         and cut.get("non_perforating") is True
         and str(cut.get("placement_id", "")) == str(placement.get("id", ""))
+        and cut.get("boolean_operation") == "difference"
+        and cut.get("geometry_attribution")
+        in {"flat_inset", "flat_grip"}
+        and cut.get("creates_positive_geometry") is False
+        and cut.get("creates_printable_body") is False
+        and cut.get("creates_union") is False
+        and cut.get("positive_geometry_digest")
+        == finalized_container_geometry_certificate.get(
+            "positive_geometry_digest"
+        )
         for placement in placements
         if isinstance(placement, dict)
         for cut in placement.get("top_inset_cuts", [])
+    )
+    subtractive_flat_inset_certificate = (
+        flat_inset_subtraction_plan["certificate"]
     )
     certified = bool(
         composite.certificate.get("certified") is True
@@ -1792,6 +2078,7 @@ def _attach_xy_composite_geometry(
         and container_fill_subtraction_balance_error
         <= material_volume_tolerance
         and finalized_container_geometry_certificate["certified"] is True
+        and subtractive_flat_inset_certificate.get("certified") is True
         and all_top_cuts_are_exact
         and all_owners_connected
         and all_frozen_calibrations_match
@@ -1829,6 +2116,11 @@ def _attach_xy_composite_geometry(
                 finalized_container_geometry_certificate["certified"]
                 is True,
                 "FINALIZED_CONTAINER_POSITIVE_GEOMETRY_UNCERTIFIED",
+            ),
+            (
+                subtractive_flat_inset_certificate.get("certified")
+                is True,
+                "FLAT_INSET_SUBTRACTION_PLAN_UNCERTIFIED",
             ),
             (all_top_cuts_are_exact, "COMPOSITE_TOP_CUT_INVALID"),
             (all_owners_connected, "COMPOSITE_OWNER_UNION_DISCONNECTED"),
@@ -1882,6 +2174,12 @@ def _attach_xy_composite_geometry(
         ),
         "finalized_container_geometry_certificate": (
             finalized_container_geometry_certificate
+        ),
+        "flat_inset_subtraction_plan_digest": (
+            flat_inset_subtraction_plan["deterministic_digest"]
+        ),
+        "subtractive_flat_inset_certificate": deepcopy(
+            subtractive_flat_inset_certificate
         ),
         "all_top_inset_cuts_target_exact_owner_intersections": all_top_cuts_are_exact,
         "closure_source_volume_mm3": round(
@@ -2858,124 +3156,6 @@ def _ordered_finalized_container_cells(
             }
         )
     return tuple(result)
-
-
-def _composite_cell_cuts(
-    owner_id: str,
-    prism_id: str,
-    closure_origin: Sequence[float],
-    closure_size: Sequence[float],
-    finalized_size: Sequence[float],
-    reservations: Sequence[Mapping[str, object]],
-    design_top: float,
-    owner_origin: Sequence[float],
-    frozen_cavities: Sequence[Mapping[str, object]],
-) -> tuple[dict[str, object], ...]:
-    cuts: list[dict[str, object]] = []
-    footprints = _reservations_at_cell(
-        closure_origin,
-        closure_size,
-        reservations,
-        kind="footprint",
-    )
-    selected: list[tuple[str, Mapping[str, object]]] = []
-    if footprints:
-        selected.extend(
-            ("top_inset", reservation)
-            for reservation in footprints
-        )
-    else:
-        grip = _deepest_reservation_at_cell(
-            closure_origin,
-            closure_size,
-            reservations,
-            kind="grip",
-        )
-        if grip is not None:
-            selected.append(("top_inset_grip", grip))
-    finalized_top = closure_origin[2] + finalized_size[2]
-    for cut_index, (kind, reservation) in enumerate(selected):
-        local_region = reservation.get("local_region")
-        if kind == "top_inset" and isinstance(
-            local_region,
-            Mapping,
-        ):
-            cut_bottom = float(local_region["layer_bottom_z_mm"])
-            cut_top = float(local_region["layer_top_z_mm"])
-        else:
-            cut_bottom = design_top - float(
-                reservation["inset_depth_from_top_mm"]
-            )
-            cut_top = finalized_top
-        reservation_id = str(reservation["id"])
-        flat_item_id = str(reservation["flat_item_id"])
-        removal_order = int(reservation["removal_order"])
-        cut_bottom = max(float(closure_origin[2]), cut_bottom)
-        cut_top = min(finalized_top, cut_top)
-        if cut_top <= cut_bottom + 0.0001:
-            continue
-        cut_size_z = cut_top - cut_bottom
-        world_origin = (
-            closure_origin[0],
-            closure_origin[1],
-            cut_bottom,
-        )
-        size = (
-            closure_size[0],
-            closure_size[1],
-            cut_size_z,
-        )
-        cuts.append(
-            {
-                "id": (
-                    f"{reservation_id}:{owner_id}:{prism_id}:"
-                    f"{kind}:{cut_index}"
-                ),
-                "kind": kind,
-                "reservation_id": reservation_id,
-                "flat_item_id": flat_item_id,
-                "placement_id": owner_id,
-                "local_region_id": str(
-                    reservation.get("local_region_id", "")
-                ),
-                "overlapping_reservation_ids": deepcopy(
-                    (
-                        reservation.get("local_region", {}).get(
-                            "overlapping_reservation_ids",
-                            [reservation_id],
-                        )
-                        if isinstance(
-                            reservation.get("local_region"),
-                            Mapping,
-                        )
-                        else [reservation_id]
-                    )
-                ),
-                "removal_order": removal_order,
-                "world_origin_mm": _xyz_payload(world_origin),
-                "local_origin_mm": _xyz_payload(
-                    tuple(
-                        world_origin[index] - owner_origin[index]
-                        for index in range(3)
-                    )
-                ),
-                "size_mm": _xyz_payload(size),
-                "retained_body_below_mm": round(
-                    cut_bottom - closure_origin[2],
-                    6,
-                ),
-                "minimum_floor_mm": 0.0,
-                "cavity_overlap_area_mm2": 0.0,
-                "local_interval_z_mm": {
-                    "bottom": round(cut_bottom, 6),
-                    "top": round(cut_top, 6),
-                },
-                "non_perforating": cut_bottom
-                >= closure_origin[2] - 0.0001,
-                "target_prism_id": prism_id,
-            }
-        )
-    return tuple(cuts)
 
 
 def _build_frozen_cavity_access_cuts(
