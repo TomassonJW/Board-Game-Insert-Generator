@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09W-NEXT -->
-## Action courante : exécuter la validation D stratifiée
+## Action courante : fermer le non-déterminisme minimal observé par D
 
 R9-V est close en `human-positive` sur Fusion 0.1.80.
 `fusion-validated=true`, `print-validated=false`.
@@ -40,14 +40,25 @@ Le recadrage est maintenant préenregistré par ADR-0108 :
    ou preuve invalide ;
 5. `sample_is_rate_estimator=false` : aucun taux global ne vient de D.
 
+La campagne stratifiée v4 applique maintenant son arrêt anticipé :
+
+- `60/77` cas planifiés évalués, dont `50/67` nouveaux ;
+- deux cas causaux réussis ;
+- 56 non-régressions prêtes réussies avant l'arrêt ;
+- arrêt dur sur `p64-l09w-tuning-360-c8628c8c54` ;
+- troisième empreinte minimale D absente des deux empreintes C ;
+- 17 cas restants non exécutés et non déclarés réussis ;
+- rapport `a9892696...de46` ;
+- holdout toujours fermé.
+
 Action unique :
 
-1. utiliser l'exécuteur versionné et préflighté, lié au plan
-   `.codex-work/p64-l09w-d/stratified-validation-plan.json` ;
-2. exécuter d'abord le cas causal `stress`, puis la non-régression des prêts,
-   puis le reste de l'échantillon par petits lots checkpointés ;
-3. ne jamais appeler `run_d_batch.ps1` ;
-4. conserver le holdout fermé.
+1. diagnostiquer sur ce cas public l'ordre ou l'état qui produit les trois
+   empreintes minimales ;
+2. ajouter une preuve automatisée de déterminisme sans modifier les budgets ;
+3. décider ensuite si l'incrément de finalisation D peut être revalidé ;
+4. ne pas reprendre le checkpoint v4 arrêté, ne pas appeler
+   `run_d_batch.ps1` et conserver le holdout fermé.
 
 Le correctif courant ne change pas la recherche et laisse donc le plafond
 certifié à 332/400 contre 380/400 requis. E n'est pas admissible après ce seul
@@ -64,6 +75,9 @@ Handoff :
 
 Protocole :
 `docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md`.
+
+Verdict D :
+`docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md`.
 
 Contrats et preuves :
 

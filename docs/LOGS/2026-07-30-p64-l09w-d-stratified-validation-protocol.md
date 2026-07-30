@@ -68,5 +68,12 @@ identiques. La gate des résultats prêts compare désormais la candidate à
 l'ensemble fermé des signatures C observées ; elle refuse toujours toute
 signature nouvelle.
 
+Quatrième essai : la gate corrigée s'arrête à `60/77` cas planifiés. Le même
+cas publie cette fois `d0e5bb69...c554`, une troisième empreinte minimale
+absente des deux replays C. Le placement, la route, le certificat, la
+finalisation et la CAD IR restent positifs, mais la non-régression fonctionnelle
+exacte n'est pas démontrée. Les 17 cas restants ne sont pas exécutés, E reste
+fermée et F n'est pas lancée.
+
 `fusion-validated=true` reste hérité de 0.1.80.
 `print-validated=false`.

@@ -7,7 +7,8 @@ Date : 2026-07-30.
 
 Statut : `priority-active`, `P64-L09W-A-complete`,
 `P64-L09W-B-complete`, `P64-L09W-C-complete`,
-`P64-L09W-D-handoff-committed`, `campaign-D-partial-39`,
+`P64-L09W-D-handoff-committed`, `campaign-D-stratified-stopped`,
+`P64-L09W-D-increment-not-validated`,
 `P64-L09W-D-stratified-protocol-preregistered`,
 `automated-baseline-observed`, `holdout-sealed`.
 
@@ -96,6 +97,14 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
   dans C pour ce cas non déterministe. La gate accepte une signature uniquement
   dans l'ensemble fermé des signatures C et continue de refuser toute signature
   nouvelle.
+- Le checkpoint v4 confirme l'arrêt dur à `60/77` cas planifiés, dont `50/67`
+  nouveaux. Les deux causaux et 56 contrôles prêts passent avant que
+  `p64-l09w-tuning-360-c8628c8c54` publie une troisième empreinte minimale
+  absente de C. Le rapport `a9892696...de46` conclut
+  `increment_validation_failed`; les 17 cas restants ne sont pas exécutés.
+- L'incrément D reste sauvegardé, mais sa non-régression exacte n'est pas
+  démontrée. E est bloquée par cette gate et par le plafond certifié
+  `332/400`; F n'est pas lancée.
 - Le holdout reste fermé jusqu'à E :
   `opening_count=0`, `solver_invocation_count=0`.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.
@@ -112,6 +121,7 @@ Preuves :
 - `docs/P64_L09W_C_REFERENCE_CAMPAIGN_EVIDENCE.md`.
 - `docs/P64_L09W_D_PAUSED_HANDOFF.md`.
 - `docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md`.
+- `docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md`.
 
 ### Historique R9 clos positivement
 

@@ -62,6 +62,14 @@
   résultats sont réutilisés, 67 nouveaux cas et 81 replays suffisent pour les
   cas causaux, les 61 résultats prêts et un échantillon stratifié
   `common`/`stress`.
+- La campagne stratifiée v4 est arrêtée par sa gate dure à `60/77` cas
+  planifiés, dont `50/67` nouveaux. Les deux causaux passent et 56 contrôles
+  prêts passent avant l'arrêt. Le cas `stress`
+  `p64-l09w-tuning-360-c8628c8c54` publie une troisième empreinte minimale,
+  distincte des deux empreintes C : la non-régression exacte de D n'est pas
+  démontrée.
+- Les 17 cas planifiés restants ne sont pas nécessaires après cet arrêt et ne
+  sont pas déclarés réussis. L'incrément D reste sauvegardé mais non validé.
 - Cet échantillon ne mesure aucun taux. Le correctif courant ne peut pas faire
   passer les 332/400 solutions certifiées de C au seuil E de 380/400 ; le
   holdout reste donc fermé après ce seul incrément.
@@ -82,6 +90,7 @@ Autorités :
 - `docs/P64_L09W_C_REFERENCE_CAMPAIGN_EVIDENCE.md` ;
 - `docs/P64_L09W_D_PAUSED_HANDOFF.md` ;
 - `docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md` ;
+- `docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
 - `docs/DECISIONS/ADR-0108-validation-stratifiee-et-arrets-anticipes-p64-l09w.md` ;
 - `docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md` ;

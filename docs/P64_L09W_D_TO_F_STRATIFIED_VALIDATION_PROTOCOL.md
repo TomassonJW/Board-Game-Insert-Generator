@@ -2,7 +2,8 @@
 
 Date : 2026-07-30.
 
-Statut : `preregistered-before-new-campaign`, `holdout-sealed`.
+Statut : `executed-stopped-hard-gate`, `increment-validation-failed`,
+`holdout-sealed`.
 
 Autorité : ADR-0108.
 
@@ -145,6 +146,13 @@ même route. La gate de non-régression accepte donc une signature candidate
 seulement si elle appartient à l'ensemble fermé des signatures déjà observées
 dans C ; toute signature nouvelle reste un arrêt dur.
 
+Le quatrième essai applique cette règle. Après `60/77` cas planifiés, le même
+cas produit une troisième empreinte minimale absente de C. Le checkpoint est
+arrêté sans cas actif, les 17 cas restants ne sont pas exécutés et le rapport
+conclut `increment_validation_failed`. Cette divergence ne prouve pas que le
+correctif aval crée le non-déterminisme déjà présent dans C ; elle suffit en
+revanche à empêcher une revendication de non-régression exacte.
+
 ## 5. Gate avant P64-L09W-E
 
 E reste fermée après le seul incrément courant.
@@ -192,19 +200,15 @@ verdict E autorisant une candidate :
 - aucun temps de matérialisation n’est déduit de la CAD IR ;
 - `print-validated=false` reste obligatoire.
 
-## 8. Prochaine action
+## 8. Verdict et prochaine action
 
 L'exécuteur D distinct du script historique est versionné dans
-`scripts/solver/run_p64_l09w_d_stratified_validation.py`. Son préflight Python
-3.14 valide le plan, les deux checkpoints, le bundle courant, le manifest et le
-reçu runtime avant toute écriture.
+`scripts/solver/run_p64_l09w_d_stratified_validation.py`. Il a appliqué la gate
+de la section 4 et produit le verdict compact
+`docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md`.
 
-Exécuter maintenant cet exécuteur par petits lots. Il est lié au digest du plan
-et sait :
-
-- réutiliser les 39 résultats D sans les réécrire ;
-- exécuter les 67 nouveaux cas dans l’ordre des gates ;
-- appliquer les répétitions `1` ou `2` du plan ;
-- checkpoint après chaque cas ;
-- arrêter selon la section 4 ;
-- produire un rapport compact sans aucune surface d’accès holdout.
+Ne pas reprendre le checkpoint v4 arrêté. La prochaine action est une mission
+causale bornée sur le non-déterminisme du payload minimal du cas public
+`p64-l09w-tuning-360-c8628c8c54`, sans holdout, changement de budget ou
+modification de valeur physique. Une nouvelle validation D n'est décidée
+qu'après une preuve automatisée de déterminisme.

@@ -19,7 +19,9 @@
   Le nouveau holdout reste fermé, non exécuté et absent du manifest public.
   ADR-0108 préenregistre une validation D stratifiée de 67 nouveaux cas et
   81 replays, sans revendication de taux, puis des arrêts E mathématiquement
-  sûrs et une F conditionnelle.
+  sûrs et une F conditionnelle. La campagne applique sa gate à `60/77` :
+  une troisième empreinte minimale sur un résultat `stress` prêt empêche de
+  démontrer la non-régression exacte. E reste fermée.
 - `C-FINALIZATION` : 332 calculs certifiés ; 61 résultats prêts hors Fusion et
   271 pertes `certified_minimal_not_finalized`. La cause dominante est
   `xy_composite_residual_owner_not_found` sur 237 cas.
@@ -28,8 +30,9 @@
 - `C-PRODUCT-GRID` : `0,1 mm`, inchangée ; epsilon `0,0001 mm` distinct.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : exécuteur stratifié P64-L09W-D lié au plan
-`a5a689d0...4469`, à budget, grille, valeurs physiques et holdout inchangés.
+Prochaine frontière : diagnostic causal public du non-déterminisme minimal
+observé sur `p64-l09w-tuning-360-c8628c8c54`, à budget, grille, valeurs
+physiques et holdout inchangés.
 
 ### Historique R9 clos positivement
 

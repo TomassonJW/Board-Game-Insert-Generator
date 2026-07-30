@@ -39,7 +39,8 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-D — Optimisation causale de fermeture XY
 
-- Statut : `stratified-executor-ready`, dépendance P64-L09W-C terminée.
+- Statut : `stratified-validation-stopped`, `increment-not-validated`,
+  dépendance P64-L09W-C terminée.
 - Premier incrément sélectionné :
   `xy_composite_residual_owner_resolution_v1`.
 - Cible mesurée : 237 pertes
@@ -52,7 +53,11 @@ Priorité : avant P64-L10 et la roadmap d’origine.
   deux cas causaux, tous les 61 résultats prêts et huit pertes cibles par
   strate. Aucun taux global ne vient de cet échantillon.
 - Exécuteur D checkpointé, préflighté sous Python 3.14 et sans surface holdout.
-- Prochaine sous-mission : campagne stratifiée par petits lots gardés.
+- Campagne v4 arrêtée à `60/77`, dont `50/67` nouveaux : les deux causaux et
+  56 non-régressions prêtes passent avant une troisième empreinte minimale
+  `stress` absente de C. Les 17 cas restants ne sont pas exécutés.
+- Prochaine sous-mission : diagnostic causal du non-déterminisme minimal sur le
+  cas public `p64-l09w-tuning-360-c8628c8c54`.
 - Un incrément mesuré, testé, documenté, committé et intégré à la fois.
 - Zéro budget augmenté, faux impossible, solution perdue ou coût déplacé.
 - ADR obligatoire pour tout changement structurant.
@@ -75,9 +80,20 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 - ADR-0108, protocole D à F, planificateur déterministe et plan local livrés.
 - Aucun lot D historique relancé et aucune ouverture du holdout.
 
+### P64-L09W-D-N — Déterminisme du payload minimal
+
+- Statut : `ready`, dépend de l'arrêt D v4.
+- Reproduire les trois empreintes du cas public sans holdout.
+- Identifier l'ordre, la collection ou l'état mutable qui change le payload
+  minimal malgré un placement stable.
+- Corriger sans augmenter les budgets ni changer la grille ou les valeurs
+  physiques.
+- Ajouter une régression déterministe avant toute nouvelle validation D.
+
 ### P64-L09W-E — Holdout et verdict
 
-- Statut : `planned-blocked-by-certified-rate`, dépend de P64-L09W-D.
+- Statut : `planned-blocked-by-D-hard-gate-and-certified-rate`, dépend de
+  P64-L09W-D.
 - Geler un candidat unique puis ouvrir le nouveau holdout une seule fois.
 - Ne pas ouvrir avec le seul correctif courant : 332/400 certifiés ne peuvent
   pas atteindre 380/400 sans changement causal de recherche.

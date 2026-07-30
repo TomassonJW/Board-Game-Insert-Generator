@@ -12,8 +12,10 @@ optimisations mesurées et le holdout ; aucune nouvelle observation de Thomas
 n’est requise entre ces missions atomiques normales.
 
 ADR-0108 réduit D à une validation causale stratifiée sans ouvrir le holdout.
-Le candidat de finalisation courant ne peut pas atteindre les seuils certifiés
-de E ; aucune gate humaine et aucune ouverture de holdout ne sont donc actives.
+Cette validation s'est arrêtée à sa gate fonctionnelle après `60/77` cas :
+l'incrément D n'est pas validé comme non-régressif. Le candidat de finalisation
+courant ne peut pas atteindre les seuils certifiés de E ; aucune gate humaine
+et aucune ouverture de holdout ne sont donc actives.
 Quand un futur candidat devient admissible, le holdout est ouvert une seule
 fois et E s'arrête tôt si 380/400 ou 238/240 deviennent impossibles. F et sa
 gate Fusion restent conditionnelles à un verdict E positif et à un changement
