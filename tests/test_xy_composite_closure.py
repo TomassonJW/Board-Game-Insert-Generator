@@ -19,6 +19,7 @@ from board_game_insert_generator.xy_composite_closure import (
     _RawPrism,
     _is_union_z_clearance_corridor,
     _is_xy_clearance_cross_junction,
+    _partition_residual_by_owner_faces,
     close_xy_composite_partition,
     xy_composite_closure_to_dict,
 )
@@ -426,6 +427,63 @@ class XYCompositeClosureTests(unittest.TestCase):
         )
         self.assertEqual(result.certificate["assignment_trace"], [])
         self.assertTrue(result.certificate["external_clearances_certified"])
+
+    def test_residual_partition_restores_certified_owner_face_boundaries(
+        self,
+    ) -> None:
+        residual = _RawPrism((0.0, 0.0, 2.0), (20.0, 10.0, 8.0))
+        owners = {
+            "container:a": (
+                _RawPrism((0.0, 10.0, 2.0), (9.4, 10.0, 8.0)),
+            ),
+            "container:b": (
+                _RawPrism((10.0, 10.0, 2.0), (10.0, 10.0, 8.0)),
+            ),
+        }
+
+        forward = _partition_residual_by_owner_faces(
+            residual,
+            owners,
+            max_cells=10,
+        )
+        reverse = _partition_residual_by_owner_faces(
+            residual,
+            dict(reversed(tuple(owners.items()))),
+            max_cells=10,
+        )
+
+        self.assertEqual(forward, reverse)
+        self.assertEqual(len(forward), 3)
+        self.assertEqual(sum(value.volume() for value in forward), 1600.0)
+        self.assertEqual(
+            tuple(value.origin[0] for value in forward),
+            (0.0, 9.4, 10.0),
+        )
+
+    def test_residual_partition_restores_top_inset_boundaries(self) -> None:
+        residual = _RawPrism((0.0, 0.0, 2.0), (20.0, 10.0, 8.0))
+        owners = {
+            "container:a": (
+                _RawPrism((0.0, 10.0, 2.0), (9.4, 10.0, 8.0)),
+            ),
+            "container:b": (
+                _RawPrism((10.0, 10.0, 2.0), (10.0, 10.0, 8.0)),
+            ),
+        }
+        zone = TopInsetZone((5.0, 0.0), (2.0, 10.0), 10.0, 2.0)
+
+        pieces = _partition_residual_by_owner_faces(
+            residual,
+            owners,
+            (zone,),
+            max_cells=10,
+        )
+
+        self.assertEqual(
+            tuple(value.origin[0] for value in pieces),
+            (0.0, 5.0, 7.0, 9.4, 10.0),
+        )
+        self.assertEqual(sum(value.volume() for value in pieces), 1600.0)
 
     def test_xy_z_clearance_junction_is_split_and_kept_void(self) -> None:
         lower = _placement_for(

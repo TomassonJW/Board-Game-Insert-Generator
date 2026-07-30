@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09W-NEXT -->
-## Action courante : P64-L09W-D — propriété déterministe des résiduels XY
+## Action courante : pause coordonnée et reprise D à recadrer
 
 R9-V est close en `human-positive` sur Fusion 0.1.80.
 `fusion-validated=true`, `print-validated=false`.
@@ -18,24 +18,37 @@ P64-L09W-C est terminée et automatisée-validée :
 - holdout toujours scellé, `opening_count=0`,
   `solver_invocation_count=0`.
 
-Action immédiate unique :
+P64-L09W-D est volontairement en pause sans commit :
 
-1. reconstruire au moins un échec `common` et un échec `stress`
-   `xy_composite_residual_owner_not_found` ;
-2. prouver pourquoi aucune option de propriétaire n’est produite ;
-3. définir une règle déterministe fondée sur les intersections et certificats
-   existants, sans propriétaire arbitraire ;
-4. ajouter les tests ciblés avant le changement ;
-5. mesurer l’incrément sur les cas concernés puis rejouer les 400 cas ouverts ;
-6. refuser toute solution perdue, régression de résultat prêt, budget augmenté,
-   coût déplacé vers CAD/Fusion ou changement physique ;
-7. intégrer un seul incrément avant de geler le candidat de E.
+- worktree exclusif :
+  `C:\Users\janko\.codex\worktrees\930b\BGIG` ;
+- branche : `codex/p64-l09w-d-xy-residual-owner` ;
+- incrément ciblé et tests présents dans le working tree ;
+- campagne D proprement arrêtée à `39/400`, sans cas actif ;
+- sur ces 39 cas, 18 sont prêts contre 8 en C et aucun cas déjà prêt ne
+  régresse ;
+- le holdout n’a été ni lu, ni ouvert, ni invoqué.
+
+Ordre demandé par Thomas :
+
+1. dans un clavardage séparé, auditer, committer et unifier autant que possible
+   les autres worktrees BGIG ; exclure totalement le worktree `930b` et ne
+   jamais perdre un changement étranger ;
+2. après ce nettoyage, reprendre dans le worktree `930b`, relire
+   `docs/P64_L09W_D_PAUSED_HANDOFF.md`, vérifier la nouvelle position de
+   `origin/main` et préserver le diff D ;
+3. recadrer explicitement D, E et F pour réduire le coût en temps et en tokens
+   tout en conservant des preuves honnêtes, des strates représentatives, zéro
+   régression des résultats prêts et un holdout E ouvert une seule fois ;
+4. ne relancer aucun lot D avant que ce protocole allégé soit défini et
+   documenté ;
+5. terminer ensuite D atomiquement, puis E et F selon le protocole accepté.
 
 Le holdout privé reste fermé jusqu’à P64-L09W-E. Aucun seuil 95 % ou 99 % ne
 peut être revendiqué depuis les splits ouverts.
 
 Handoff :
-`docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md`.
+`docs/P64_L09W_D_PAUSED_HANDOFF.md`.
 
 Contrats et preuves :
 

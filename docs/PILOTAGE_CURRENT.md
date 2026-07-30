@@ -43,9 +43,21 @@
 - SCIP n’est pas le premier levier mesuré : p95 `16,775 ms` sur les cas
   certifiés. La strate `stress` mesure un calcul p50 `24,943 s`, p95
   `77,117 s` et seulement 6/160 résultats prêts hors Fusion.
-- P64-L09W-D est l’unique mission `ready`. Le premier incrément causal
-  sélectionné est `xy_composite_residual_owner_resolution_v1`, sans
-  augmentation de budget, fallback arbitraire ni changement physique.
+- P64-L09W-D est en `paused-user-handoff`, sans commit D. Le travail courant
+  appartient exclusivement au worktree
+  `C:\Users\janko\.codex\worktrees\930b\BGIG`, branche
+  `codex/p64-l09w-d-xy-residual-owner`.
+- L’incrément non committé restaure les frontières XY certifiées des
+  propriétaires et réservations après fusion de cellules résiduelles. Les
+  budgets, la grille, les valeurs physiques et le solveur minimal restent
+  inchangés.
+- La campagne D est arrêtée à une frontière propre `39/400` :
+  `active_case_id=None`, aucun processus restant, 18 résultats prêts contre
+  8 sur les mêmes cas C et zéro régression d’un résultat déjà prêt.
+- Avant toute reprise D, Thomas demande deux missions séparées : d’abord
+  auditer, committer et unifier les autres worktrees sans toucher à celui-ci ;
+  ensuite revenir dans ce même worktree pour recadrer le coût de validation de
+  D à F avant de relancer une campagne.
 - Le holdout reste fermé : `opening_count=0`,
   `solver_invocation_count=0`.
 - Le GO autonome reste acquis. Aucune gate humaine n’est ouverte avant une
@@ -58,6 +70,7 @@ Autorités :
 - `docs/P64_L09W_B_PRODUCT_CORPUS_CONTRACT.md` ;
 - `docs/P64_L09W_B_PRODUCT_CORPUS_EVIDENCE.md` ;
 - `docs/P64_L09W_C_REFERENCE_CAMPAIGN_EVIDENCE.md` ;
+- `docs/P64_L09W_D_PAUSED_HANDOFF.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
 - `docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md` ;
 - `docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md` ;

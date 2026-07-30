@@ -39,14 +39,39 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-D — Optimisation causale de fermeture XY
 
-- Statut : `ready`, dépendance P64-L09W-C terminée.
+- Statut : `paused-user-handoff`, dépendance P64-L09W-C terminée, aucun commit D.
 - Premier incrément sélectionné :
   `xy_composite_residual_owner_resolution_v1`.
 - Cible mesurée : 237 pertes
   `xy_composite_residual_owner_not_found`.
+- Travail courant limité à deux fichiers suivis : fermeture XY et tests.
+- Campagne partielle propre : `39/400`, 18 prêts contre 8 en C sur le même
+  préfixe, zéro régression de résultat prêt, holdout fermé.
 - Un incrément mesuré, testé, documenté, committé et intégré à la fois.
 - Zéro budget augmenté, faux impossible, solution perdue ou coût déplacé.
 - ADR obligatoire pour tout changement structurant.
+
+### Coordination Git hors D — audit et unification des worktrees
+
+- Statut : `requested-separate-chat`.
+- Inventorier chaque worktree, branche, HEAD, upstream, diff et relation avec
+  `main` avant toute mutation.
+- Committer et intégrer les changements intentionnels autant que possible,
+  préserver les travaux étrangers et ne supprimer aucun worktree sale ou non
+  intégré.
+- Exclusion absolue : ne pas committer, modifier, déplacer ou supprimer
+  `C:\Users\janko\.codex\worktrees\930b\BGIG`.
+
+### P64-L09W-D-R — Recadrage léger de D à F
+
+- Statut : `planned-after-worktree-cleanup`, dans le même worktree `930b`.
+- Vérifier `origin/main` après unification et préserver le diff D non committé.
+- Comparer le contrat complet actuel à un protocole stratifié moins coûteux :
+  cas causaux, non-régression des prêts, échantillons common/stress et verdict
+  holdout E unique.
+- Documenter les preuves minimales suffisantes, les règles d’arrêt et ce qui
+  reste exceptionnel avant de reprendre D.
+- Aucun nouveau lot D et aucune ouverture du holdout avant cette décision.
 
 ### P64-L09W-E — Holdout et verdict
 
@@ -64,7 +89,7 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 - `print-validated=false` sans impression réelle.
 
 Handoff :
-`docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md`.
+`docs/P64_L09W_D_PAUSED_HANDOFF.md`.
 
 ### Historique R9 clos positivement
 

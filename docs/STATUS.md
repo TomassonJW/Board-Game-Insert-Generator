@@ -7,7 +7,8 @@ Date : 2026-07-30.
 
 Statut : `priority-active`, `P64-L09W-A-complete`,
 `P64-L09W-B-complete`, `P64-L09W-C-complete`,
-`P64-L09W-D-ready`, `automated-baseline-observed`, `holdout-sealed`.
+`P64-L09W-D-paused-user-handoff`, `working-tree-dirty-intentional`,
+`campaign-D-partial-39`, `automated-baseline-observed`, `holdout-sealed`.
 
 - R9-V est `human-positive` sur Fusion 0.1.80 :
   `fusion-validated=true`, `print-validated=false`.
@@ -57,9 +58,21 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
 - La finalisation est le levier dominant : 271 solutions minimales certifiées
   ne sont pas finalisées, dont 237 pour
   `xy_composite_residual_owner_not_found`.
-- P64-L09W-D est la seule mission `ready`. Son premier incrément causal
-  sélectionné cible la propriété déterministe des résiduels XY. SCIP, les
-  budgets, la grille et les valeurs physiques restent inchangés.
+- P64-L09W-D contient un incrément non committé qui restaure les frontières XY
+  certifiées des propriétaires et réservations lorsque la fusion des résiduels
+  les a effacées. SCIP, les budgets, la grille et les valeurs physiques restent
+  inchangés.
+- Les tests ciblés observés passent : fermeture XY `19/19`, diagnostics de
+  finalisation `9/9`, L09S-F `5/5`, L09T-F `8/8`, L09U-R3 `21/21` et calcul
+  staged `21/21`.
+- La campagne D est en pause propre à `39/400`, `active_case_id=None`, aucun
+  processus restant. Sur ce préfixe, les résultats prêts passent de 8 à 18 et
+  aucune régression d’un résultat déjà prêt n’est observée.
+- D n’est ni terminé, ni validé globalement, ni committé. Des échecs avancent
+  vers des refus CAD ou de certificat final et ne sont pas comptés comme gains.
+- Thomas demande d’abord un nettoyage Git séparé de tous les autres worktrees,
+  en excluant `930b`, puis une reprise dans `930b` pour recadrer D à F avant
+  toute nouvelle campagne.
 - Le holdout reste fermé jusqu’à E :
   `opening_count=0`, `solver_invocation_count=0`.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.
@@ -74,6 +87,7 @@ Preuves :
 - `docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md` ;
 - `docs/P64_L09W_B_PRODUCT_CORPUS_EVIDENCE.md`.
 - `docs/P64_L09W_C_REFERENCE_CAMPAIGN_EVIDENCE.md`.
+- `docs/P64_L09W_D_PAUSED_HANDOFF.md`.
 
 ### Historique R9 clos positivement
 

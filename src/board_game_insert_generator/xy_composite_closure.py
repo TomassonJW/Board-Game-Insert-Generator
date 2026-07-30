@@ -690,6 +690,49 @@ def _close_hybrid_residual(
                     )
                 )
         if not options:
+            boundary_split = next(
+                (
+                    (residual_index, pieces)
+                    for residual_index, residual in enumerate(pending)
+                    if (
+                        pieces := _partition_residual_by_owner_faces(
+                            residual,
+                            raw_by_owner,
+                            top_inset_zones,
+                            max_cells=max_cells - len(pending) + 1,
+                        )
+                    )
+                    and any(
+                        _vertical_extension_options(
+                            0,
+                            piece,
+                            raw_by_owner,
+                            float(xy_clearance_mm),
+                            float(between_bodies_z_mm),
+                            top_inset_zones,
+                        )
+                        or _attachment_options(
+                            0,
+                            piece,
+                            raw_by_owner,
+                            float(xy_clearance_mm),
+                            float(between_bodies_z_mm),
+                            top_inset_zones,
+                        )
+                        for piece in pieces
+                    )
+                ),
+                None,
+            )
+            if boundary_split is not None:
+                residual_index, pieces = boundary_split
+                pending = [
+                    *pending[:residual_index],
+                    *pieces,
+                    *pending[residual_index + 1 :],
+                ]
+                continue
+        if not options:
             unassigned_volume = sum(value.volume() for value in pending)
             return _failure(
                 "xy_composite_residual_owner_not_found",
@@ -1044,6 +1087,74 @@ def _consume_pending_residuals(
         tuple(consumed),
         fully_consumed,
         split_count,
+    )
+
+
+def _partition_residual_by_owner_faces(
+    residual: _RawPrism,
+    raw_by_owner: Mapping[str, Sequence[_RawPrism]],
+    zones: Sequence[TopInsetZone] = (),
+    *,
+    max_cells: int,
+) -> tuple[_RawPrism, ...]:
+    """Restore certified XY boundaries erased by residual merging."""
+
+    lower = residual.origin
+    upper = tuple(
+        residual.origin[axis] + residual.size[axis]
+        for axis in range(3)
+    )
+    axes: list[set[float]] = [
+        {lower[0], upper[0]},
+        {lower[1], upper[1]},
+    ]
+    for values in raw_by_owner.values():
+        for value in values:
+            for axis in (0, 1):
+                for boundary in (
+                    value.origin[axis],
+                    value.origin[axis] + value.size[axis],
+                ):
+                    if (
+                        lower[axis] + _EPSILON
+                        < boundary
+                        < upper[axis] - _EPSILON
+                    ):
+                        axes[axis].add(boundary)
+    for zone in zones:
+        for axis in (0, 1):
+            for boundary in (
+                zone.origin_xy_mm[axis],
+                zone.origin_xy_mm[axis] + zone.size_xy_mm[axis],
+            ):
+                if (
+                    lower[axis] + _EPSILON
+                    < boundary
+                    < upper[axis] - _EPSILON
+                ):
+                    axes[axis].add(boundary)
+    x_values = sorted(axes[0])
+    y_values = sorted(axes[1])
+    cell_count = (len(x_values) - 1) * (len(y_values) - 1)
+    if cell_count <= 1 or cell_count > max_cells:
+        return ()
+    return tuple(
+        sorted(
+            (
+                _RawPrism(
+                    (x0, y0, residual.origin[2]),
+                    (
+                        x1 - x0,
+                        y1 - y0,
+                        residual.size[2],
+                    ),
+                )
+                for x0, x1 in zip(x_values, x_values[1:])
+                for y0, y1 in zip(y_values, y_values[1:])
+                if x1 - x0 > _EPSILON and y1 - y0 > _EPSILON
+            ),
+            key=_raw_signature,
+        )
     )
 
 
