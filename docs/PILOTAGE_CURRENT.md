@@ -43,21 +43,19 @@
 - SCIP n’est pas le premier levier mesuré : p95 `16,775 ms` sur les cas
   certifiés. La strate `stress` mesure un calcul p50 `24,943 s`, p95
   `77,117 s` et seulement 6/160 résultats prêts hors Fusion.
-- P64-L09W-D est en `paused-user-handoff`, sans commit D. Le travail courant
-  appartient exclusivement au worktree
-  `C:\Users\janko\.codex\worktrees\930b\BGIG`, branche
+- P64-L09W-D est en `handoff-committed`. Son incrément courant est sauvegardé
+  dans `2de5959d4363e63e45b943ffff712b0de53e51f5`, branche
   `codex/p64-l09w-d-xy-residual-owner`.
-- L’incrément non committé restaure les frontières XY certifiées des
+- L’incrément de passation restaure les frontières XY certifiées des
   propriétaires et réservations après fusion de cellules résiduelles. Les
   budgets, la grille, les valeurs physiques et le solveur minimal restent
   inchangés.
 - La campagne D est arrêtée à une frontière propre `39/400` :
   `active_case_id=None`, aucun processus restant, 18 résultats prêts contre
   8 sur les mêmes cas C et zéro régression d’un résultat déjà prêt.
-- Avant toute reprise D, Thomas demande deux missions séparées : d’abord
-  auditer, committer et unifier les autres worktrees sans toucher à celui-ci ;
-  ensuite revenir dans ce même worktree pour recadrer le coût de validation de
-  D à F avant de relancer une campagne.
+- Le nettoyage Git est terminé. La prochaine reprise crée une branche
+  successeure depuis le commit de passation dans un nouveau worktree, puis
+  recadre le coût de validation de D à F avant toute nouvelle campagne.
 - Le holdout reste fermé : `opening_count=0`,
   `solver_invocation_count=0`.
 - Le GO autonome reste acquis. Aucune gate humaine n’est ouverte avant une

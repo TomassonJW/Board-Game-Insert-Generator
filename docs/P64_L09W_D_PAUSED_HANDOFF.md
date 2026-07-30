@@ -1,9 +1,28 @@
-# P64-L09W-D — handoff de pause propre
+# P64-L09W-D — handoff Git propre
 
 Date : 2026-07-30.
 
-Statut : `paused-user-handoff`, `working-tree-dirty-intentional`,
+Statut : `handoff-committed`, `working-tree-clean-tracked`,
 `campaign-partial-39`, `holdout-sealed`.
+
+## Clôture Git de la passation
+
+Thomas a levé l’exclusion du worktree uniquement pour sauvegarder le travail et
+permettre une reprise dans un nouveau clavardage et une nouvelle branche.
+
+L’incrément technique, ses tests et l’état de pause sont sauvegardés dans :
+
+- commit : `2de5959d4363e63e45b943ffff712b0de53e51f5` ;
+- branche source : `codex/p64-l09w-d-xy-residual-owner`.
+
+Les artefacts `.codex-work/p64-l09w-d/` restent volontairement locaux et
+ignorés. Ils ne contiennent aucun résultat de holdout et ne sont pas promus
+dans Git.
+
+La prochaine reprise doit créer une branche successeure depuis ce commit dans
+un nouveau worktree, puis recadrer D à F avant toute nouvelle campagne.
+Les sections historiques ci-dessous décrivent l’état antérieur au commit ;
+cette clôture Git est désormais autoritaire.
 
 ## Décision de Thomas
 
@@ -28,17 +47,18 @@ Le GO autonome P64-L09W reste acquis. Ne pas créer un nouveau GO normal.
 - base et upstream au moment de la pause : `origin/main` ;
 - HEAD : `7a09c5c25eb70eae2f97de2e3da69e574032f129` ;
 - ce commit est P64-L09W-C et est déjà poussé directement dans `origin/main` ;
-- P64-L09W-D n’a aucun commit.
+- commit de passation : `2de5959d4363e63e45b943ffff712b0de53e51f5` ;
+- P64-L09W-D n’est pas terminé ; son incrément courant possède désormais un
+  commit de sauvegarde dédié.
 
-Fichiers suivis modifiés avant mise à jour du pilotage :
+Fichiers techniques sauvegardés :
 
 - `src/board_game_insert_generator/xy_composite_closure.py` ;
 - `tests/test_xy_composite_closure.py`.
 
-Les documents de pilotage et ce handoff sont également modifiés sans commit.
-Le clavardage de nettoyage des worktrees doit exclure entièrement ce worktree.
+Les documents de pilotage et ce handoff sont sauvegardés avec le même commit.
 
-## Incrément D non committé
+## Incrément D sauvegardé
 
 Cause mesurée en C :
 

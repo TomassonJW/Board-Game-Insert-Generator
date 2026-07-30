@@ -18,12 +18,13 @@ P64-L09W-C est terminée et automatisée-validée :
 - holdout toujours scellé, `opening_count=0`,
   `solver_invocation_count=0`.
 
-P64-L09W-D est volontairement en pause sans commit :
+P64-L09W-D possède maintenant un handoff committé :
 
 - worktree exclusif :
   `C:\Users\janko\.codex\worktrees\930b\BGIG` ;
 - branche : `codex/p64-l09w-d-xy-residual-owner` ;
-- incrément ciblé et tests présents dans le working tree ;
+- commit de passation : `2de5959d4363e63e45b943ffff712b0de53e51f5` ;
+- incrément ciblé et tests sauvegardés ;
 - campagne D proprement arrêtée à `39/400`, sans cas actif ;
 - sur ces 39 cas, 18 sont prêts contre 8 en C et aucun cas déjà prêt ne
   régresse ;
@@ -31,12 +32,10 @@ P64-L09W-D est volontairement en pause sans commit :
 
 Ordre demandé par Thomas :
 
-1. dans un clavardage séparé, auditer, committer et unifier autant que possible
-   les autres worktrees BGIG ; exclure totalement le worktree `930b` et ne
-   jamais perdre un changement étranger ;
-2. après ce nettoyage, reprendre dans le worktree `930b`, relire
-   `docs/P64_L09W_D_PAUSED_HANDOFF.md`, vérifier la nouvelle position de
-   `origin/main` et préserver le diff D ;
+1. créer une branche successeure depuis
+   `2de5959d4363e63e45b943ffff712b0de53e51f5` dans un nouveau worktree géré ;
+2. relire `docs/P64_L09W_D_PAUSED_HANDOFF.md`, vérifier `origin/main` et
+   préserver la relation exacte avec le commit D ;
 3. recadrer explicitement D, E et F pour réduire le coût en temps et en tokens
    tout en conservant des preuves honnêtes, des strates représentatives, zéro
    régression des résultats prêts et un holdout E ouvert une seule fois ;

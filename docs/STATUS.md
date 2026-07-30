@@ -7,8 +7,8 @@ Date : 2026-07-30.
 
 Statut : `priority-active`, `P64-L09W-A-complete`,
 `P64-L09W-B-complete`, `P64-L09W-C-complete`,
-`P64-L09W-D-paused-user-handoff`, `working-tree-dirty-intentional`,
-`campaign-D-partial-39`, `automated-baseline-observed`, `holdout-sealed`.
+`P64-L09W-D-handoff-committed`, `campaign-D-partial-39`,
+`automated-baseline-observed`, `holdout-sealed`.
 
 - R9-V est `human-positive` sur Fusion 0.1.80 :
   `fusion-validated=true`, `print-validated=false`.
@@ -58,7 +58,8 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
 - La finalisation est le levier dominant : 271 solutions minimales certifiées
   ne sont pas finalisées, dont 237 pour
   `xy_composite_residual_owner_not_found`.
-- P64-L09W-D contient un incrément non committé qui restaure les frontières XY
+- P64-L09W-D possède un incrément de passation committé dans
+  `2de5959d4363e63e45b943ffff712b0de53e51f5`. Il restaure les frontières XY
   certifiées des propriétaires et réservations lorsque la fusion des résiduels
   les a effacées. SCIP, les budgets, la grille et les valeurs physiques restent
   inchangés.
@@ -68,11 +69,11 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
 - La campagne D est en pause propre à `39/400`, `active_case_id=None`, aucun
   processus restant. Sur ce préfixe, les résultats prêts passent de 8 à 18 et
   aucune régression d’un résultat déjà prêt n’est observée.
-- D n’est ni terminé, ni validé globalement, ni committé. Des échecs avancent
-  vers des refus CAD ou de certificat final et ne sont pas comptés comme gains.
-- Thomas demande d’abord un nettoyage Git séparé de tous les autres worktrees,
-  en excluant `930b`, puis une reprise dans `930b` pour recadrer D à F avant
-  toute nouvelle campagne.
+- D n’est ni terminé ni validé globalement. Le commit courant est une
+  sauvegarde de passation, pas un verdict D. Des échecs avancent vers des refus
+  CAD ou de certificat final et ne sont pas comptés comme gains.
+- Le nettoyage Git est terminé ; la reprise doit partir d’une nouvelle branche
+  dérivée du commit de passation et recadrer D à F avant toute nouvelle campagne.
 - Le holdout reste fermé jusqu’à E :
   `opening_count=0`, `solver_invocation_count=0`.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.

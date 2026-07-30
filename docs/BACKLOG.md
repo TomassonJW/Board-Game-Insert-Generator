@@ -39,12 +39,13 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-D — Optimisation causale de fermeture XY
 
-- Statut : `paused-user-handoff`, dépendance P64-L09W-C terminée, aucun commit D.
+- Statut : `handoff-committed`, dépendance P64-L09W-C terminée.
 - Premier incrément sélectionné :
   `xy_composite_residual_owner_resolution_v1`.
 - Cible mesurée : 237 pertes
   `xy_composite_residual_owner_not_found`.
-- Travail courant limité à deux fichiers suivis : fermeture XY et tests.
+- Commit de passation : `2de5959d4363e63e45b943ffff712b0de53e51f5`.
+- Travail technique limité à deux fichiers suivis : fermeture XY et tests.
 - Campagne partielle propre : `39/400`, 18 prêts contre 8 en C sur le même
   préfixe, zéro régression de résultat prêt, holdout fermé.
 - Un incrément mesuré, testé, documenté, committé et intégré à la fois.
@@ -53,7 +54,7 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### Coordination Git hors D — audit et unification des worktrees
 
-- Statut : `requested-separate-chat`.
+- Statut : `done`.
 - Inventorier chaque worktree, branche, HEAD, upstream, diff et relation avec
   `main` avant toute mutation.
 - Committer et intégrer les changements intentionnels autant que possible,
@@ -64,8 +65,9 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-D-R — Recadrage léger de D à F
 
-- Statut : `planned-after-worktree-cleanup`, dans le même worktree `930b`.
-- Vérifier `origin/main` après unification et préserver le diff D non committé.
+- Statut : `ready-successor-branch`.
+- Créer une nouvelle branche et un nouveau worktree depuis le commit de
+  passation, vérifier `origin/main` et préserver le commit D.
 - Comparer le contrat complet actuel à un protocole stratifié moins coûteux :
   cas causaux, non-régression des prêts, échantillons common/stress et verdict
   holdout E unique.
