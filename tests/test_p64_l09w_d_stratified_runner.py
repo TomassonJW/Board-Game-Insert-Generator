@@ -15,8 +15,9 @@ def _case_result(
     target_loss: bool = False,
     deterministic: bool = True,
     functional_digest: str = "functional",
+    additional_functional_digests: tuple[str, ...] = (),
 ) -> dict[str, object]:
-    return {
+    result = {
         "status": runner.campaign.RESULT_CERTIFIED,
         "deterministic": deterministic,
         "losses": (
@@ -47,6 +48,12 @@ def _case_result(
             }
         ],
     }
+    for index, digest in enumerate(additional_functional_digests, start=2):
+        additional_run = dict(result["runs"][0])
+        additional_run["repetition"] = index
+        additional_run["functional_digest"] = digest
+        result["runs"].append(additional_run)
+    return result
 
 
 class P64L09WDStratifiedRunnerTests(unittest.TestCase):
@@ -78,6 +85,46 @@ class P64L09WDStratifiedRunnerTests(unittest.TestCase):
         self.assertIn(
             "ready_functional_digest_regression",
             regressed["failures"],
+        )
+
+    def test_ready_non_regression_accepts_only_previously_observed_signature(
+        self,
+    ) -> None:
+        row = {
+            "case_id": "ready-nondeterministic",
+            "stratum": "stress",
+            "tiers": ["ready_non_regression"],
+            "required_repeats": 1,
+        }
+        reference = _case_result(
+            ready=True,
+            deterministic=False,
+            functional_digest="first-observed",
+            additional_functional_digests=("second-observed",),
+        )
+        matched_second = runner.assess_case(
+            schedule_row=row,
+            reference_result=reference,
+            candidate_result=_case_result(
+                ready=True,
+                functional_digest="second-observed",
+            ),
+        )
+        self.assertTrue(matched_second["hard_gate_passed"])
+
+        introduced_third = runner.assess_case(
+            schedule_row=row,
+            reference_result=reference,
+            candidate_result=_case_result(
+                ready=True,
+                deterministic=False,
+                functional_digest="second-observed",
+                additional_functional_digests=("new-third-signature",),
+            ),
+        )
+        self.assertIn(
+            "ready_functional_digest_regression",
+            introduced_third["failures"],
         )
 
     def test_causal_case_requires_ready_chain_and_removed_target_loss(

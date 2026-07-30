@@ -61,5 +61,12 @@ identiques, mais le digest aval change parce que D produit désormais un résult
 prêt. La gate est corrigée pour préserver les invariants solveur/placement sans
 interdire l'effet de finalisation recherché.
 
+Troisième essai : arrêt après 50 nouveaux cas sur
+`p64-l09w-tuning-360-c8628c8c54`. Le digest D `b314a432...08dc` est exactement
+le second des deux digests déjà observés dans C, avec placement, statut et route
+identiques. La gate des résultats prêts compare désormais la candidate à
+l'ensemble fermé des signatures C observées ; elle refuse toujours toute
+signature nouvelle.
+
 `fusion-validated=true` reste hérité de 0.1.80.
 `print-validated=false`.

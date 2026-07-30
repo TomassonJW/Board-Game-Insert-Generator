@@ -91,7 +91,12 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
   non-déterminisme déjà présent dans C. L'audit conserve ce fait comme dette
   préexistante et resserre l'arrêt aux régressions réelles de déterminisme,
   signature solveur ou placement.
-- Le holdout reste fermé jusqu’à E :
+- Le troisième checkpoint d'audit s'arrête après 50 nouveaux cas sur un résultat
+  `stress` prêt. D reproduit exactement le second des deux digests déjà observés
+  dans C pour ce cas non déterministe. La gate accepte une signature uniquement
+  dans l'ensemble fermé des signatures C et continue de refuser toute signature
+  nouvelle.
+- Le holdout reste fermé jusqu'à E :
   `opening_count=0`, `solver_invocation_count=0`.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.
 

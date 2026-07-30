@@ -182,16 +182,29 @@ def _has_target_loss(result: Mapping[str, object]) -> bool:
     )
 
 
-def _functional_signature(
+def _run_functional_signature(
     result: Mapping[str, object],
+    run: Mapping[str, object],
 ) -> tuple[object, ...]:
-    run = _first_run(result)
     return (
         result.get("status"),
         run.get("solver_status"),
         run.get("functional_digest"),
         run.get("placement_digest"),
     )
+
+
+def _functional_signatures(
+    result: Mapping[str, object],
+) -> set[tuple[object, ...]]:
+    runs = result.get("runs")
+    if not isinstance(runs, list) or not runs:
+        return {_run_functional_signature(result, {})}
+    return {
+        _run_functional_signature(result, run)
+        for run in runs
+        if isinstance(run, Mapping)
+    }
 
 
 def _solver_signature(
@@ -245,8 +258,8 @@ def assess_case(
     if "ready_non_regression" in tiers:
         if not ready:
             failures.append("ready_result_regression")
-        if _functional_signature(candidate_result) != _functional_signature(
-            reference_result
+        if not _functional_signatures(candidate_result).issubset(
+            _functional_signatures(reference_result)
         ):
             failures.append("ready_functional_digest_regression")
 

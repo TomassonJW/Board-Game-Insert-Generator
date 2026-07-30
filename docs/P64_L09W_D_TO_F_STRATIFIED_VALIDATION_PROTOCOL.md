@@ -137,6 +137,14 @@ attendu : placement, route et statut solveur restent identiques tandis que la
 finalisation passe de l'échec au résultat prêt. La gate cible compare donc la
 signature solveur et le placement, pas le digest aval que D doit modifier.
 
+Le troisième essai s'est arrêté après 50 nouveaux cas sur le résultat prêt
+`p64-l09w-tuning-360-c8628c8c54`. C avait déjà observé deux signatures
+fonctionnelles sur ce cas et l'avait déclaré non déterministe. D reproduit
+exactement la seconde signature C, avec le même placement, le même statut et la
+même route. La gate de non-régression accepte donc une signature candidate
+seulement si elle appartient à l'ensemble fermé des signatures déjà observées
+dans C ; toute signature nouvelle reste un arrêt dur.
+
 ## 5. Gate avant P64-L09W-E
 
 E reste fermée après le seul incrément courant.
