@@ -42,7 +42,7 @@ Le recadrage est maintenant préenregistré par ADR-0108 :
 
 Action unique :
 
-1. implémenter l'exécuteur lié au plan
+1. utiliser l'exécuteur versionné et préflighté, lié au plan
    `.codex-work/p64-l09w-d/stratified-validation-plan.json` ;
 2. exécuter d'abord le cas causal `stress`, puis la non-régression des prêts,
    puis le reste de l'échantillon par petits lots checkpointés ;

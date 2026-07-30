@@ -172,8 +172,13 @@ verdict E autorisant une candidate :
 
 ## 8. Prochaine action
 
-Implémenter un exécuteur D distinct du script historique, lié au digest du plan,
-capable de :
+L'exécuteur D distinct du script historique est versionné dans
+`scripts/solver/run_p64_l09w_d_stratified_validation.py`. Son préflight Python
+3.14 valide le plan, les deux checkpoints, le bundle courant, le manifest et le
+reçu runtime avant toute écriture.
+
+Exécuter maintenant cet exécuteur par petits lots. Il est lié au digest du plan
+et sait :
 
 - réutiliser les 39 résultats D sans les réécrire ;
 - exécuter les 67 nouveaux cas dans l’ordre des gates ;

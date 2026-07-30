@@ -39,7 +39,7 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-D — Optimisation causale de fermeture XY
 
-- Statut : `stratified-validation-planned`, dépendance P64-L09W-C terminée.
+- Statut : `stratified-executor-ready`, dépendance P64-L09W-C terminée.
 - Premier incrément sélectionné :
   `xy_composite_residual_owner_resolution_v1`.
 - Cible mesurée : 237 pertes
@@ -51,7 +51,8 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 - ADR-0108 remplace les 361 cas restants par 67 nouveaux cas et 81 replays :
   deux cas causaux, tous les 61 résultats prêts et huit pertes cibles par
   strate. Aucun taux global ne vient de cet échantillon.
-- Prochaine sous-mission : exécuteur D checkpointé et sans surface holdout.
+- Exécuteur D checkpointé, préflighté sous Python 3.14 et sans surface holdout.
+- Prochaine sous-mission : campagne stratifiée par petits lots gardés.
 - Un incrément mesuré, testé, documenté, committé et intégré à la fois.
 - Zéro budget augmenté, faux impossible, solution perdue ou coût déplacé.
 - ADR obligatoire pour tout changement structurant.

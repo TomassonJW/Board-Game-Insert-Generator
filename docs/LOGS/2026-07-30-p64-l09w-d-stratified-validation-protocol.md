@@ -43,6 +43,8 @@ candidate Fusion, installation ou recette humaine ne compense un échec E.
 - sélection déterministe testée ;
 - couverture de toutes les valeurs observées des axes sélectionnés testée ;
 - protocole documentaire testé.
+- exécuteur distinct testé et préflighté sous Python 3.14 sans lancement
+  solveur ni surface holdout.
 
 `fusion-validated=true` reste hérité de 0.1.80.
 `print-validated=false`.
