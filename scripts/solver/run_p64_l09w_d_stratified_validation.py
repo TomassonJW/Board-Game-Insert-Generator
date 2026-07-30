@@ -194,6 +194,23 @@ def _functional_signature(
     )
 
 
+def _solver_signature(
+    result: Mapping[str, object],
+) -> tuple[object, ...]:
+    run = _first_run(result)
+    route = run.get("route")
+    return (
+        result.get("status"),
+        run.get("solver_status"),
+        run.get("placement_digest"),
+        (
+            route.get("lane_id")
+            if isinstance(route, Mapping)
+            else None
+        ),
+    )
+
+
 def assess_case(
     *,
     schedule_row: Mapping[str, object],
@@ -219,7 +236,7 @@ def assess_case(
             and candidate_result.get("deterministic") is not True
         ):
             failures.append("target_replay_nondeterminism_regression")
-        if _functional_signature(candidate_result) != _functional_signature(
+        if _solver_signature(candidate_result) != _solver_signature(
             reference_result
         ):
             failures.append("target_solver_signature_regression")

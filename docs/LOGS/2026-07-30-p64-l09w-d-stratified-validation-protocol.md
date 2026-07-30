@@ -55,5 +55,11 @@ gain prêt, mais ce n'est pas une nouvelle régression de déterminisme. La gate
 refuse désormais uniquement un non-déterminisme nouveau ou une divergence de
 signature/placement canonique.
 
+Second essai : arrêt encore avant tout nouveau solve sur le causal `common`.
+Son placement `4c995e46...c36f`, sa route et son statut solveur restent
+identiques, mais le digest aval change parce que D produit désormais un résultat
+prêt. La gate est corrigée pour préserver les invariants solveur/placement sans
+interdire l'effet de finalisation recherché.
+
 `fusion-validated=true` reste hérité de 0.1.80.
 `print-validated=false`.

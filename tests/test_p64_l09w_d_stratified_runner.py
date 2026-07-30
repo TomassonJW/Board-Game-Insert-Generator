@@ -29,6 +29,7 @@ def _case_result(
                 "solver_status": "solution_found",
                 "functional_digest": functional_digest,
                 "placement_digest": "placement",
+                "route": {"lane_id": "lane"},
                 "finalization": {
                     "status": (
                         "solution_found"
@@ -135,6 +136,16 @@ class P64L09WDStratifiedRunnerTests(unittest.TestCase):
         )
         self.assertTrue(preexisting["hard_gate_passed"])
         self.assertTrue(preexisting["preexisting_nondeterminism"])
+
+        improved_downstream = runner.assess_case(
+            schedule_row=row,
+            reference_result=reference,
+            candidate_result=_case_result(
+                ready=True,
+                functional_digest="expected-downstream-change",
+            ),
+        )
+        self.assertTrue(improved_downstream["hard_gate_passed"])
 
     def test_execution_order_starts_with_stress_causal_then_ready(self) -> None:
         rows = [

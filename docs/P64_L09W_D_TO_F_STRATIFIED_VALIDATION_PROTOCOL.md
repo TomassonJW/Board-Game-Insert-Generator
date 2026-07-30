@@ -131,6 +131,12 @@ identiques dans C et D ; seule la perte aval passe du propriétaire résiduel au
 certificat d’ancrage final. La gate est donc corrigée pour refuser une
 régression de déterminisme, jamais pour réattribuer à D une dette C existante.
 
+Le second essai s'est aussi arrêté avant tout nouveau solve sur le causal
+`common` parce que son digest fonctionnel aval change. Ce changement est
+attendu : placement, route et statut solveur restent identiques tandis que la
+finalisation passe de l'échec au résultat prêt. La gate cible compare donc la
+signature solveur et le placement, pas le digest aval que D doit modifier.
+
 ## 5. Gate avant P64-L09W-E
 
 E reste fermée après le seul incrément courant.

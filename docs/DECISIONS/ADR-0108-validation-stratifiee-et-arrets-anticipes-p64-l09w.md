@@ -81,7 +81,8 @@ diagnostic puis un arrêt. Elle ne peut pas être moyennée avec les gains.
 
 Un non-déterminisme déjà présent dans C n’est pas imputé à D. Il reste publié
 comme dette préexistante et n’est acceptable que si le statut, la signature
-fonctionnelle canonique et le placement du premier replay restent identiques.
+solveur, la route et le placement du premier replay restent identiques. Le
+digest fonctionnel aval peut changer lorsque la finalisation ciblée réussit.
 L’apparition d’un nouveau non-déterminisme sur une référence déterministe reste
 un arrêt dur.
 
