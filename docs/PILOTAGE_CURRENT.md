@@ -32,9 +32,22 @@
 - Le holdout neuf est scellé sous l’engagement
   `18bd4010...ec5a`, sans recette privée dans le manifest public,
   `opening_count=0` et `solver_invocation_count=0`.
-- P64-L09W-C est l’unique mission `ready` : construire le runner produit
-  borné, exécuter seulement `discovery` et `tuning` sur 0.1.80, mesurer les
-  phases aval séparément et attribuer les pertes avant toute optimisation.
+- P64-L09W-C est terminée : le runner borné et reprenable a exécuté deux
+  replays sur chacun des 400 positifs ouverts, sans double exécution.
+- Résultat C : 332 `certified_solution`, 68 `bounded_unknown`, 368/400 replays
+  fonctionnellement identiques, zéro faux impossible et 61 résultats prêts
+  hors Fusion.
+- La perte dominante est aval : 271 solutions minimales certifiées ne sont
+  pas finalisées, dont 237 avec
+  `xy_composite_residual_owner_not_found`.
+- SCIP n’est pas le premier levier mesuré : p95 `16,775 ms` sur les cas
+  certifiés. La strate `stress` mesure un calcul p50 `24,943 s`, p95
+  `77,117 s` et seulement 6/160 résultats prêts hors Fusion.
+- P64-L09W-D est l’unique mission `ready`. Le premier incrément causal
+  sélectionné est `xy_composite_residual_owner_resolution_v1`, sans
+  augmentation de budget, fallback arbitraire ni changement physique.
+- Le holdout reste fermé : `opening_count=0`,
+  `solver_invocation_count=0`.
 - Le GO autonome reste acquis. Aucune gate humaine n’est ouverte avant une
   éventuelle candidate produit en P64-L09W-F.
 
@@ -44,6 +57,7 @@ Autorités :
 - `docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md` ;
 - `docs/P64_L09W_B_PRODUCT_CORPUS_CONTRACT.md` ;
 - `docs/P64_L09W_B_PRODUCT_CORPUS_EVIDENCE.md` ;
+- `docs/P64_L09W_C_REFERENCE_CAMPAIGN_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
 - `docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md` ;
 - `docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md` ;

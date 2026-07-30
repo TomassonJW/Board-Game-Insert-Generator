@@ -1,33 +1,35 @@
 # Next Actions
 
 <!-- P64-L09W-NEXT -->
-## Action courante : P64-L09W-C — campagne de référence ouverte
+## Action courante : P64-L09W-D — propriété déterministe des résiduels XY
 
 R9-V est close en `human-positive` sur Fusion 0.1.80.
 `fusion-validated=true`, `print-validated=false`.
 
-P64-L09W-B est terminée et automatisée-validée :
+P64-L09W-C est terminée et automatisée-validée :
 
-- 400 positifs ouverts : 240 `discovery/common`, 160 `tuning/stress` ;
-- 400 positifs privés : 240 `common`, 160 `stress` ;
-- 40 contrôles impossibles à borne formelle ;
-- minima pairwise satisfaits et splits disjoints ;
-- holdout scellé, `opening_count=0`, `solver_invocation_count=0`.
+- 400/400 positifs ouverts exécutés, deux replays par cas ;
+- 332 `certified_solution`, 68 `bounded_unknown` ;
+- 368/400 replays fonctionnellement identiques ;
+- zéro faux impossible et zéro solution non certifiée publiée ;
+- 61 résultats prêts hors Fusion ;
+- 271 pertes de finalisation, dont 237
+  `xy_composite_residual_owner_not_found` ;
+- holdout toujours scellé, `opening_count=0`,
+  `solver_invocation_count=0`.
 
 Action immédiate unique :
 
-1. définir le résultat unitaire et les checkpoints de campagne sans changer le
-   solveur ;
-2. adapter le runner reprenable existant au parcours produit courant ;
-3. exécuter 0.1.80 uniquement sur les 400 cas ouverts, jamais sur le holdout ;
-4. publier les statuts honnêtes, temps, mémoire, routes, compteurs, certificat,
-   finalisation et CAD IR séparément ;
-5. agréger taux et `p50/p95/p99` par strate et par axe sans masquer les cas
-   censurés ;
-6. attribuer les pertes par cause mesurée et comparer les hypothèses selon
-   simplicité, maintenance, testabilité, gain probable et risque fonctionnel ;
-7. sélectionner au plus une première optimisation causale pour P64-L09W-D, ou
-   conclure honnêtement qu’aucun changement n’est justifié.
+1. reconstruire au moins un échec `common` et un échec `stress`
+   `xy_composite_residual_owner_not_found` ;
+2. prouver pourquoi aucune option de propriétaire n’est produite ;
+3. définir une règle déterministe fondée sur les intersections et certificats
+   existants, sans propriétaire arbitraire ;
+4. ajouter les tests ciblés avant le changement ;
+5. mesurer l’incrément sur les cas concernés puis rejouer les 400 cas ouverts ;
+6. refuser toute solution perdue, régression de résultat prêt, budget augmenté,
+   coût déplacé vers CAD/Fusion ou changement physique ;
+7. intégrer un seul incrément avant de geler le candidat de E.
 
 Le holdout privé reste fermé jusqu’à P64-L09W-E. Aucun seuil 95 % ou 99 % ne
 peut être revendiqué depuis les splits ouverts.
@@ -41,6 +43,7 @@ Contrats et preuves :
 - `docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md` ;
 - `docs/P64_L09W_B_PRODUCT_CORPUS_CONTRACT.md` ;
 - `docs/P64_L09W_B_PRODUCT_CORPUS_EVIDENCE.md` ;
+- `docs/P64_L09W_C_REFERENCE_CAMPAIGN_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md`.
 
 ### Historique R9-V clos positivement

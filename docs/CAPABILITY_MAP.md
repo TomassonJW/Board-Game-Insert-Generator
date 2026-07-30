@@ -1,7 +1,7 @@
 # Capability Map
 
 <!-- P64-L09W-CAPABILITY -->
-## P64-L09W — corpus produit scellé, campagne de référence prête
+## P64-L09W — baseline produit mesurée, optimisation causale prête
 
 - `C-FUSION` : 0.1.80 `human-positive`, `fusion-validated=true`.
 - `C-STAGED-CALCULATION` : performance R9 validée sur les deux cas
@@ -9,23 +9,25 @@
   reconstructibles consommées, sans extrapolation au futur domaine.
 - `C-GLOBAL-LAYOUT` et `C-MINIMAL-LAYOUT` : solutions certifiées et résultat R9
   conservés ; récupération historiquement faible sur dense et presque saturé.
-- `C-OBSERVABILITY` : attribution calcul, certificat, finalisation, CAD IR,
-  routes, compteurs, temps et mémoire versionnée ; matérialisation hors ligne
-  explicitement non mesurée. Le runner produit complet reste à livrer en C.
+- `C-OBSERVABILITY` : `automated-validated`. Le runner C publie calcul,
+  certificat, finalisation, CAD IR, routes, compteurs, temps et mémoire sur
+  400 cas ouverts avec reprise atomique et deux replays par cas.
 - `C-QUALITY` : 165 dérives sémantiques isolées, holdouts anciens consommés,
   reçus historiques validés sans réécriture et ADR-0107 implémentée.
   B ajoute 400 positifs ouverts, 400 positifs privés, 40 contrôles formels,
   minima pairwise satisfaits et zéro collision des quatre familles de digests.
   Le nouveau holdout reste fermé, non exécuté et absent du manifest public.
-- `C-FINALIZATION` : 21 calculs certifiés recertifiés ; 2 réussites et 19 refus
-  immédiats par stratégie aval, sans timeout.
-- `C-CAD-IR` : 2/2 plans finalisés prêts pour Fusion.
+- `C-FINALIZATION` : 332 calculs certifiés ; 61 résultats prêts hors Fusion et
+  271 pertes `certified_minimal_not_finalized`. La cause dominante est
+  `xy_composite_residual_owner_not_found` sur 237 cas.
+- `C-CAD-IR` : 61 plans finalisés prêts hors Fusion.
 - `C-MATERIALIZATION` : `not-measured-offline`.
 - `C-PRODUCT-GRID` : `0,1 mm`, inchangée ; epsilon `0,0001 mm` distinct.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : P64-L09W-C, runner borné et reprenable, baseline produit
-0.1.80 sur les splits ouverts et attribution causale avant optimisation.
+Prochaine frontière : P64-L09W-D,
+`xy_composite_residual_owner_resolution_v1`, un seul incrément mesuré à budget,
+grille, valeurs physiques et holdout inchangés.
 
 ### Historique R9 clos positivement
 

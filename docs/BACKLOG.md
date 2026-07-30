@@ -30,14 +30,20 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-C — Campagne de référence
 
-- Statut : `ready`, dépendance P64-L09W-B terminée.
+- Statut : `done`, `automated-validated`, `baseline-observed`.
 - Runner borné, reprenable, déterministe et sans double exécution.
 - Taux de succès et temps p50/p95/p99 par strate.
 - Calcul, certification, finalisation, CAD IR et matérialisation séparés.
+- Preuve :
+  `docs/P64_L09W_C_REFERENCE_CAMPAIGN_EVIDENCE.md`.
 
-### P64-L09W-D — Optimisations causales
+### P64-L09W-D — Optimisation causale de fermeture XY
 
-- Statut : `planned`, dépend de P64-L09W-C.
+- Statut : `ready`, dépendance P64-L09W-C terminée.
+- Premier incrément sélectionné :
+  `xy_composite_residual_owner_resolution_v1`.
+- Cible mesurée : 237 pertes
+  `xy_composite_residual_owner_not_found`.
 - Un incrément mesuré, testé, documenté, committé et intégré à la fois.
 - Zéro budget augmenté, faux impossible, solution perdue ou coût déplacé.
 - ADR obligatoire pour tout changement structurant.

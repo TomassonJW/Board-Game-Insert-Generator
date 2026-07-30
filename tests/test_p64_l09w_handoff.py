@@ -43,7 +43,7 @@ class P64L09WGeneralSolverRobustnessHandoffTests(unittest.TestCase):
         self.assertIn("Il est interdit", handoff)
         self.assertIn("tous les cas possibles", handoff)
 
-    def test_current_pilotage_prioritizes_open_campaign_before_optimization(
+    def test_current_pilotage_prioritizes_causal_optimization_after_campaign(
         self,
     ) -> None:
         pilotage = {
@@ -61,11 +61,19 @@ class P64L09WGeneralSolverRobustnessHandoffTests(unittest.TestCase):
 
         for text in pilotage.values():
             self.assertIn("P64-L09W", text)
-        self.assertIn("P64-L09W-B", pilotage["docs/NEXT_ACTIONS.md"])
         self.assertIn("P64-L09W-C", pilotage["docs/NEXT_ACTIONS.md"])
+        self.assertIn("P64-L09W-D", pilotage["docs/NEXT_ACTIONS.md"])
         self.assertIn(
-            "jamais sur le holdout",
+            "P64-L09W-C est terminée",
             pilotage["docs/NEXT_ACTIONS.md"],
+        )
+        self.assertIn(
+            "Le holdout privé reste fermé",
+            pilotage["docs/NEXT_ACTIONS.md"],
+        )
+        self.assertIn(
+            "xy_composite_residual_owner_resolution_v1",
+            pilotage["docs/BACKLOG.md"],
         )
         self.assertIn(
             "aucune gate humaine ouverte",
@@ -75,6 +83,25 @@ class P64L09WGeneralSolverRobustnessHandoffTests(unittest.TestCase):
             "Le nouveau holdout reste fermé",
             pilotage["docs/CAPABILITY_MAP.md"],
         )
+
+    def test_reference_campaign_evidence_is_complete_and_keeps_holdout_closed(
+        self,
+    ) -> None:
+        evidence = (
+            ROOT / "docs/P64_L09W_C_REFERENCE_CAMPAIGN_EVIDENCE.md"
+        ).read_text(encoding="utf-8")
+
+        for marker in (
+            "400/400",
+            "332",
+            "83,00 %",
+            "xy_composite_residual_owner_not_found",
+            "holdout_file_read=false",
+            "holdout_opening_count=0",
+            "holdout_solver_invocation_count=0",
+            "1061/1061",
+        ):
+            self.assertIn(marker, evidence)
 
 
 if __name__ == "__main__":

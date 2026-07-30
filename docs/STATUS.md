@@ -6,8 +6,8 @@
 Date : 2026-07-30.
 
 Statut : `priority-active`, `P64-L09W-A-complete`,
-`P64-L09W-B-complete`, `P64-L09W-C-ready`,
-`automated-baseline-observed`, `holdout-sealed`.
+`P64-L09W-B-complete`, `P64-L09W-C-complete`,
+`P64-L09W-D-ready`, `automated-baseline-observed`, `holdout-sealed`.
 
 - R9-V est `human-positive` sur Fusion 0.1.80 :
   `fusion-validated=true`, `print-validated=false`.
@@ -49,8 +49,19 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
 - Validation B : test de reprise `1/1`, suite ciblée `10/10`, gate L09W
   `21/21`, documents `11/11`, vérification finale des engagements et suite
   complète `1054/1054` passées avec `1` skip prévu.
-- Aucune optimisation n’est encore sélectionnée. P64-L09W-C est la seule
-  mission `ready` ; le holdout reste fermé jusqu’à E.
+- P64-L09W-C exécute les 400 positifs ouverts avec deux replays par cas :
+  332 solutions certifiées, 68 `bounded_unknown`, 368 replays identiques,
+  zéro faux impossible et zéro solution non certifiée publiée.
+- Seuls 61/400 cas sont prêts hors Fusion. La strate `stress` n’en compte que
+  6/160, avec un calcul p50 `24,943 s`, p95 `77,117 s` et p99 `121,761 s`.
+- La finalisation est le levier dominant : 271 solutions minimales certifiées
+  ne sont pas finalisées, dont 237 pour
+  `xy_composite_residual_owner_not_found`.
+- P64-L09W-D est la seule mission `ready`. Son premier incrément causal
+  sélectionné cible la propriété déterministe des résiduels XY. SCIP, les
+  budgets, la grille et les valeurs physiques restent inchangés.
+- Le holdout reste fermé jusqu’à E :
+  `opening_count=0`, `solver_invocation_count=0`.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.
 
 Contrats :
@@ -62,6 +73,7 @@ Preuves :
 
 - `docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md` ;
 - `docs/P64_L09W_B_PRODUCT_CORPUS_EVIDENCE.md`.
+- `docs/P64_L09W_C_REFERENCE_CAMPAIGN_EVIDENCE.md`.
 
 ### Historique R9 clos positivement
 
