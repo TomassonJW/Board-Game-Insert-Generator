@@ -1050,6 +1050,47 @@
       "stratum": "stress"
     },
     {
+      "case_digest": "1d6a51b56f33025c7b9c8fe2b9af83de15998a88eb4effbc1727f83e513c7ed4",
+      "case_id": "p64-l09w-tuning-300-cf933fb090",
+      "features": {
+        "aspect_profile": "balanced",
+        "box_size": "medium",
+        "container_count": 50,
+        "contents_per_container": 1,
+        "difficulty": "stress",
+        "execution": "local_parameter",
+        "flat_count": 3,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 5,
+        "minimum_axis_margin_pct": 63.6364,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 9762.202,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "78664b81e8a48f0841505e5aa05d85df61656e9b011f192a7e62007bd5b4c4b2"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [
+          "xy_composite_deadline_reached"
+        ],
+        "placement_digest": "3fee5dde80927ab092c862df83b4ad2df5fdd890b62bcf89a34c7afed0d09d0f",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "sentinel"
+      ],
+      "stratum": "stress"
+    },
+    {
       "case_digest": "b6a4b34ef138f21b5cdc02ebe2ebe136f4f6c30b7bf4e1faaff8dca9357788f7",
       "case_id": "p64-l09w-tuning-396-85a80285ef",
       "features": {
@@ -1209,45 +1250,6 @@
         "bounded_control",
         "candidate",
         "sentinel"
-      ],
-      "stratum": "stress"
-    },
-    {
-      "case_digest": "ada4d080a6f0d0bc851c168701b3bc986525a1dba3f93112a0c44a00275fe0be",
-      "case_id": "p64-l09w-tuning-293-268fb46b33",
-      "features": {
-        "aspect_profile": "near-equal-xy",
-        "box_size": "large",
-        "container_count": 64,
-        "contents_per_container": 8,
-        "difficulty": "stress",
-        "execution": "local_parameter",
-        "flat_count": 10,
-        "fragmentation_class": "reserved-top",
-        "free_region_lower_bound": 1,
-        "layer_bucket": "4+",
-        "layer_count": 8,
-        "minimum_axis_margin_pct": 58.753,
-        "split": "tuning",
-        "stratum": "stress",
-        "target_density_pct": 95
-      },
-      "reference": {
-        "calculation_ms": 20554.67,
-        "candidate_source": "not_available",
-        "deterministic": true,
-        "functional_digests": [],
-        "lane_id": "not_available",
-        "loss_details": [
-          "global_deadline_reached_before_external_search;external=not_available"
-        ],
-        "placement_digest": null,
-        "ready": false,
-        "status": "bounded_unknown"
-      },
-      "roles": [
-        "bounded_control",
-        "candidate"
       ],
       "stratum": "stress"
     },
@@ -1821,6 +1823,45 @@
       "stratum": "stress"
     },
     {
+      "case_digest": "42794a5c6410c4d373bb67ca21d77e7d6819923d8193ee7b8c3f63acd9f9cce0",
+      "case_id": "p64-l09w-tuning-383-683ecf36ae",
+      "features": {
+        "aspect_profile": "near-equal-xy",
+        "box_size": "large",
+        "container_count": 8,
+        "contents_per_container": 64,
+        "difficulty": "stress",
+        "execution": "add",
+        "flat_count": 10,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 8,
+        "minimum_axis_margin_pct": 29.9625,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 48671.733,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "global_deadline_reached_without_candidate;external=not_available"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "stress"
+    },
+    {
       "case_digest": "7403fe563d60b30b180d8292ada63ddda4bc27d0e2611e228386500c8a927fcc",
       "case_id": "p64-l09w-tuning-271-8cb52a6e29",
       "features": {
@@ -1856,47 +1897,6 @@
       "roles": [
         "candidate",
         "ready_non_regression"
-      ],
-      "stratum": "stress"
-    },
-    {
-      "case_digest": "14042ad7aca7dcc4d6599b2363951b80d8772b6b0c192e8062213090e39dc55b",
-      "case_id": "p64-l09w-tuning-277-a66af911e7",
-      "features": {
-        "aspect_profile": "deep",
-        "box_size": "large",
-        "container_count": 64,
-        "contents_per_container": 8,
-        "difficulty": "stress",
-        "execution": "global_parameter",
-        "flat_count": 4,
-        "fragmentation_class": "reserved-top",
-        "free_region_lower_bound": 1,
-        "layer_bucket": "4+",
-        "layer_count": 8,
-        "minimum_axis_margin_pct": 52.7473,
-        "split": "tuning",
-        "stratum": "stress",
-        "target_density_pct": 95
-      },
-      "reference": {
-        "calculation_ms": 53091.319,
-        "candidate_source": "portfolio_lane",
-        "deterministic": true,
-        "functional_digests": [
-          "7bacf8d003d5008d93d04a8758c385b60c364a07d30622db1d93dee76d8e2c2c"
-        ],
-        "lane_id": "canonical_floor_maxrects",
-        "loss_details": [
-          "xy_composite_deadline_reached"
-        ],
-        "placement_digest": "dd956c8afe45d71caed71d8785d0bc9f25987f8d972f5162e0ab18fda5794367",
-        "ready": false,
-        "status": "certified_solution"
-      },
-      "roles": [
-        "candidate",
-        "sentinel"
       ],
       "stratum": "stress"
     },
@@ -1960,7 +1960,7 @@
     "solver_budget_changed": false
   },
   "mission": "P64-L09W-D-P",
-  "plan_digest": "a389db5f100390fef95b98979eb0ead6961bf99e5522c26fc91d0e59391b5d62",
+  "plan_digest": "d427e148a194d6dec66bf354e287604e6f5446eb50c7e083682419187a36e528",
   "schema_version": "bgig.p64_l09w_performance_panels.v1",
   "selection": {
     "candidate_case_ids": [
@@ -1990,11 +1990,11 @@
       "p64-l09w-discovery-001-55d8459fc2",
       "p64-l09w-tuning-340-780412f833",
       "p64-l09w-tuning-240-ea12ccc81d",
+      "p64-l09w-tuning-300-cf933fb090",
       "p64-l09w-tuning-396-85a80285ef",
       "p64-l09w-tuning-287-6a0b59538e",
       "p64-l09w-tuning-269-70926170e2",
       "p64-l09w-tuning-388-a020715e35",
-      "p64-l09w-tuning-293-268fb46b33",
       "p64-l09w-tuning-338-f5347d13f7",
       "p64-l09w-tuning-361-337507087f",
       "p64-l09w-tuning-328-00d377a685",
@@ -2009,8 +2009,8 @@
       "p64-l09w-tuning-242-4286d04b06",
       "p64-l09w-tuning-311-a359353af1",
       "p64-l09w-tuning-333-e600efeb08",
+      "p64-l09w-tuning-383-683ecf36ae",
       "p64-l09w-tuning-271-8cb52a6e29",
-      "p64-l09w-tuning-277-a66af911e7",
       "p64-l09w-tuning-331-d7d3f65f9f"
     ],
     "causal_case_ids": [
@@ -2140,7 +2140,7 @@
       "p64-l09w-tuning-388-a020715e35",
       "p64-l09w-tuning-360-c8628c8c54",
       "p64-l09w-tuning-384-ed4a7a7670",
-      "p64-l09w-tuning-277-a66af911e7"
+      "p64-l09w-tuning-300-cf933fb090"
     ]
   },
   "sources": {
@@ -2152,7 +2152,7 @@
   "tiers": {
     "candidate": {
       "case_count": 48,
-      "estimated_reference_calculation_seconds": 769.364,
+      "estimated_reference_calculation_seconds": 754.152,
       "purpose": "promising_candidate_confirmation",
       "repetitions": 2,
       "requires_sentinel_pass": true
@@ -2164,7 +2164,7 @@
     },
     "sentinel": {
       "case_count": 16,
-      "estimated_reference_calculation_seconds": 207.336,
+      "estimated_reference_calculation_seconds": 164.007,
       "purpose": "permanent_fast_causal_functional_and_performance_gate",
       "repetitions": 5
     }

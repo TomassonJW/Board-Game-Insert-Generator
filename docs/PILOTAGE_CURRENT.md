@@ -85,11 +85,15 @@
   8 stress`, puis 48 cas `24 + 24`. Les sentinelles couvrent toutes les valeurs
   des sept axes publics et contiennent les deux cas causaux, cinq résultats
   prêts, deux contrôles bornés et `tuning-360`.
-- Le plan reproductible vaut `a389db5f...b5d62`. Son passage sentinelle est
-  estimé à `207,336 s`; le passage 48 cas à `769,364 s`. Aucun des deux
+- Le plan reproductible vaut `d427e148...6e528`. Son passage sentinelle C est
+  estimé à `164,007 s`; le passage 48 cas à `754,152 s`. Aucun des deux
   échantillons ne mesure un taux.
-- La prochaine action est la baseline à cinq répétitions des 16 sentinelles,
-  puis le gel de seuils dérivés de leur variance réelle.
+- La baseline à cinq répétitions est complète : 16/16, 80 calculs, zéro échec
+  fonctionnel. Le total mesure une médiane `181,092 s`, une MAD `0,480 s` et
+  une borne gelée `183,511 s`.
+- Les seuils sont dérivés de la variance réelle par borne robuste unilatérale
+  à 99 % et correction de Bonferroni, sans marge fixe. Le digest des seuils est
+  `beac0010...54a4b72`.
 - Cet échantillon ne mesure aucun taux. Le correctif courant ne peut pas faire
   passer les 332/400 solutions certifiées de C au seuil E de 380/400 ; le
   holdout reste donc fermé après ce seul incrément.
@@ -113,6 +117,7 @@ Autorités :
 - `docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md` ;
 - `docs/P64_L09W_D_N_DETERMINISM_EVIDENCE.md` ;
 - `docs/P64_L09W_PERFORMANCE_PANEL_CONTRACT.md` ;
+- `docs/P64_L09W_PERFORMANCE_SENTINEL_BASELINE_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
 - `docs/DECISIONS/ADR-0108-validation-stratifiee-et-arrets-anticipes-p64-l09w.md` ;
 - `docs/DECISIONS/ADR-0109-identite-produit-selectionne-et-trace-de-recherche.md` ;

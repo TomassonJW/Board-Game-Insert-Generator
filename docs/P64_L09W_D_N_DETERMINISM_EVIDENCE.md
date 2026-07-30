@@ -55,6 +55,14 @@ ADR-0109 sépare désormais :
 - `deterministic`, stabilité du résultat produit ;
 - `execution_trace_deterministic`, stabilité de la trace.
 
+La baseline sentinelle a ensuite durci ce contrat :
+
+- copie profonde du plan minimal avant toute finalisation aval ;
+- identité produit v2 excluant le `candidate_digest` du certificat global,
+  tout en conservant ses checks ;
+- `execution_route_deterministic` distinct, car deux voies peuvent certifier le
+  même produit.
+
 Les anciens checkpoints restent lisibles. Leur champ historique
 `functional_digest` n'est pas réécrit.
 
@@ -65,6 +73,8 @@ Les anciens checkpoints restent lisibles. Leur champ historique
 - comparaison complète des plans : `4/4` comparaisons à zéro différence, OK ;
 - suite complète : aucun échec observé avant la borne, mais timeout gardé à
   `600 s`, donc verdict global `timeout`, non compté comme vert ;
+- suite complète finale après clôture des panels :
+  `1093/1093`, `1` skip prévu, OK en `622,557 s` avec la commande canonique ;
 - `git diff --check` : OK ;
 - holdout : aucune lecture, ouverture ou invocation.
 

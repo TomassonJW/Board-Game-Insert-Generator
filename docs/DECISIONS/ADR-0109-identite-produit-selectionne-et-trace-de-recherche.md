@@ -47,14 +47,17 @@ Retenue :
   nouvelle identité est disponible ;
 - `execution_trace_deterministic` publie séparément la stabilité stricte de la
   trace ;
+- `execution_route_deterministic` publie séparément la stabilité de la voie
+  qui a livré ce produit ;
 - les anciens checkpoints restent lisibles par repli sur leur ancien
   `functional_digest`.
 
 ## Décision
 
-Une variation de trace sous limite de temps n'est pas une variation fonctionnelle
-si et seulement si le statut, le statut solveur, le produit sélectionné, le
-placement et la route sélectionnée restent identiques.
+Une variation de trace sous limite de temps n'est pas une variation
+fonctionnelle si le statut, le statut solveur, le produit sélectionné et le
+placement restent identiques. La route sélectionnée est une donnée d'exécution :
+deux voies peuvent certifier exactement le même produit.
 
 La projection produit est volontairement une liste autorisée. Elle exclut le
 digest complet, le résumé des candidats, l'identifiant de requête, les compteurs,
@@ -63,8 +66,8 @@ réservations, les stages, les supports, les résiduels, la validation et les
 certificats de géométrie/finalisation du résultat retenu.
 
 Une variation du produit sélectionné reste un arrêt dur. Une variation de trace
-est publiée et peut déclencher un diagnostic de performance, mais elle ne peut
-plus être présentée comme un changement de géométrie.
+ou de route est publiée et peut déclencher un diagnostic de performance, mais
+elle ne peut plus être présentée comme un changement de géométrie.
 
 ## Conséquences
 

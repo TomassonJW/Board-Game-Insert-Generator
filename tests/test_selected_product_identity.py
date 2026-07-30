@@ -40,6 +40,12 @@ def _plan() -> dict[str, object]:
             "finalization_applied": True,
             "automatic_body_count": 2,
             "flat_geometry_certificate": {"certified": True},
+            "global_certificate": {
+                "schema_version": "bgig.minimal_layout_certificate.v1",
+                "candidate_digest": "e" * 64,
+                "certified": True,
+                "checks": [{"name": "inside_box", "passed": True}],
+            },
             "search_provenance": {
                 "candidate_count_before_dedup": 10,
                 "certificate_rejection_count": 4,
@@ -62,6 +68,9 @@ class SelectedProductIdentityTests(unittest.TestCase):
             "certificate_rejection_count"
         ] = 32
         second["minimal_layout"]["certifiable_payload_digest"] = "d" * 64
+        second["minimal_layout"]["global_certificate"][
+            "candidate_digest"
+        ] = "f" * 64
 
         self.assertEqual(
             selected_product_digest(first),

@@ -32,8 +32,8 @@ Le panel contient exactement 8 cas `common` et 8 cas `stress`. Il inclut :
   densité, taille de boîte, type d'exécution, nombre de couches, nombre
   d'éléments plats, fragmentation et profil d'aspect.
 
-Le temps C estimé d'un passage est `207,336 s`. La baseline de variance prévoit
-cinq répétitions, soit environ `17 min 17 s` de calcul de référence.
+Le temps C estimé d'un passage est `164,007 s`. La baseline de variance utilise
+cinq répétitions.
 
 ## Panel candidat — 48 cas
 
@@ -48,8 +48,8 @@ Le panel candidat contient les 16 sentinelles et 32 cas supplémentaires :
 - préférence de départ pour les résultats prêts et les cas bornés répartis sur
   leur plage de temps.
 
-Le temps C estimé d'un passage est `769,364 s`. Deux répétitions sont prévues
-pour confirmer un candidat, soit environ `25 min 39 s`.
+Le temps C estimé d'un passage est `754,152 s`. Deux répétitions sont prévues
+pour confirmer un candidat, soit environ `25 min 08 s`.
 
 ## Règles de passage
 
@@ -87,9 +87,10 @@ panel 48.
 
 Aucun seuil fixe de type `±5 %` n'est préenregistré.
 
-Les limites seront calculées après les cinq répétitions sentinelles à partir de
-la dispersion réellement observée par cas et au niveau du panel. La méthode et
-les valeurs dérivées seront versionnées avant d'évaluer un candidat.
+Les limites sont calculées après cinq répétitions sentinelles à partir de la
+dispersion réellement observée par cas et au niveau du panel. Elles utilisent
+une borne robuste unilatérale à 99 %, corrigée par Bonferroni pour les 16 cas,
+et au moins le plus grand écart supérieur observé.
 
 ## Autorités et reproductibilité
 
@@ -110,7 +111,13 @@ Le plan engage :
 - zéro lecture, ouverture ou invocation holdout.
 
 Digest du plan :
-`a389db5f100390fef95b98979eb0ead6961bf99e5522c26fc91d0e59391b5d62`.
+`d427e148a194d6dec66bf354e287604e6f5446eb50c7e083682419187a36e528`.
 
-Deux générations indépendantes ont produit le même SHA-256 de fichier :
-`b5968d38c2f7f07f49a2021627a77b7cba0760cdcf7ee926adbb33a93dceb29c`.
+SHA-256 du fichier :
+`1b8d270b526bed51a770947f291374190f2a86462f4dbe49d53367bb7904b600`.
+
+Seuils gelés :
+`tests/fixtures/p64_l09w_performance_thresholds.v1.json`.
+
+Preuve :
+`docs/P64_L09W_PERFORMANCE_SENTINEL_BASELINE_EVIDENCE.md`.

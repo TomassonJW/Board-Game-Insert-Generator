@@ -118,6 +118,17 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
 - Les 400 cas ouverts ne sont plus une routine de micro-optimisation : ils sont
   réservés à un changement global ou au candidat gelé avant E. Les panels ne
   produisent aucun taux global.
+- La baseline sentinelle est complète : 16/16 cas, cinq répétitions, 80
+  calculs, zéro échec fonctionnel et holdout intact. Médiane totale
+  `181,092 s`, MAD `0,480 s`, maximum observé et borne gelée `183,511 s`.
+- Les seuils n'utilisent aucune marge fixe : borne robuste unilatérale à 99 %,
+  correction de Bonferroni et plancher égal au plus grand écart supérieur
+  observé. Digest : `beac0010...54a4b72`.
+- La baseline a séparé définitivement produit, route et trace, corrigé la copie
+  superficielle du premier replay et remplacé une sentinelle lourde non
+  reproductible avant le gel final du panel.
+- Validation finale : `34/34` tests ciblés, `11/11` tests documentaires et
+  `1093/1093` tests de la suite complète passent, avec `1` skip prévu.
 - L'incrément D reste sauvegardé, mais sa non-régression exacte n'est pas
   démontrée. E est bloquée par cette gate et par le plafond certifié
   `332/400`; F n'est pas lancée.

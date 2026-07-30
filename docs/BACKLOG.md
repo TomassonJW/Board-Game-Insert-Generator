@@ -98,8 +98,7 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-D-P — Panels permanents de performance
 
-- Statut : `panels-preregistered`, `variance-baseline-ready`, dépend de
-  P64-L09W-D-N.
+- Statut : `done-baseline-and-thresholds-frozen`, dépend de P64-L09W-D-N.
 - Panel sentinelle permanent : 12 à 16 cas reproductibles, causaux et
   représentatifs des strates `common` et `stress`.
 - Panel candidat : 48 cas, utilisé uniquement après un signal sentinelle
@@ -111,9 +110,12 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 - Acquis : 16 sentinelles `8 + 8` couvrant toutes les valeurs des sept axes ;
   48 cas `24 + 24`, 16 prêts, 13 bornés et 16 pertes cibles ; génération
   bit à bit reproductible ; holdout absent.
-- Prochaine sous-mission : exécuter cinq répétitions sentinelles et geler les
-  seuils mesurés avant tout candidat.
+- Baseline : 16/16, 80 calculs, zéro échec fonctionnel ; seuils robustes 99 %
+  corrigés par Bonferroni, sans marge fixe.
+- Prochaine utilisation : sentinelles sur un changement causal de recherche,
+  puis 48 cas seulement si le signal est prometteur.
 - Contrat : `docs/P64_L09W_PERFORMANCE_PANEL_CONTRACT.md`.
+- Preuve : `docs/P64_L09W_PERFORMANCE_SENTINEL_BASELINE_EVIDENCE.md`.
 
 ### P64-L09W-E — Holdout et verdict
 

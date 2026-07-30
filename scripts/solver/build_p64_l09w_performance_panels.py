@@ -61,7 +61,7 @@ SENTINEL_CASE_IDS = (
     "p64-l09w-tuning-388-a020715e35",
     "p64-l09w-tuning-360-c8628c8c54",
     "p64-l09w-tuning-384-ed4a7a7670",
-    "p64-l09w-tuning-277-a66af911e7",
+    "p64-l09w-tuning-300-cf933fb090",
 )
 
 FEATURE_AXES = (

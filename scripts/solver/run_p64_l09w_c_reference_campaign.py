@@ -801,6 +801,14 @@ def _result_stop_reason(value: Mapping[str, object]) -> str:
     return "not_reported"
 
 
+def _detached_plan_payload(value: object) -> dict[str, object]:
+    return (
+        deepcopy(dict(value))
+        if isinstance(value, Mapping)
+        else {}
+    )
+
+
 def _run_once(
     *,
     case_id: str,
@@ -831,7 +839,7 @@ def _run_once(
     calculation_ms = (perf_counter() - calculation_started) * 1000.0
     instrumentation = probe.report(calculation_ms)
     plan = calculated.get("partition")
-    plan_payload = dict(plan) if isinstance(plan, Mapping) else {}
+    plan_payload = _detached_plan_payload(plan)
     solver_result = calculated.get("solver_result")
     solver_status = (
         str(solver_result.get("status", "error"))
@@ -1048,8 +1056,6 @@ def _functional_runs_identical(
         runs[0].get("selected_product_digest")
         or runs[0].get("functional_digest"),
         runs[0]["placement_digest"],
-        dict(runs[0]["route"]).get("candidate_source"),
-        dict(runs[0]["route"]).get("lane_id"),
     )
     return all(
         (
@@ -1058,8 +1064,6 @@ def _functional_runs_identical(
             value.get("selected_product_digest")
             or value.get("functional_digest"),
             value["placement_digest"],
-            dict(value["route"]).get("candidate_source"),
-            dict(value["route"]).get("lane_id"),
         )
         == expected
         for value in runs[1:]
@@ -1079,6 +1083,25 @@ def _execution_traces_identical(
         value.get(
             "execution_trace_digest",
             value.get("functional_digest"),
+        )
+        == expected
+        for value in runs[1:]
+    )
+
+
+def _execution_routes_identical(
+    runs: Sequence[Mapping[str, object]],
+) -> bool | None:
+    if len(runs) < 2:
+        return None
+    expected = (
+        dict(runs[0]["route"]).get("candidate_source"),
+        dict(runs[0]["route"]).get("lane_id"),
+    )
+    return all(
+        (
+            dict(value["route"]).get("candidate_source"),
+            dict(value["route"]).get("lane_id"),
         )
         == expected
         for value in runs[1:]
@@ -1301,6 +1324,9 @@ def run_open_case(
         "runs": runs,
         "deterministic": _functional_runs_identical(runs),
         "execution_trace_deterministic": _execution_traces_identical(
+            runs
+        ),
+        "execution_route_deterministic": _execution_routes_identical(
             runs
         ),
         "resources": {

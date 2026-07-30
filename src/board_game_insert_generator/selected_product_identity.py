@@ -16,8 +16,8 @@ from board_game_insert_generator.incremental_project_state import (
 )
 
 
-SELECTED_PRODUCT_IDENTITY_SCHEMA_V1 = (
-    "bgig.selected_product_identity.v1"
+SELECTED_PRODUCT_IDENTITY_SCHEMA_V2 = (
+    "bgig.selected_product_identity.v2"
 )
 
 _PLAN_FIELDS = (
@@ -50,7 +50,6 @@ _MINIMAL_LAYOUT_FIELDS = (
     "automatic_body_count",
     "flat_geometry_certificate",
     "container_variant_certificate",
-    "global_certificate",
 )
 
 
@@ -60,7 +59,7 @@ def selected_product_identity(
     """Return the stable, allow-listed product projection of a plan."""
 
     projection: dict[str, object] = {
-        "schema_version": SELECTED_PRODUCT_IDENTITY_SCHEMA_V1,
+        "schema_version": SELECTED_PRODUCT_IDENTITY_SCHEMA_V2,
         "plan": {
             field: deepcopy(plan[field])
             for field in _PLAN_FIELDS
@@ -74,6 +73,13 @@ def selected_product_identity(
             for field in _MINIMAL_LAYOUT_FIELDS
             if field in minimal
         }
+        global_certificate = minimal.get("global_certificate")
+        if isinstance(global_certificate, Mapping):
+            projection["minimal_layout"]["global_certificate"] = {
+                field: deepcopy(value)
+                for field, value in global_certificate.items()
+                if field != "candidate_digest"
+            }
     return projection
 
 

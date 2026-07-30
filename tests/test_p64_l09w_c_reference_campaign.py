@@ -215,6 +215,49 @@ class P64L09WCReferenceCampaignTests(unittest.TestCase):
             campaign._functional_runs_identical([first, second])
         )
 
+    def test_selected_product_replay_classifies_route_separately(self) -> None:
+        first = _run(
+            status=campaign.RESULT_CERTIFIED,
+            lane="lane-a",
+            calculation_ms=10.0,
+        )
+        second = _run(
+            status=campaign.RESULT_CERTIFIED,
+            lane="lane-b",
+            calculation_ms=12.0,
+        )
+
+        self.assertTrue(
+            campaign._functional_runs_identical([first, second])
+        )
+        self.assertFalse(
+            campaign._execution_routes_identical([first, second])
+        )
+
+    def test_plan_payload_is_detached_before_downstream_mutation(self) -> None:
+        source = {
+            "minimal_layout": {
+                "finalization_applied": False,
+                "search_provenance": {"candidate_count": 10},
+            }
+        }
+
+        detached = campaign._detached_plan_payload(source)
+        source["minimal_layout"]["finalization_applied"] = True
+        source["minimal_layout"]["search_provenance"][
+            "candidate_count"
+        ] = 11
+
+        self.assertFalse(
+            detached["minimal_layout"]["finalization_applied"]
+        )
+        self.assertEqual(
+            detached["minimal_layout"]["search_provenance"][
+                "candidate_count"
+            ],
+            10,
+        )
+
     def test_summary_keeps_censored_cases_and_nearest_rank_percentiles(
         self,
     ) -> None:
