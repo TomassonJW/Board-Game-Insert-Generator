@@ -11,6 +11,14 @@ aucune gate. P64-L09W-B à E portent sur les oracles, la campagne, les
 optimisations mesurées et le holdout ; aucune nouvelle observation de Thomas
 n’est requise entre ces missions atomiques normales.
 
+ADR-0108 réduit D à une validation causale stratifiée sans ouvrir le holdout.
+Le candidat de finalisation courant ne peut pas atteindre les seuils certifiés
+de E ; aucune gate humaine et aucune ouverture de holdout ne sont donc actives.
+Quand un futur candidat devient admissible, le holdout est ouvert une seule
+fois et E s'arrête tôt si 380/400 ou 238/240 deviennent impossibles. F et sa
+gate Fusion restent conditionnelles à un verdict E positif et à un changement
+produit réellement retenu.
+
 Une nouvelle gate humaine n’est ouverte que si une candidate produit réellement
 modifiée est préparée et installée en P64-L09W-F, ou si une décision
 structurante non résolue par les contrats exige l’autorité de Thomas.
@@ -23,6 +31,9 @@ Handoff :
 
 Preuve A :
 `docs/P64_L09W_A_SOLVER_ROBUSTNESS_BASELINE_EVIDENCE.md`.
+
+Protocole D à F :
+`docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md`.
 
 ### Historique R9-V clos positivement
 

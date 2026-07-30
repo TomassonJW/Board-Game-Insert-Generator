@@ -8,6 +8,7 @@ Date : 2026-07-30.
 Statut : `priority-active`, `P64-L09W-A-complete`,
 `P64-L09W-B-complete`, `P64-L09W-C-complete`,
 `P64-L09W-D-handoff-committed`, `campaign-D-partial-39`,
+`P64-L09W-D-stratified-protocol-preregistered`,
 `automated-baseline-observed`, `holdout-sealed`.
 
 - R9-V est `human-positive` sur Fusion 0.1.80 :
@@ -72,8 +73,16 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
 - D n’est ni terminé ni validé globalement. Le commit courant est une
   sauvegarde de passation, pas un verdict D. Des échecs avancent vers des refus
   CAD ou de certificat final et ne sont pas comptés comme gains.
-- Le nettoyage Git est terminé ; la reprise doit partir d’une nouvelle branche
-  dérivée du commit de passation et recadrer D à F avant toute nouvelle campagne.
+- Le nettoyage Git est terminé ; `HEAD`, `main` et `origin/main` valent
+  `82e66c78ff9fd513e0c57016aac68cb23a20f1bc`. La branche de reprise
+  `codex/p64-l09w-d-stratified-validation` préserve le checkpoint D.
+- ADR-0108 et le protocole D à F remplacent les 361 cas restants par 67
+  nouveaux cas et 81 replays : deux causaux, les 61 prêts et huit pertes
+  cibles par strate. Le plan vaut
+  `a5a689d0...4469` et ne possède aucune surface holdout.
+- L'échantillon D n'est pas un estimateur de taux. Le correctif de
+  finalisation ne change pas les 332/400 solutions certifiées de C et ne rend
+  donc pas E admissible face au seuil 380/400.
 - Le holdout reste fermé jusqu’à E :
   `opening_count=0`, `solver_invocation_count=0`.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.
@@ -89,6 +98,7 @@ Preuves :
 - `docs/P64_L09W_B_PRODUCT_CORPUS_EVIDENCE.md`.
 - `docs/P64_L09W_C_REFERENCE_CAMPAIGN_EVIDENCE.md`.
 - `docs/P64_L09W_D_PAUSED_HANDOFF.md`.
+- `docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md`.
 
 ### Historique R9 clos positivement
 

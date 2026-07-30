@@ -39,7 +39,7 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-D — Optimisation causale de fermeture XY
 
-- Statut : `handoff-committed`, dépendance P64-L09W-C terminée.
+- Statut : `stratified-validation-planned`, dépendance P64-L09W-C terminée.
 - Premier incrément sélectionné :
   `xy_composite_residual_owner_resolution_v1`.
 - Cible mesurée : 237 pertes
@@ -48,6 +48,10 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 - Travail technique limité à deux fichiers suivis : fermeture XY et tests.
 - Campagne partielle propre : `39/400`, 18 prêts contre 8 en C sur le même
   préfixe, zéro régression de résultat prêt, holdout fermé.
+- ADR-0108 remplace les 361 cas restants par 67 nouveaux cas et 81 replays :
+  deux cas causaux, tous les 61 résultats prêts et huit pertes cibles par
+  strate. Aucun taux global ne vient de cet échantillon.
+- Prochaine sous-mission : exécuteur D checkpointé et sans surface holdout.
 - Un incrément mesuré, testé, documenté, committé et intégré à la fois.
 - Zéro budget augmenté, faux impossible, solution perdue ou coût déplacé.
 - ADR obligatoire pour tout changement structurant.
@@ -65,27 +69,26 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-D-R — Recadrage léger de D à F
 
-- Statut : `ready-successor-branch`.
-- Créer une nouvelle branche et un nouveau worktree depuis le commit de
-  passation, vérifier `origin/main` et préserver le commit D.
-- Comparer le contrat complet actuel à un protocole stratifié moins coûteux :
-  cas causaux, non-régression des prêts, échantillons common/stress et verdict
-  holdout E unique.
-- Documenter les preuves minimales suffisantes, les règles d’arrêt et ce qui
-  reste exceptionnel avant de reprendre D.
-- Aucun nouveau lot D et aucune ouverture du holdout avant cette décision.
+- Statut : `done-documentation`, `preregistered-before-new-campaign`.
+- Branche, HEAD, `origin/main`, checkpoint D et artefacts locaux vérifiés.
+- ADR-0108, protocole D à F, planificateur déterministe et plan local livrés.
+- Aucun lot D historique relancé et aucune ouverture du holdout.
 
 ### P64-L09W-E — Holdout et verdict
 
-- Statut : `planned`, dépend de P64-L09W-D.
+- Statut : `planned-blocked-by-certified-rate`, dépend de P64-L09W-D.
 - Geler un candidat unique puis ouvrir le nouveau holdout une seule fois.
+- Ne pas ouvrir avec le seul correctif courant : 332/400 certifiés ne peuvent
+  pas atteindre 380/400 sans changement causal de recherche.
+- Arrêter au troisième échec `common`, au vingt-et-unième échec global ou à
+  la première invalidation dure.
 - Publier les résultats par famille, y compris les échecs.
 - Revendiquer uniquement le domaine et les limites démontrés.
 
 ### P64-L09W-F — Produit et Fusion si justifié
 
 - Statut : `planned-conditional`, dépend de P64-L09W-E.
-- Créer une candidate seulement si du code produit a changé.
+- Créer une candidate seulement si du code produit a changé et si E passe.
 - Installer automatiquement, vérifier et remettre à Thomas uniquement la
   recette humaine finale.
 - `print-validated=false` sans impression réelle.

@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09W-NEXT -->
-## Action courante : pause coordonnée et reprise D à recadrer
+## Action courante : exécuter la validation D stratifiée
 
 R9-V est close en `human-positive` sur Fusion 0.1.80.
 `fusion-validated=true`, `print-validated=false`.
@@ -30,24 +30,40 @@ P64-L09W-D possède maintenant un handoff committé :
   régresse ;
 - le holdout n’a été ni lu, ni ouvert, ni invoqué.
 
-Ordre demandé par Thomas :
+Le recadrage est maintenant préenregistré par ADR-0108 :
 
-1. créer une branche successeure depuis
-   `2de5959d4363e63e45b943ffff712b0de53e51f5` dans un nouveau worktree géré ;
-2. relire `docs/P64_L09W_D_PAUSED_HANDOFF.md`, vérifier `origin/main` et
-   préserver la relation exacte avec le commit D ;
-3. recadrer explicitement D, E et F pour réduire le coût en temps et en tokens
-   tout en conservant des preuves honnêtes, des strates représentatives, zéro
-   régression des résultats prêts et un holdout E ouvert une seule fois ;
-4. ne relancer aucun lot D avant que ce protocole allégé soit défini et
-   documenté ;
-5. terminer ensuite D atomiquement, puis E et F selon le protocole accepté.
+1. les 361 cas D restants ne sont pas rejoués mécaniquement ;
+2. les 39 résultats checkpointés sont préservés ;
+3. le plan impose les deux cas causaux, les 61 résultats C déjà prêts et
+   huit cas cibles par strate couvrant tous les axes sélectionnés ;
+4. il reste 67 nouveaux cas et 81 replays, avec arrêt immédiat sur régression
+   ou preuve invalide ;
+5. `sample_is_rate_estimator=false` : aucun taux global ne vient de D.
+
+Action unique :
+
+1. implémenter l'exécuteur lié au plan
+   `.codex-work/p64-l09w-d/stratified-validation-plan.json` ;
+2. exécuter d'abord le cas causal `stress`, puis la non-régression des prêts,
+   puis le reste de l'échantillon par petits lots checkpointés ;
+3. ne jamais appeler `run_d_batch.ps1` ;
+4. conserver le holdout fermé.
+
+Le correctif courant ne change pas la recherche et laisse donc le plafond
+certifié à 332/400 contre 380/400 requis. E n'est pas admissible après ce seul
+incrément ; D devra traiter ensuite les 68 `bounded_unknown` par un changement
+causal distinct. E restera une ouverture unique avec arrêt anticipé au
+troisième échec `common` ou au vingt-et-unième échec global. F restera
+conditionnelle à un changement réellement retenu et à un verdict E positif.
 
 Le holdout privé reste fermé jusqu’à P64-L09W-E. Aucun seuil 95 % ou 99 % ne
 peut être revendiqué depuis les splits ouverts.
 
 Handoff :
 `docs/P64_L09W_D_PAUSED_HANDOFF.md`.
+
+Protocole :
+`docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md`.
 
 Contrats et preuves :
 

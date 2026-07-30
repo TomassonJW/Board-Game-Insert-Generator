@@ -53,9 +53,20 @@
 - La campagne D est arrêtée à une frontière propre `39/400` :
   `active_case_id=None`, aucun processus restant, 18 résultats prêts contre
   8 sur les mêmes cas C et zéro régression d’un résultat déjà prêt.
-- Le nettoyage Git est terminé. La prochaine reprise crée une branche
-  successeure depuis le commit de passation dans un nouveau worktree, puis
-  recadre le coût de validation de D à F avant toute nouvelle campagne.
+- Le nettoyage Git est terminé. `HEAD`, `main` et `origin/main` pointent sur
+  `82e66c78ff9fd513e0c57016aac68cb23a20f1bc`; le checkpoint D est un ancêtre
+  et ses deux fichiers techniques sont inchangés.
+- ADR-0108 recadre D à F avant toute nouvelle campagne. Les 361 cas D restants
+  sont non nécessaires pour le changement de finalisation courant : 39
+  résultats sont réutilisés, 67 nouveaux cas et 81 replays suffisent pour les
+  cas causaux, les 61 résultats prêts et un échantillon stratifié
+  `common`/`stress`.
+- Cet échantillon ne mesure aucun taux. Le correctif courant ne peut pas faire
+  passer les 332/400 solutions certifiées de C au seuil E de 380/400 ; le
+  holdout reste donc fermé après ce seul incrément.
+- E conservera une ouverture unique et des arrêts anticipés uniquement lorsque
+  les seuils deviennent mathématiquement impossibles. F reste conditionnelle à
+  une candidate réellement retenue et acceptée.
 - Le holdout reste fermé : `opening_count=0`,
   `solver_invocation_count=0`.
 - Le GO autonome reste acquis. Aucune gate humaine n’est ouverte avant une
@@ -69,7 +80,9 @@ Autorités :
 - `docs/P64_L09W_B_PRODUCT_CORPUS_EVIDENCE.md` ;
 - `docs/P64_L09W_C_REFERENCE_CAMPAIGN_EVIDENCE.md` ;
 - `docs/P64_L09W_D_PAUSED_HANDOFF.md` ;
+- `docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
+- `docs/DECISIONS/ADR-0108-validation-stratifiee-et-arrets-anticipes-p64-l09w.md` ;
 - `docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md` ;
 - `docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md` ;
 - `docs/P64_L06B_BENCHMARK_CORPUS_CONTRACT.md` ;

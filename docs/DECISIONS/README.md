@@ -277,3 +277,6 @@ Tests, cartes backlog ou gates humaines a preparer.
   verticaux bornés pour les portions sous et hors plateau.
 - ADR-0102-empilement-local-exact-des-reservations-superieures.md - partition
   XY atomique, intervalles Z locaux et conservation jusqu'au plan Fusion.
+- ADR-0108-validation-stratifiee-et-arrets-anticipes-p64-l09w.md - preuve D
+  causale et stratifiée, holdout E ouvert une seule fois avec arrêts
+  mathématiques, F strictement conditionnelle.
