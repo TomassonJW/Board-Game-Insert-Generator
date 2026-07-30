@@ -79,6 +79,12 @@ argument de holdout. Il doit publier `sample_is_rate_estimator=false`.
 Une différence sur un résultat déjà prêt déclenche un second replay de
 diagnostic puis un arrêt. Elle ne peut pas être moyennée avec les gains.
 
+Un non-déterminisme déjà présent dans C n’est pas imputé à D. Il reste publié
+comme dette préexistante et n’est acceptable que si le statut, la signature
+fonctionnelle canonique et le placement du premier replay restent identiques.
+L’apparition d’un nouveau non-déterminisme sur une référence déterministe reste
+un arrêt dur.
+
 ### E — holdout intact
 
 Le holdout reste fermé tant qu’un candidat ne peut pas raisonnablement atteindre

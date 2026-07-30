@@ -46,5 +46,14 @@ candidate Fusion, installation ou recette humaine ne compense un échec E.
 - exécuteur distinct testé et préflighté sous Python 3.14 sans lancement
   solveur ni surface holdout.
 
+Premier essai : arrêt avant tout nouveau solve sur
+`p64-l09w-discovery-014-0ef6e517d6`. C et D sont tous deux non déterministes,
+mais leur premier digest fonctionnel `3ea1d80b...add6` et leur placement
+`32477ab2...3369` sont identiques. D retire la perte de propriétaire résiduel
+et atteint ensuite `final_cavity_anchor_certificate_rejected`; ce n'est pas un
+gain prêt, mais ce n'est pas une nouvelle régression de déterminisme. La gate
+refuse désormais uniquement un non-déterminisme nouveau ou une divergence de
+signature/placement canonique.
+
 `fusion-validated=true` reste hérité de 0.1.80.
 `print-validated=false`.

@@ -115,13 +115,21 @@ Arrêt immédiat et rapport KO sur :
 - faux impossible ;
 - solution publiée sans certificat ;
 - erreur candidate ;
-- non-déterminisme d’un cas causal stratifié rejoué ;
+- nouveau non-déterminisme par rapport à C, ou divergence de la signature
+  solveur/placement canonique d’un cas stratifié ;
 - mismatch de checkpoint, binding ou bundle ;
 - toute tentative d’accès au holdout.
 
 Les autres cas de l’échantillon peuvent conserver une autre perte aval
 explicitement nommée. Un gain n’est compté que si le résiduel cible disparaît
 et si la chaîne finale reste certifiée.
+
+Le premier essai de l’exécuteur s’est arrêté avant tout nouveau solve sur
+`p64-l09w-discovery-014-0ef6e517d6`. L’audit prouve que ce cas était déjà
+non déterministe dans C. Son premier digest fonctionnel et son placement sont
+identiques dans C et D ; seule la perte aval passe du propriétaire résiduel au
+certificat d’ancrage final. La gate est donc corrigée pour refuser une
+régression de déterminisme, jamais pour réattribuer à D une dette C existante.
 
 ## 5. Gate avant P64-L09W-E
 

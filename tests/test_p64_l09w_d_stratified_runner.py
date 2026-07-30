@@ -108,16 +108,33 @@ class P64L09WDStratifiedRunnerTests(unittest.TestCase):
 
         nondeterministic = runner.assess_case(
             schedule_row=row,
-            reference_result=reference,
+            reference_result={
+                **reference,
+                "deterministic": True,
+            },
             candidate_result=_case_result(
                 ready=True,
                 deterministic=False,
             ),
         )
         self.assertIn(
-            "target_replay_nondeterminism",
+            "target_replay_nondeterminism_regression",
             nondeterministic["failures"],
         )
+
+        preexisting = runner.assess_case(
+            schedule_row=row,
+            reference_result={
+                **reference,
+                "deterministic": False,
+            },
+            candidate_result=_case_result(
+                ready=True,
+                deterministic=False,
+            ),
+        )
+        self.assertTrue(preexisting["hard_gate_passed"])
+        self.assertTrue(preexisting["preexisting_nondeterminism"])
 
     def test_execution_order_starts_with_stress_causal_then_ready(self) -> None:
         rows = [

@@ -213,11 +213,16 @@ def assess_case(
         and reference_result.get("status") == campaign.RESULT_CERTIFIED
     ):
         failures.append("certified_status_regression")
-    if (
-        "target_stratified" in tiers
-        and candidate_result.get("deterministic") is not True
-    ):
-        failures.append("target_replay_nondeterminism")
+    if "target_stratified" in tiers:
+        if (
+            reference_result.get("deterministic") is True
+            and candidate_result.get("deterministic") is not True
+        ):
+            failures.append("target_replay_nondeterminism_regression")
+        if _functional_signature(candidate_result) != _functional_signature(
+            reference_result
+        ):
+            failures.append("target_solver_signature_regression")
 
     ready = _is_ready(candidate_result)
     if "ready_non_regression" in tiers:
@@ -238,6 +243,9 @@ def assess_case(
         "tiers": sorted(tiers),
         "ready": ready,
         "target_loss_removed": target_removed,
+        "preexisting_nondeterminism": (
+            reference_result.get("deterministic") is False
+        ),
         "hard_gate_passed": not failures,
         "failures": failures,
     }

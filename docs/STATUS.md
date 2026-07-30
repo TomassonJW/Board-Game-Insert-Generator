@@ -87,7 +87,10 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
   donc pas E admissible face au seuil 380/400.
 - L'exécuteur stratifié est versionné, testé et préflighté avec le Python 3.14
   Fusion : plan, checkpoints, bundle, manifest et reçu runtime sont compatibles.
-  Aucun solveur de campagne n'a encore été lancé par ce nouveau parcours.
+  Son premier essai s'est arrêté avant tout nouveau solve sur un
+  non-déterminisme déjà présent dans C. L'audit conserve ce fait comme dette
+  préexistante et resserre l'arrêt aux régressions réelles de déterminisme,
+  signature solveur ou placement.
 - Le holdout reste fermé jusqu’à E :
   `opening_count=0`, `solver_invocation_count=0`.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.
