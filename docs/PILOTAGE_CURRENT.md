@@ -78,10 +78,18 @@
 - Le runner sépare désormais l'identité du produit sélectionné de l'identité
   stricte de la trace. Les budgets, la grille, les valeurs physiques et les
   checkpoints historiques restent inchangés.
-- L'action courante est la construction des panels permanents : 12 à 16
-  sentinelles, 48 cas pour un candidat prometteur, 400 cas seulement pour un
-  changement global ou le candidat gelé avant E. Les seuils seront dérivés de
-  la variance mesurée.
+- La stratégie permanente retient 16 sentinelles, 48 cas pour un candidat
+  prometteur et 400 cas seulement pour un changement global ou le candidat
+  gelé avant E. Les seuils seront dérivés de la variance mesurée.
+- Les panels sont maintenant préenregistrés : 16 sentinelles `8 common +
+  8 stress`, puis 48 cas `24 + 24`. Les sentinelles couvrent toutes les valeurs
+  des sept axes publics et contiennent les deux cas causaux, cinq résultats
+  prêts, deux contrôles bornés et `tuning-360`.
+- Le plan reproductible vaut `a389db5f...b5d62`. Son passage sentinelle est
+  estimé à `207,336 s`; le passage 48 cas à `769,364 s`. Aucun des deux
+  échantillons ne mesure un taux.
+- La prochaine action est la baseline à cinq répétitions des 16 sentinelles,
+  puis le gel de seuils dérivés de leur variance réelle.
 - Cet échantillon ne mesure aucun taux. Le correctif courant ne peut pas faire
   passer les 332/400 solutions certifiées de C au seuil E de 380/400 ; le
   holdout reste donc fermé après ce seul incrément.
@@ -104,6 +112,7 @@ Autorités :
 - `docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md` ;
 - `docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md` ;
 - `docs/P64_L09W_D_N_DETERMINISM_EVIDENCE.md` ;
+- `docs/P64_L09W_PERFORMANCE_PANEL_CONTRACT.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
 - `docs/DECISIONS/ADR-0108-validation-stratifiee-et-arrets-anticipes-p64-l09w.md` ;
 - `docs/DECISIONS/ADR-0109-identite-produit-selectionne-et-trace-de-recherche.md` ;

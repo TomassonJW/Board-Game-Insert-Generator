@@ -62,9 +62,9 @@ Le diagnostic `tuning-360` est clos par ADR-0109 :
 
 Action unique :
 
-1. construire un panel permanent de 12 à 16 sentinelles reproductibles ;
-2. construire un panel candidat de 48 cas représentatifs ;
-3. mesurer plusieurs replays du panel sentinelle avant de fixer les seuils ;
+1. exécuter les cinq répétitions de la baseline des 16 sentinelles ;
+2. dériver et geler les seuils depuis la variance observée ;
+3. conserver le panel candidat de 48 cas pour un changement prometteur ;
 4. réserver les 400 cas ouverts à un changement global ou au candidat gelé
    avant E ;
 5. ne pas reprendre le checkpoint v4 arrêté, ne pas appeler
@@ -91,6 +91,9 @@ Verdict D :
 
 Diagnostic D-N :
 `docs/P64_L09W_D_N_DETERMINISM_EVIDENCE.md`.
+
+Contrat des panels :
+`docs/P64_L09W_PERFORMANCE_PANEL_CONTRACT.md`.
 
 Contrats et preuves :
 

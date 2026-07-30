@@ -111,6 +111,13 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
 - ADR-0109 et le runner séparent maintenant `selected_product_digest` de
   `execution_trace_digest`. Tests ciblés : `17/17` ; suite complète sans échec
   observé mais bornée à `600 s`, donc verdict honnête `timeout`.
+- Le plan permanent de performance est préenregistré : 16 sentinelles
+  équilibrées `common/stress`, puis 48 cas emboîtés. Les sentinelles couvrent
+  toutes les valeurs des sept axes publics ; le plan est reproduit bit à bit et
+  ses 5 tests ciblés passent.
+- Les 400 cas ouverts ne sont plus une routine de micro-optimisation : ils sont
+  réservés à un changement global ou au candidat gelé avant E. Les panels ne
+  produisent aucun taux global.
 - L'incrément D reste sauvegardé, mais sa non-régression exacte n'est pas
   démontrée. E est bloquée par cette gate et par le plafond certifié
   `332/400`; F n'est pas lancée.

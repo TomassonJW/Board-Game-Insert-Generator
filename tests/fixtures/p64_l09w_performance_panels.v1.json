@@ -1,0 +1,2172 @@
+{
+  "cases": [
+    {
+      "case_digest": "0c40ffe7642d2669617b2d717971db6e99e8fea736e133385f2d5035a3f2306a",
+      "case_id": "p64-l09w-discovery-198-8571c434f9",
+      "features": {
+        "aspect_profile": "near-equal-xy",
+        "box_size": "large",
+        "container_count": 1,
+        "contents_per_container": 1,
+        "difficulty": "common",
+        "execution": "global_parameter",
+        "flat_count": 0,
+        "fragmentation_class": "single-layer",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 98.2071,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 7.186,
+        "candidate_source": "certified_witness",
+        "deterministic": true,
+        "functional_digests": [
+          "9c1348a16b6d38a6fc12eea6a83c3fefd24c9d281ed86dc65076fdad0a5169ec"
+        ],
+        "lane_id": "certified_witness_incumbent",
+        "loss_details": [],
+        "placement_digest": "1d056823ccfa49066de1f7e27a5447b7094c1d31da3b46ac23667fbbdb4b3256",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression",
+        "sentinel"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "abb75f1f7aa680fadd81009474af2163b8af82e61024c999cc4b4ff7e7110f8d",
+      "case_id": "p64-l09w-discovery-108-bde597aa0a",
+      "features": {
+        "aspect_profile": "near-equal-xy",
+        "box_size": "small",
+        "container_count": 1,
+        "contents_per_container": 4,
+        "difficulty": "common",
+        "execution": "global_parameter",
+        "flat_count": 0,
+        "fragmentation_class": "single-layer",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 82.9787,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 9.652,
+        "candidate_source": "certified_witness",
+        "deterministic": true,
+        "functional_digests": [
+          "b31f502e9f2c73e3cffe8c9513d8d828bc2229d7fba39d45764b2b195b1ade3f"
+        ],
+        "lane_id": "certified_witness_incumbent",
+        "loss_details": [],
+        "placement_digest": "19cbd799f0c22b991d168ba663e95711ffdc3f0186e2b553ea2f08238c96d557",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "4b34d82ee281273c94718082c71f21491e26369e5ef9a54b19dfa3a784fc51d8",
+      "case_id": "p64-l09w-discovery-066-df4182ac57",
+      "features": {
+        "aspect_profile": "wide",
+        "box_size": "small",
+        "container_count": 1,
+        "contents_per_container": 1,
+        "difficulty": "common",
+        "execution": "add",
+        "flat_count": 0,
+        "fragmentation_class": "single-layer",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 67.094,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 96.405,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "06aac621657787375ef7507d42e733bb64e995b01a1d10a2f4115105235ac331"
+        ],
+        "lane_id": "historical_bridge_edge",
+        "loss_details": [],
+        "placement_digest": "155ad603bbb957935d3b2076e8465ff07ca7c12d003d45f13a6a0ada13c55559",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression",
+        "sentinel"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "b3cf9210cdc77a50898c9927772ac031ed74bad57329004b7151d42c131c2613",
+      "case_id": "p64-l09w-discovery-082-667b19090c",
+      "features": {
+        "aspect_profile": "deep",
+        "box_size": "small",
+        "container_count": 12,
+        "contents_per_container": 1,
+        "difficulty": "common",
+        "execution": "cold",
+        "flat_count": 0,
+        "fragmentation_class": "layered",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "3",
+        "layer_count": 3,
+        "minimum_axis_margin_pct": 71.9512,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 155.16,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "fa6607dedb5748a98a3e328475777fba4ee143b5f23e76964560640205566be5"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [],
+        "placement_digest": "2613f963e497d032ef1ce3fde98199c3b8c36fa083d6af661bc3bb8e41b3e823",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "a97b8abdd00f6dcc1a43b6e1ce8ba79223610c7a55348238fa0c1c2a62192a4c",
+      "case_id": "p64-l09w-discovery-064-fd122f2d65",
+      "features": {
+        "aspect_profile": "tall",
+        "box_size": "large",
+        "container_count": 12,
+        "contents_per_container": 1,
+        "difficulty": "common",
+        "execution": "cold",
+        "flat_count": 1,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "3",
+        "layer_count": 3,
+        "minimum_axis_margin_pct": 93.232,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 177.468,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "be50ef0c68fb7390133513f06aeb8b98f1550fa285e66eac23571d69023c6acd"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "9561527f5853970fe270818df833be8622001235e7fa0cce5a437b1c13324510",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "target_loss"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "448fe9c62ae24b2da9c03796572a40106e778dc1875ac80089402e0519f2448e",
+      "case_id": "p64-l09w-discovery-148-7baec50770",
+      "features": {
+        "aspect_profile": "near-equal-xy",
+        "box_size": "medium",
+        "container_count": 12,
+        "contents_per_container": 1,
+        "difficulty": "common",
+        "execution": "add",
+        "flat_count": 0,
+        "fragmentation_class": "layered",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "3",
+        "layer_count": 3,
+        "minimum_axis_margin_pct": 84.5205,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 191.657,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "b6a7d052baf66016e260dc6b462039306e034953ad3cf1e8ad3af0bf6f23e6bd"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [],
+        "placement_digest": "9e8adc322ee406a065ee91d2fad3149de28e9656a770916963fbfa92308bce23",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "c79187c81d61451124884d14861bd9236a7dbf6fd0f9046018cb4f0a71b4cf1d",
+      "case_id": "p64-l09w-discovery-191-ec4377484e",
+      "features": {
+        "aspect_profile": "wide",
+        "box_size": "small",
+        "container_count": 18,
+        "contents_per_container": 1,
+        "difficulty": "stress",
+        "execution": "local_parameter",
+        "flat_count": 0,
+        "fragmentation_class": "layered",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "3",
+        "layer_count": 3,
+        "minimum_axis_margin_pct": 47.7387,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 85
+      },
+      "reference": {
+        "calculation_ms": 227.669,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "9c57721bbb17f8d629e6abbad370ed4d22514eb7dd444f6f4ec1582ab2508812"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [],
+        "placement_digest": "378f11defc83abb26bb4f63a80b34af0853d071dcb097cfa245bc41963d2191c",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression",
+        "sentinel"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "464086f587730266d7a6d92c4f084ab9e52c4e3999141504f7f92f496d04f308",
+      "case_id": "p64-l09w-discovery-204-23f1925df7",
+      "features": {
+        "aspect_profile": "tall",
+        "box_size": "small",
+        "container_count": 1,
+        "contents_per_container": 8,
+        "difficulty": "stress",
+        "execution": "remove",
+        "flat_count": 0,
+        "fragmentation_class": "single-layer",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 84.4485,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 85
+      },
+      "reference": {
+        "calculation_ms": 287.254,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "494ce1700a5b197b759c8e701af1c83a1ae2e75b365eb3fb184d3c809e209c1c"
+        ],
+        "lane_id": "historical_bridge_edge",
+        "loss_details": [],
+        "placement_digest": "980ab47344d370edc61f4f0cbe166d6d74bd642c9c14ca75283ca860fffa2c0e",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "9beb0523cc57bccbb459ea8ef733e7f1727c261c351623505426a2807dc9f609",
+      "case_id": "p64-l09w-discovery-035-9c38dbce0f",
+      "features": {
+        "aspect_profile": "balanced",
+        "box_size": "small",
+        "container_count": 18,
+        "contents_per_container": 4,
+        "difficulty": "common",
+        "execution": "add",
+        "flat_count": 1,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "3",
+        "layer_count": 3,
+        "minimum_axis_margin_pct": 64.1026,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 373.516,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "692ccbfb4b49c647183844a9b99478d77709ac5bab5391ac72a2668934f166ec"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "ec79763e5b27bc45da873d5fb4518015bfe7a5047cd00c39086f1daa6c409c41",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "sentinel",
+        "target_loss"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "ca24a3b2c3ffb7518a3f8a3aeac89950ddefce176b43daa3d9c8090a04d0ffec",
+      "case_id": "p64-l09w-discovery-079-4bad30c3b3",
+      "features": {
+        "aspect_profile": "tall",
+        "box_size": "small",
+        "container_count": 2,
+        "contents_per_container": 8,
+        "difficulty": "common",
+        "execution": "add",
+        "flat_count": 0,
+        "fragmentation_class": "layered",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "2",
+        "layer_count": 2,
+        "minimum_axis_margin_pct": 69.6649,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 433.138,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "772d8c8bec34028486e138d9543e4f2806d92bda3f129e03fdc53e66da55ab78"
+        ],
+        "lane_id": "variant_edge_interleave",
+        "loss_details": [
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "5979f3945166834c6431469cc8347124600277c85791fc5ddb28066446ac2e67",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "target_loss"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "e410a21aaac2bcecee881a7fde6577ec318ce5d79ef922489b35619a46ffc87f",
+      "case_id": "p64-l09w-discovery-013-14af2337be",
+      "features": {
+        "aspect_profile": "near-equal-xy",
+        "box_size": "large",
+        "container_count": 2,
+        "contents_per_container": 8,
+        "difficulty": "stress",
+        "execution": "global_parameter",
+        "flat_count": 0,
+        "fragmentation_class": "single-layer",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 90.2273,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 85
+      },
+      "reference": {
+        "calculation_ms": 465.611,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "f7129af4db4a39cfe60f18a1e96c154b61bccfe340272baee42e74538c24dd20"
+        ],
+        "lane_id": "variant_center_footprint",
+        "loss_details": [],
+        "placement_digest": "38ddc0b8d32c9ff23961cd4479c7554d9516b855b8e060d8ba4cccc3fbb5a0e9",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "0ed362df662165a0311fdca2015af7a05f111e8d14aea83515a4aa2f11f30260",
+      "case_id": "p64-l09w-discovery-227-290a689b57",
+      "features": {
+        "aspect_profile": "deep",
+        "box_size": "large",
+        "container_count": 18,
+        "contents_per_container": 16,
+        "difficulty": "common",
+        "execution": "remove",
+        "flat_count": 0,
+        "fragmentation_class": "layered",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "3",
+        "layer_count": 3,
+        "minimum_axis_margin_pct": 71.3333,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 515.421,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "6c7ac32f45f4f0c0c0c1b85d5ba2d5ca10f062634f35c1a34b8998ee4353763c"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [],
+        "placement_digest": "67f2b544819fb0b3fe3e4767c3498b42b9f84de5c8023a3179a1231c8150ad31",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "d81ed89e4b2c6feb0d8b23ccb4902ee4852dee92134dfa66dae7831f51e12d6d",
+      "case_id": "p64-l09w-discovery-085-f8796b5b6e",
+      "features": {
+        "aspect_profile": "balanced",
+        "box_size": "medium",
+        "container_count": 2,
+        "contents_per_container": 4,
+        "difficulty": "common",
+        "execution": "global_parameter",
+        "flat_count": 0,
+        "fragmentation_class": "layered",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "2",
+        "layer_count": 2,
+        "minimum_axis_margin_pct": 88.3318,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 652.127,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "6460cfa4c421ccfcea4862ab831f5f22d84f541883ce32cb4da70f8b066a329f"
+        ],
+        "lane_id": "variant_edge_interleave",
+        "loss_details": [
+          "final_cavity_anchor_certificate_rejected"
+        ],
+        "placement_digest": "06680bc8161e8837de93278a544d360ba9d1aebe23ed9481e5d61c1df720263d",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "bbb7e55791d39edb64e57e1f53e35021156e9454d2a27f885d4efaef7859a8d2",
+      "case_id": "p64-l09w-discovery-069-661b906258",
+      "features": {
+        "aspect_profile": "tall",
+        "box_size": "medium",
+        "container_count": 8,
+        "contents_per_container": 2,
+        "difficulty": "common",
+        "execution": "cold",
+        "flat_count": 0,
+        "fragmentation_class": "single-layer",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 70.0,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 996.458,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "hard_budget_reached;external=certificate_rejected"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "e59d69b0f66f7d20df9eb6431631fdf8127905a27e7fe334ea7f11cae5c458fc",
+      "case_id": "p64-l09w-discovery-201-bdfe0b1cca",
+      "features": {
+        "aspect_profile": "wide",
+        "box_size": "large",
+        "container_count": 8,
+        "contents_per_container": 4,
+        "difficulty": "common",
+        "execution": "local_parameter",
+        "flat_count": 0,
+        "fragmentation_class": "single-layer",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 84.3072,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 1208.057,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "hard_budget_reached;external=certificate_rejected"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate",
+        "sentinel"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "bccf515bc93dbfe3c00d433649d54af8719dc3e540fb1dbb2dd50e90970b6f69",
+      "case_id": "p64-l09w-discovery-147-b403405ddb",
+      "features": {
+        "aspect_profile": "deep",
+        "box_size": "large",
+        "container_count": 8,
+        "contents_per_container": 8,
+        "difficulty": "common",
+        "execution": "local_parameter",
+        "flat_count": 1,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 57.7396,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 2532.151,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "hard_budget_reached;external=certificate_rejected"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "eaad4720b756f992624e448a3bf405ea58ac21a1671f46b13c7808ae13b22665",
+      "case_id": "p64-l09w-discovery-081-6381b05e49",
+      "features": {
+        "aspect_profile": "wide",
+        "box_size": "medium",
+        "container_count": 8,
+        "contents_per_container": 8,
+        "difficulty": "stress",
+        "execution": "remove",
+        "flat_count": 1,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "2",
+        "layer_count": 2,
+        "minimum_axis_margin_pct": 68.1193,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 85
+      },
+      "reference": {
+        "calculation_ms": 2602.299,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "hard_budget_reached;external=certificate_rejected"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "97ab50b7e4c9770dfb9fb179a6002c8e3bb7dbf80c43005c5ea56f265c7112ec",
+      "case_id": "p64-l09w-discovery-218-71f60f5cab",
+      "features": {
+        "aspect_profile": "near-equal-xy",
+        "box_size": "medium",
+        "container_count": 4,
+        "contents_per_container": 16,
+        "difficulty": "common",
+        "execution": "cold",
+        "flat_count": 2,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 66.843,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 3101.979,
+        "candidate_source": "certified_witness",
+        "deterministic": true,
+        "functional_digests": [
+          "ab832e22777bb73be035df35c31cf0cad9a40b5a76bea6819af8980096c5255c"
+        ],
+        "lane_id": "certified_witness_incumbent",
+        "loss_details": [
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "8b91a3a686db95304c686e7fc44246e028cdc5a434ff22786da2694b5de8cd4b",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "sentinel",
+        "target_loss"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "f7248ff22eb8c69fe436d53f32efa7ff4cc07c496ef9bfcd77865b2d86db0f70",
+      "case_id": "p64-l09w-discovery-149-42821c0b72",
+      "features": {
+        "aspect_profile": "tall",
+        "box_size": "small",
+        "container_count": 18,
+        "contents_per_container": 4,
+        "difficulty": "stress",
+        "execution": "global_parameter",
+        "flat_count": 2,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "3",
+        "layer_count": 3,
+        "minimum_axis_margin_pct": 60.8333,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 85
+      },
+      "reference": {
+        "calculation_ms": 3988.528,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "c31116d0734b30daf498a439cf7cac5ff8af9576f4625bab1903d9ea45673967"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "b3f14f28841e3d2044d02b50cbfbc69c4e5ddacaf484c77318178ffcde565840",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "target_loss"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "9372a4ea6694df9bf825d53945e0cf99af74ea735e7fcf3c0d53c89cbf4f673f",
+      "case_id": "p64-l09w-discovery-070-c256de0876",
+      "features": {
+        "aspect_profile": "balanced",
+        "box_size": "small",
+        "container_count": 12,
+        "contents_per_container": 16,
+        "difficulty": "stress",
+        "execution": "local_parameter",
+        "flat_count": 2,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "3",
+        "layer_count": 3,
+        "minimum_axis_margin_pct": 65.7559,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 85
+      },
+      "reference": {
+        "calculation_ms": 4223.048,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "6ec0e5e93df0206c248187fb86675d335500cc656b8bc327619e4437a6ec3f33"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [],
+        "placement_digest": "5d83899e2778203a2dfadae6d54de50dfab7afa0c98db93e8d8112f524b71c3e",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "dd917df2bb100a75b6e9782e90fb054674142e8059385fbafcb04e3401670782",
+      "case_id": "p64-l09w-discovery-195-13e6de7224",
+      "features": {
+        "aspect_profile": "balanced",
+        "box_size": "large",
+        "container_count": 8,
+        "contents_per_container": 16,
+        "difficulty": "common",
+        "execution": "cold",
+        "flat_count": 2,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 61.8661,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 5513.109,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "hard_budget_reached;external=certificate_rejected"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "7d0a9296709b17d5531c1716e90a1456337eacad26d5f6f01761f5dfce48ad03",
+      "case_id": "p64-l09w-discovery-050-0185c51bad",
+      "features": {
+        "aspect_profile": "balanced",
+        "box_size": "small",
+        "container_count": 4,
+        "contents_per_container": 1,
+        "difficulty": "common",
+        "execution": "remove",
+        "flat_count": 2,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "2",
+        "layer_count": 2,
+        "minimum_axis_margin_pct": 75.5274,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 20137.869,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "fb6ac4024fb797c74a999fe2d13d72697b80f6388d4f7f9aa089fe281515571d"
+        ],
+        "lane_id": "historical_legacy_corner",
+        "loss_details": [
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "691d5f4574ba3562e21b4cf6cf8489c67bba6a323c1004e884a59876fe0a3c1d",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "sentinel",
+        "target_loss"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "b5c6814214b909cb234bca7ecb4b4a08ed0175ef496d1d207732220b4bb31023",
+      "case_id": "p64-l09w-discovery-007-b54fe4b1f0",
+      "features": {
+        "aspect_profile": "deep",
+        "box_size": "large",
+        "container_count": 2,
+        "contents_per_container": 1,
+        "difficulty": "stress",
+        "execution": "add",
+        "flat_count": 2,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "2",
+        "layer_count": 2,
+        "minimum_axis_margin_pct": 95.988,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 85
+      },
+      "reference": {
+        "calculation_ms": 20669.363,
+        "candidate_source": "portfolio_lane",
+        "deterministic": false,
+        "functional_digests": [
+          "842e4f1253ce2e2fc29e9742772a764bad3e440940ffeecf516b611c15b721c6",
+          "d88742a7c0c07d585181ab3df41cbaa3c11d551d393362388e81f9a314a7f2e5"
+        ],
+        "lane_id": "historical_bridge_edge",
+        "loss_details": [
+          "functional_digest_or_route_differs",
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "9ac8cc396faced4535eacee382b51ba042dcf74e60caed2fdc11c1afa72704d8",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "target_loss"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "0322f5c37f052343fb57e43a5e598cfaabf21eccf94948ff7f69a1af35e1e17a",
+      "case_id": "p64-l09w-discovery-001-55d8459fc2",
+      "features": {
+        "aspect_profile": "wide",
+        "box_size": "large",
+        "container_count": 2,
+        "contents_per_container": 4,
+        "difficulty": "common",
+        "execution": "local_parameter",
+        "flat_count": 2,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "2",
+        "layer_count": 2,
+        "minimum_axis_margin_pct": 92.1405,
+        "split": "discovery",
+        "stratum": "common",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 20997.678,
+        "candidate_source": "portfolio_lane",
+        "deterministic": false,
+        "functional_digests": [
+          "8e4971ba5069af26affa864aeb40fa2e2c0565393a76d5442bb85a474a01eca4",
+          "ef192e761badf012c5e3e8068fc00409e612eec260cfc738f3112738c70a9f95"
+        ],
+        "lane_id": "historical_bridge_edge",
+        "loss_details": [
+          "functional_digest_or_route_differs",
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "4c995e46d7d3ff530aa72206bfaaf07c49e41a83ade6a9057ba700f945a7c36f",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "causal",
+        "sentinel",
+        "target_loss"
+      ],
+      "stratum": "common"
+    },
+    {
+      "case_digest": "45945d9460fea64e1710386783a8215818229b33be9c5c70fd1ea7856ff3ae8f",
+      "case_id": "p64-l09w-tuning-340-780412f833",
+      "features": {
+        "aspect_profile": "balanced",
+        "box_size": "medium",
+        "container_count": 1,
+        "contents_per_container": 32,
+        "difficulty": "stress",
+        "execution": "global_parameter",
+        "flat_count": 3,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 76.7635,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 3344.263,
+        "candidate_source": "certified_witness",
+        "deterministic": true,
+        "functional_digests": [
+          "70f92fc8ddd6fe89950be436199d80887eebacf69d98eff8bca5e6d5ccadb3e3"
+        ],
+        "lane_id": "certified_witness_incumbent",
+        "loss_details": [],
+        "placement_digest": "3b9a322d696a358b612c014cf68c1fb4d52ace861db7390cf654d65b25005164",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression",
+        "sentinel"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "44f26b1ece54243e616c90e3519a02ac9c884d9c18d577c1ef97ff92f3096ba8",
+      "case_id": "p64-l09w-tuning-240-ea12ccc81d",
+      "features": {
+        "aspect_profile": "balanced",
+        "box_size": "medium",
+        "container_count": 30,
+        "contents_per_container": 1,
+        "difficulty": "stress",
+        "execution": "cold",
+        "flat_count": 3,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 5,
+        "minimum_axis_margin_pct": 87.844,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 6333.326,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "e7d4ceb852fbd9ff79a1bce7b61464dc953a800f4ac8a359c9f5d26355f7d13b"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "cdb63b0b4f6ead2667827ac705535f4595e35c9d58291b5b6ac4e01a4af333de",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "causal",
+        "sentinel",
+        "target_loss"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "b6a4b34ef138f21b5cdc02ebe2ebe136f4f6c30b7bf4e1faaff8dca9357788f7",
+      "case_id": "p64-l09w-tuning-396-85a80285ef",
+      "features": {
+        "aspect_profile": "wide",
+        "box_size": "large",
+        "container_count": 1,
+        "contents_per_container": 32,
+        "difficulty": "stress",
+        "execution": "global_parameter",
+        "flat_count": 6,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 71.1656,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 12222.789,
+        "candidate_source": "certified_witness",
+        "deterministic": true,
+        "functional_digests": [
+          "ffc51aaf7652a6aafdf90015ed573009deb5557e7611323967234f2916b911c5"
+        ],
+        "lane_id": "certified_witness_incumbent",
+        "loss_details": [
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "0b5db6b2d827f3ae200aa8a715b1f970edb971b728f2ff40b06c3b8409ec7219",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "sentinel",
+        "target_loss"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "3773d61058f96dd5337ee18be6051f6c10d8f395038f429461df5e4923e252a3",
+      "case_id": "p64-l09w-tuning-287-6a0b59538e",
+      "features": {
+        "aspect_profile": "deep",
+        "box_size": "large",
+        "container_count": 50,
+        "contents_per_container": 2,
+        "difficulty": "stress",
+        "execution": "cold",
+        "flat_count": 4,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 10,
+        "minimum_axis_margin_pct": 83.376,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 18731.88,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "f5fdd4458d3a186791ee99ac9f0212f5598cd6264feef76bb1f254f8f7cac1fa"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "fdbf7f1ab369f1624a059499d5d7ac210b4913e751f985c3e57feaa87616e292",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "sentinel",
+        "target_loss"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "dafbf30510b3db8677c9dbd2a3f9cf1c74d6f410358def98eee1d5e27cf58191",
+      "case_id": "p64-l09w-tuning-269-70926170e2",
+      "features": {
+        "aspect_profile": "tall",
+        "box_size": "large",
+        "container_count": 64,
+        "contents_per_container": 8,
+        "difficulty": "stress",
+        "execution": "remove",
+        "flat_count": 5,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 8,
+        "minimum_axis_margin_pct": 65.4618,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 20108.602,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "global_deadline_reached_before_external_search;external=not_available"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "9ec7e5b5b316f5af781543f9d5fb6f679b141dde904074cfd05338fdd8e58ed3",
+      "case_id": "p64-l09w-tuning-388-a020715e35",
+      "features": {
+        "aspect_profile": "near-equal-xy",
+        "box_size": "medium",
+        "container_count": 1,
+        "contents_per_container": 32,
+        "difficulty": "stress",
+        "execution": "remove",
+        "flat_count": 10,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 76.7635,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 20295.884,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "global_deadline_reached_without_candidate;external=not_available"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate",
+        "sentinel"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "ada4d080a6f0d0bc851c168701b3bc986525a1dba3f93112a0c44a00275fe0be",
+      "case_id": "p64-l09w-tuning-293-268fb46b33",
+      "features": {
+        "aspect_profile": "near-equal-xy",
+        "box_size": "large",
+        "container_count": 64,
+        "contents_per_container": 8,
+        "difficulty": "stress",
+        "execution": "local_parameter",
+        "flat_count": 10,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 8,
+        "minimum_axis_margin_pct": 58.753,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 20554.67,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "global_deadline_reached_before_external_search;external=not_available"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "7592efb5e4bff073e1ddb336fe0d4a9f641845dd58b04ca9c9088bc157b1a291",
+      "case_id": "p64-l09w-tuning-338-f5347d13f7",
+      "features": {
+        "aspect_profile": "near-equal-xy",
+        "box_size": "small",
+        "container_count": 4,
+        "contents_per_container": 32,
+        "difficulty": "stress",
+        "execution": "cold",
+        "flat_count": 10,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 4,
+        "minimum_axis_margin_pct": 0.0,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 85
+      },
+      "reference": {
+        "calculation_ms": 20604.923,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "global_deadline_reached_without_candidate;external=not_available"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "252089e755651a24cac27276640e749c533ddaaad27d9281488e36a91f9378dc",
+      "case_id": "p64-l09w-tuning-361-337507087f",
+      "features": {
+        "aspect_profile": "wide",
+        "box_size": "medium",
+        "container_count": 2,
+        "contents_per_container": 64,
+        "difficulty": "stress",
+        "execution": "global_parameter",
+        "flat_count": 6,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "2",
+        "layer_count": 2,
+        "minimum_axis_margin_pct": 49.1156,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 21822.394,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "global_deadline_reached_without_candidate;external=not_available"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "0635981c775e8f64f2725db20eb7180b430b0e84ca4b9534413b26aee7675eee",
+      "case_id": "p64-l09w-tuning-328-00d377a685",
+      "features": {
+        "aspect_profile": "near-equal-xy",
+        "box_size": "medium",
+        "container_count": 1,
+        "contents_per_container": 32,
+        "difficulty": "stress",
+        "execution": "local_parameter",
+        "flat_count": 10,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 76.7635,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 22124.125,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "global_deadline_reached_without_candidate;external=not_available"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "5eaa851795284e9d90f634cd70a42113c8e533f902f8508050d89ab74e14ef38",
+      "case_id": "p64-l09w-tuning-360-c8628c8c54",
+      "features": {
+        "aspect_profile": "balanced",
+        "box_size": "large",
+        "container_count": 1,
+        "contents_per_container": 32,
+        "difficulty": "stress",
+        "execution": "remove",
+        "flat_count": 3,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 85.8012,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 22331.733,
+        "candidate_source": "portfolio_lane",
+        "deterministic": false,
+        "functional_digests": [
+          "0d5576290638d1c1124062e8575f8a07b3708604a8cebbea0a405c992f0f3f12",
+          "b314a43278547e522dbab4fafc2bcccfd3d0ff53164b2946e95af23d2aad08dc"
+        ],
+        "lane_id": "historical_bridge_edge",
+        "loss_details": [
+          "functional_digest_or_route_differs"
+        ],
+        "placement_digest": "8906fd298e360b0a9b124b64fdf18f3e46b6cc4c8d9a5f009f24335344d490ea",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "determinism",
+        "ready_non_regression",
+        "sentinel"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "fb53525908679d9ff3c64443cbedea10171459a83e1fab3b3800c28ea71c763a",
+      "case_id": "p64-l09w-tuning-377-0382fd0acf",
+      "features": {
+        "aspect_profile": "deep",
+        "box_size": "small",
+        "container_count": 2,
+        "contents_per_container": 64,
+        "difficulty": "stress",
+        "execution": "local_parameter",
+        "flat_count": 4,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "2",
+        "layer_count": 2,
+        "minimum_axis_margin_pct": 19.403,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 22692.675,
+        "candidate_source": "portfolio_lane",
+        "deterministic": false,
+        "functional_digests": [
+          "f053d3d93e38d1f2f9465f167a5316d03df8a7d2b7e0a8ada28e67452810cfac",
+          "f1230a81d9465de29ab8a917621b84d635c6b4dbdefe64e7078901a716e61d6e"
+        ],
+        "lane_id": "historical_legacy_corner",
+        "loss_details": [
+          "functional_digest_or_route_differs",
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "f64a9086e5716b210677b742386f02d820bca0c2554d24711dd004347cf07cdf",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "target_loss"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "a0e7a806c8dc48ab0bec2be1c7854268190752374fcb56f3b3a6734fcda292e4",
+      "case_id": "p64-l09w-tuning-365-c4090d74d6",
+      "features": {
+        "aspect_profile": "balanced",
+        "box_size": "small",
+        "container_count": 2,
+        "contents_per_container": 64,
+        "difficulty": "stress",
+        "execution": "remove",
+        "flat_count": 3,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "2",
+        "layer_count": 2,
+        "minimum_axis_margin_pct": 54.8309,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 22976.59,
+        "candidate_source": "portfolio_lane",
+        "deterministic": false,
+        "functional_digests": [
+          "21dc68a2d11e5d6f8a82a596a9d65b13fd2c2d3fcbe50fc699eec69a257ab34b",
+          "f3299bca941b1a7cf48b44c8960689b97af5a121017a131c4290565b6aaed30f"
+        ],
+        "lane_id": "historical_legacy_corner",
+        "loss_details": [
+          "functional_digest_or_route_differs",
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "ab994800e30e790ae60cb34e314fd004f76f5d894e9ff9477af344dc3b1b8ffd",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "target_loss"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "53086a3752393f23caa9311aba34112ff8c09b363dee48ebdbedea9ad257e835",
+      "case_id": "p64-l09w-tuning-332-2c5e4244f0",
+      "features": {
+        "aspect_profile": "deep",
+        "box_size": "small",
+        "container_count": 1,
+        "contents_per_container": 32,
+        "difficulty": "stress",
+        "execution": "remove",
+        "flat_count": 4,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 0.0,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 24158.566,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "892fbc3113ecdbdf7e4386f057e70d1cf6cab9fdc85c0e28065a4e6345e022c2"
+        ],
+        "lane_id": "historical_bridge_edge",
+        "loss_details": [
+          "final_cavity_anchor_certificate_rejected"
+        ],
+        "placement_digest": "256751fbdec9e80e768ad00e5f054d73b936c86109480bc457c22dd9f7191177",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "02ee280e6e9225f1e29bc130e0b221e92779c26b035da992547bedffd62de735",
+      "case_id": "p64-l09w-tuning-384-ed4a7a7670",
+      "features": {
+        "aspect_profile": "tall",
+        "box_size": "large",
+        "container_count": 1,
+        "contents_per_container": 32,
+        "difficulty": "stress",
+        "execution": "local_parameter",
+        "flat_count": 5,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "1",
+        "layer_count": 1,
+        "minimum_axis_margin_pct": 81.3196,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 30
+      },
+      "reference": {
+        "calculation_ms": 24834.712,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "02dca1071f98ce45cbceb1d16aec6d7a6604c33ae113262fa5454b52e94c58d6"
+        ],
+        "lane_id": "historical_bridge_edge",
+        "loss_details": [
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "3354990944a24281ed82f64f2bbdb6b5bc329434c26df4313ad85c1f7591ec11",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "sentinel",
+        "target_loss"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "95a33bde9325b45ad60a616724743b93f48c6751d3339dffb09a61e211f831b4",
+      "case_id": "p64-l09w-tuning-334-1b5d0e59e0",
+      "features": {
+        "aspect_profile": "tall",
+        "box_size": "medium",
+        "container_count": 4,
+        "contents_per_container": 32,
+        "difficulty": "stress",
+        "execution": "add",
+        "flat_count": 5,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 4,
+        "minimum_axis_margin_pct": 29.003,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 85
+      },
+      "reference": {
+        "calculation_ms": 27613.539,
+        "candidate_source": "portfolio_lane",
+        "deterministic": false,
+        "functional_digests": [
+          "4041e4889c191706d78d399d7f1f285112aeaf77ac28010d49dca884059528c3",
+          "9d5aa5826eea16a4a75d8cd0eab7facffc0a637aa7663163ce176042862786f6"
+        ],
+        "lane_id": "historical_legacy_corner",
+        "loss_details": [
+          "functional_digest_or_route_differs",
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "51dced5b4425e1b310a858e06c82bd9acc708f091286d53b8f0d9919e42f2c04",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "target_loss"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "5fb36d0d48cefd25db39587cd2038d326ce16bc0ea31b286fd8a6ee2b2081bb4",
+      "case_id": "p64-l09w-tuning-282-a4fac05518",
+      "features": {
+        "aspect_profile": "deep",
+        "box_size": "medium",
+        "container_count": 64,
+        "contents_per_container": 4,
+        "difficulty": "stress",
+        "execution": "cold",
+        "flat_count": 4,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 4,
+        "minimum_axis_margin_pct": 67.7656,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 28149.709,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "360545b8c9af9714f6167c070cbd3e88d0ec0b6d106ce89415c7691d60db4d49"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [],
+        "placement_digest": "73ed8b06329613d0c396f90e1f3327ae59041e7c2a1dacac917311219eed9e75",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "8025de61604728b7f246dec146040d8c89c03968fb3cfc0c847a435a5393e0cc",
+      "case_id": "p64-l09w-tuning-329-a082f36a95",
+      "features": {
+        "aspect_profile": "tall",
+        "box_size": "small",
+        "container_count": 2,
+        "contents_per_container": 64,
+        "difficulty": "stress",
+        "execution": "cold",
+        "flat_count": 5,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "2",
+        "layer_count": 2,
+        "minimum_axis_margin_pct": 0.0,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 29809.215,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "4d7a242e9920183dd300fbe004d0e2cf01fb9906d5d63d75a8ec975bd4441cc0"
+        ],
+        "lane_id": "historical_legacy_corner",
+        "loss_details": [
+          "xy_composite_residual_owner_not_found"
+        ],
+        "placement_digest": "542949981f9dd407a04b25a5279c86377fbae698d35ee70949ac458599dd08cb",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "target_loss"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "5d2c5f6242c130b74d974d46c9941fcd652ae89dc647151fcda1d2f1c7b67c16",
+      "case_id": "p64-l09w-tuning-242-4286d04b06",
+      "features": {
+        "aspect_profile": "deep",
+        "box_size": "medium",
+        "container_count": 64,
+        "contents_per_container": 4,
+        "difficulty": "stress",
+        "execution": "global_parameter",
+        "flat_count": 4,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 4,
+        "minimum_axis_margin_pct": 67.7656,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 34135.596,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "721ce1a6d44cdb1cc20cca191d258cf329b65e5556e2391e47b96c18e2c4afdd"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [],
+        "placement_digest": "73ed8b06329613d0c396f90e1f3327ae59041e7c2a1dacac917311219eed9e75",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "49c8e303f532732713022bcf85e5504a8c6638d44c1df9240c6353cc20b51b3f",
+      "case_id": "p64-l09w-tuning-311-a359353af1",
+      "features": {
+        "aspect_profile": "wide",
+        "box_size": "large",
+        "container_count": 50,
+        "contents_per_container": 2,
+        "difficulty": "stress",
+        "execution": "remove",
+        "flat_count": 6,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 10,
+        "minimum_axis_margin_pct": 61.4085,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 46543.14,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "4b5207bb26f530c50358600f2a64f45ddb6d2147d3025d7f6e8e904a2de0490e"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [],
+        "placement_digest": "70ea53ac91eb1b623c074acbea7c0ad14c7e985cae64edaa1b441808e1eed645",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "187b94168b4559e5301fea0eb54659f7b63527b028b9352cdc38e8c089af022c",
+      "case_id": "p64-l09w-tuning-333-e600efeb08",
+      "features": {
+        "aspect_profile": "near-equal-xy",
+        "box_size": "large",
+        "container_count": 2,
+        "contents_per_container": 64,
+        "difficulty": "stress",
+        "execution": "global_parameter",
+        "flat_count": 10,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "2",
+        "layer_count": 2,
+        "minimum_axis_margin_pct": 74.6784,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 65
+      },
+      "reference": {
+        "calculation_ms": 46713.456,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "global_deadline_reached_without_candidate;external=not_available"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "7403fe563d60b30b180d8292ada63ddda4bc27d0e2611e228386500c8a927fcc",
+      "case_id": "p64-l09w-tuning-271-8cb52a6e29",
+      "features": {
+        "aspect_profile": "wide",
+        "box_size": "large",
+        "container_count": 50,
+        "contents_per_container": 2,
+        "difficulty": "stress",
+        "execution": "add",
+        "flat_count": 6,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 10,
+        "minimum_axis_margin_pct": 78.1553,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 51125.082,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "0eeebb36ce2313d580d5224f69bd934d3e5cccec7caf2b33de6c7ac06e989e37"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [],
+        "placement_digest": "5a17bcd7b131ef2776234b5737326c85aefcbae037459e4400784e25e6f31c35",
+        "ready": true,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "ready_non_regression"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "14042ad7aca7dcc4d6599b2363951b80d8772b6b0c192e8062213090e39dc55b",
+      "case_id": "p64-l09w-tuning-277-a66af911e7",
+      "features": {
+        "aspect_profile": "deep",
+        "box_size": "large",
+        "container_count": 64,
+        "contents_per_container": 8,
+        "difficulty": "stress",
+        "execution": "global_parameter",
+        "flat_count": 4,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 8,
+        "minimum_axis_margin_pct": 52.7473,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 53091.319,
+        "candidate_source": "portfolio_lane",
+        "deterministic": true,
+        "functional_digests": [
+          "7bacf8d003d5008d93d04a8758c385b60c364a07d30622db1d93dee76d8e2c2c"
+        ],
+        "lane_id": "canonical_floor_maxrects",
+        "loss_details": [
+          "xy_composite_deadline_reached"
+        ],
+        "placement_digest": "dd956c8afe45d71caed71d8785d0bc9f25987f8d972f5162e0ab18fda5794367",
+        "ready": false,
+        "status": "certified_solution"
+      },
+      "roles": [
+        "candidate",
+        "sentinel"
+      ],
+      "stratum": "stress"
+    },
+    {
+      "case_digest": "b7e398d5dddb1360a24531da65f3606d4b0a8a592811eee80bb2c799c44af1ec",
+      "case_id": "p64-l09w-tuning-331-d7d3f65f9f",
+      "features": {
+        "aspect_profile": "wide",
+        "box_size": "large",
+        "container_count": 8,
+        "contents_per_container": 64,
+        "difficulty": "stress",
+        "execution": "cold",
+        "flat_count": 6,
+        "fragmentation_class": "reserved-top",
+        "free_region_lower_bound": 1,
+        "layer_bucket": "4+",
+        "layer_count": 8,
+        "minimum_axis_margin_pct": 27.5194,
+        "split": "tuning",
+        "stratum": "stress",
+        "target_density_pct": 95
+      },
+      "reference": {
+        "calculation_ms": 79482.573,
+        "candidate_source": "not_available",
+        "deterministic": true,
+        "functional_digests": [],
+        "lane_id": "not_available",
+        "loss_details": [
+          "global_deadline_reached_without_candidate;external=not_available"
+        ],
+        "placement_digest": null,
+        "ready": false,
+        "status": "bounded_unknown"
+      },
+      "roles": [
+        "bounded_control",
+        "candidate"
+      ],
+      "stratum": "stress"
+    }
+  ],
+  "early_stop_rules": [
+    "false_impossible",
+    "uncertified_solution",
+    "selected_product_regression",
+    "ready_result_regression",
+    "causal_case_failure",
+    "new_replay_nondeterminism",
+    "checkpoint_or_binding_mismatch",
+    "holdout_access_attempt"
+  ],
+  "invariants": {
+    "geometry_epsilon_changed": false,
+    "holdout_file_read": false,
+    "holdout_opening_count": 0,
+    "holdout_solver_invocation_count": 0,
+    "physical_value_changed": false,
+    "product_grid_changed": false,
+    "solver_budget_changed": false
+  },
+  "mission": "P64-L09W-D-P",
+  "plan_digest": "a389db5f100390fef95b98979eb0ead6961bf99e5522c26fc91d0e59391b5d62",
+  "schema_version": "bgig.p64_l09w_performance_panels.v1",
+  "selection": {
+    "candidate_case_ids": [
+      "p64-l09w-discovery-198-8571c434f9",
+      "p64-l09w-discovery-108-bde597aa0a",
+      "p64-l09w-discovery-066-df4182ac57",
+      "p64-l09w-discovery-082-667b19090c",
+      "p64-l09w-discovery-064-fd122f2d65",
+      "p64-l09w-discovery-148-7baec50770",
+      "p64-l09w-discovery-191-ec4377484e",
+      "p64-l09w-discovery-204-23f1925df7",
+      "p64-l09w-discovery-035-9c38dbce0f",
+      "p64-l09w-discovery-079-4bad30c3b3",
+      "p64-l09w-discovery-013-14af2337be",
+      "p64-l09w-discovery-227-290a689b57",
+      "p64-l09w-discovery-085-f8796b5b6e",
+      "p64-l09w-discovery-069-661b906258",
+      "p64-l09w-discovery-201-bdfe0b1cca",
+      "p64-l09w-discovery-147-b403405ddb",
+      "p64-l09w-discovery-081-6381b05e49",
+      "p64-l09w-discovery-218-71f60f5cab",
+      "p64-l09w-discovery-149-42821c0b72",
+      "p64-l09w-discovery-070-c256de0876",
+      "p64-l09w-discovery-195-13e6de7224",
+      "p64-l09w-discovery-050-0185c51bad",
+      "p64-l09w-discovery-007-b54fe4b1f0",
+      "p64-l09w-discovery-001-55d8459fc2",
+      "p64-l09w-tuning-340-780412f833",
+      "p64-l09w-tuning-240-ea12ccc81d",
+      "p64-l09w-tuning-396-85a80285ef",
+      "p64-l09w-tuning-287-6a0b59538e",
+      "p64-l09w-tuning-269-70926170e2",
+      "p64-l09w-tuning-388-a020715e35",
+      "p64-l09w-tuning-293-268fb46b33",
+      "p64-l09w-tuning-338-f5347d13f7",
+      "p64-l09w-tuning-361-337507087f",
+      "p64-l09w-tuning-328-00d377a685",
+      "p64-l09w-tuning-360-c8628c8c54",
+      "p64-l09w-tuning-377-0382fd0acf",
+      "p64-l09w-tuning-365-c4090d74d6",
+      "p64-l09w-tuning-332-2c5e4244f0",
+      "p64-l09w-tuning-384-ed4a7a7670",
+      "p64-l09w-tuning-334-1b5d0e59e0",
+      "p64-l09w-tuning-282-a4fac05518",
+      "p64-l09w-tuning-329-a082f36a95",
+      "p64-l09w-tuning-242-4286d04b06",
+      "p64-l09w-tuning-311-a359353af1",
+      "p64-l09w-tuning-333-e600efeb08",
+      "p64-l09w-tuning-271-8cb52a6e29",
+      "p64-l09w-tuning-277-a66af911e7",
+      "p64-l09w-tuning-331-d7d3f65f9f"
+    ],
+    "causal_case_ids": [
+      "p64-l09w-discovery-001-55d8459fc2",
+      "p64-l09w-tuning-240-ea12ccc81d"
+    ],
+    "determinism_case_id": "p64-l09w-tuning-360-c8628c8c54",
+    "feature_axes": [
+      "target_density_pct",
+      "box_size",
+      "execution",
+      "layer_bucket",
+      "flat_count",
+      "fragmentation_class",
+      "aspect_profile"
+    ],
+    "population_axis_values": {
+      "aspect_profile": [
+        "balanced",
+        "deep",
+        "near-equal-xy",
+        "tall",
+        "wide"
+      ],
+      "box_size": [
+        "large",
+        "medium",
+        "small"
+      ],
+      "execution": [
+        "add",
+        "cold",
+        "global_parameter",
+        "local_parameter",
+        "remove"
+      ],
+      "flat_count": [
+        0,
+        1,
+        10,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "fragmentation_class": [
+        "layered",
+        "reserved-top",
+        "single-layer"
+      ],
+      "layer_bucket": [
+        "1",
+        "2",
+        "3",
+        "4+"
+      ],
+      "target_density_pct": [
+        30,
+        65,
+        85,
+        95
+      ]
+    },
+    "sample_is_rate_estimator": false,
+    "sentinel_axis_values": {
+      "aspect_profile": [
+        "balanced",
+        "deep",
+        "near-equal-xy",
+        "tall",
+        "wide"
+      ],
+      "box_size": [
+        "large",
+        "medium",
+        "small"
+      ],
+      "execution": [
+        "add",
+        "cold",
+        "global_parameter",
+        "local_parameter",
+        "remove"
+      ],
+      "flat_count": [
+        0,
+        1,
+        10,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "fragmentation_class": [
+        "layered",
+        "reserved-top",
+        "single-layer"
+      ],
+      "layer_bucket": [
+        "1",
+        "2",
+        "3",
+        "4+"
+      ],
+      "target_density_pct": [
+        30,
+        65,
+        85,
+        95
+      ]
+    },
+    "sentinel_case_ids": [
+      "p64-l09w-discovery-198-8571c434f9",
+      "p64-l09w-discovery-066-df4182ac57",
+      "p64-l09w-discovery-191-ec4377484e",
+      "p64-l09w-discovery-035-9c38dbce0f",
+      "p64-l09w-discovery-201-bdfe0b1cca",
+      "p64-l09w-discovery-218-71f60f5cab",
+      "p64-l09w-discovery-050-0185c51bad",
+      "p64-l09w-discovery-001-55d8459fc2",
+      "p64-l09w-tuning-340-780412f833",
+      "p64-l09w-tuning-240-ea12ccc81d",
+      "p64-l09w-tuning-396-85a80285ef",
+      "p64-l09w-tuning-287-6a0b59538e",
+      "p64-l09w-tuning-388-a020715e35",
+      "p64-l09w-tuning-360-c8628c8c54",
+      "p64-l09w-tuning-384-ed4a7a7670",
+      "p64-l09w-tuning-277-a66af911e7"
+    ]
+  },
+  "sources": {
+    "manifest_digest": "04dd2bf5feed37b7d5e72e523d5d7f0cd6bc0672f9ecfb55b227d5fcb6635840",
+    "reference_checkpoint_digest": "57d5661a0dd12d71e23394132dfd3421f060b3fa615c4d6d2de8df6e2b9b4f62",
+    "reference_code_bundle_digest": "23a9e9a2a6f5657f8371da4a4a6eaaecab08df3ad370398ade786d57a22e8dd5"
+  },
+  "status": "planned",
+  "tiers": {
+    "candidate": {
+      "case_count": 48,
+      "estimated_reference_calculation_seconds": 769.364,
+      "purpose": "promising_candidate_confirmation",
+      "repetitions": 2,
+      "requires_sentinel_pass": true
+    },
+    "open_frozen": {
+      "case_count": 400,
+      "purpose": "global_change_or_frozen_candidate_before_e",
+      "requires_candidate_pass": true
+    },
+    "sentinel": {
+      "case_count": 16,
+      "estimated_reference_calculation_seconds": 207.336,
+      "purpose": "permanent_fast_causal_functional_and_performance_gate",
+      "repetitions": 5
+    }
+  }
+}
