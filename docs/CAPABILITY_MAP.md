@@ -1264,3 +1264,15 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-FUSION-UI : package 0.1.44 automated-validated ; gate P64-H02V requise.
 - Limites : aucune promotion physique ou géométrique ; recherche heuristique,
   fusion-validated: false, print-validated: false.
+
+## P64-H03 — Recherche dirigée par contraintes
+
+- C-SOLVER-VOLUMETRIC : implemented et automated-validated ; faisceau vertical
+  diversifié, ordres XY géométriques et redistribution Z dirigée par les
+  réservations, sans optimalité globale revendiquée.
+- C-TOP-INSET-RESERVATION : validation physique inchangée et autoritaire ; les
+  rectangles de cavité/réservation ne servent qu’à guider la recherche.
+- C-FUSION-UI : package d’essai 0.1.45 préparé ; P64-H03V requise,
+  `fusion-validated: false`, `print-validated: false`.
+- C-MVP-SCOPE : Fusion 360 uniquement ; schéma, defaults, tolérances, valeurs
+  physiques, géométrie et matérialisation automatique inchangés.

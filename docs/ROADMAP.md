@@ -754,3 +754,14 @@ P44-VH02H01 réunit également `...` et la croix dans la même cellule d’actio
 
 P64-H02V devient la seule action suivante. P44-V reste ouverte jusqu’à sa preuve ;
 P45 demeure bloqué. `fusion-validated: false`, `print-validated: false`.
+
+## P64-H03 — Recherche dirigée par contraintes (2026-07-17)
+
+Le retour contextuel P64-H02V confirme l’alignement UX mais révèle encore un faux
+`Calcul impossible` après un petit ajout. P64-H03 conserve le chemin canonique et
+utilise les contraintes de cavité/réservation pour guider un faisceau vertical
+borné, des ordres XY géométriques et une redistribution Z interne aux piles.
+
+Le package d’essai 0.1.45 est automated-validated sur l’état exact et des stress
+jusqu’à 28 conteneurs. P64-H03V remplace P64-H02V comme seule action suivante.
+P44-V, P45 et les lots ultérieurs restent bloqués. `print-validated: false`.

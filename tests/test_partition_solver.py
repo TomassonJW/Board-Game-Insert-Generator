@@ -364,6 +364,92 @@ class PartitionSolverTests(unittest.TestCase):
             {item["code"] for item in result["diagnostics"]},
         )
 
+    def test_directed_headroom_order_recovers_after_a_small_asset_changes_the_envelope(self) -> None:
+        project = localized_top_inset_order_project()
+        token_content = next(
+            item for item in project["contents"]
+            if item["container_group_id"] == "tokens"
+        )
+        token_content["dimensions_mm"]["y"] = 69.8
+        renamed = {
+            "c5": "bac-mro0new9-3",
+            "c6": "bac-mro6klb7-x",
+        }
+        for group in project["container_groups"]:
+            group["id"] = renamed.get(group["id"], group["id"])
+        for content in project["contents"]:
+            content["container_group_id"] = renamed.get(
+                content["container_group_id"],
+                content["container_group_id"],
+            )
+
+        result = solve_partition_plan(project)
+
+        self.assertEqual(result["summary"]["status"], "constructed")
+        self.assertEqual(result["summary"]["placed_container_count"], 8)
+        self.assertEqual(
+            result["solver"]["search"]["structured_order_strategy"],
+            "top_inset_headroom_asc",
+        )
+        self.assertEqual(result["solver"]["search"]["directed_portfolios_evaluated"], 1)
+        self.assertEqual(result["solver"]["search"]["hash_portfolios_evaluated"], 0)
+        self.assertTrue(result["validation"]["no_collisions"])
+        self.assertNotIn(
+            "TOP_INSET_PIERCES_CAVITY_FLOOR",
+            {item["code"] for item in result["diagnostics"]},
+        )
+
+    def test_constraint_directed_beam_keeps_dense_repeated_containers_solvable(self) -> None:
+        project = localized_top_inset_order_project()
+        token_content = next(
+            item for item in project["contents"]
+            if item["container_group_id"] == "tokens"
+        )
+        token_content["dimensions_mm"]["y"] = 69.8
+        renamed = {
+            "c5": "bac-mro0new9-3",
+            "c6": "bac-mro6klb7-x",
+        }
+        for group in project["container_groups"]:
+            group["id"] = renamed.get(group["id"], group["id"])
+        for content in project["contents"]:
+            content["container_group_id"] = renamed.get(
+                content["container_group_id"],
+                content["container_group_id"],
+            )
+        template = deepcopy(project["container_groups"][-1])
+        for index in range(1, 7):
+            group = deepcopy(template)
+            group["id"] = f"stress-group-{index}"
+            group["name"] = f"Petit bac {index}"
+            project["container_groups"].append(group)
+            project["contents"].append(
+                {
+                    "id": f"stress-content-{index}",
+                    "name": f"Petit asset {index}",
+                    "shape_kind": "custom",
+                    "dimensions_mm": {"x": 20.0, "y": 20.0, "z": 10.0},
+                    "quantity": 1,
+                    "container_group_id": group["id"],
+                    "content_clearance_mm": None,
+                    "measurement_confidence": "exact",
+                }
+            )
+
+        result = solve_partition_plan(project)
+
+        self.assertEqual(result["summary"]["status"], "constructed")
+        self.assertEqual(result["summary"]["placed_container_count"], 14)
+        self.assertEqual(
+            result["solver"]["search"]["structured_order_strategy"],
+            "top_inset_safe_top_asc",
+        )
+        self.assertEqual(result["solver"]["search"]["hash_portfolios_evaluated"], 0)
+        self.assertTrue(result["validation"]["no_collisions"])
+        self.assertNotIn(
+            "TOP_INSET_PIERCES_CAVITY_FLOOR",
+            {item["code"] for item in result["diagnostics"]},
+        )
     def test_is_deterministic_for_the_same_normalized_project(self) -> None:
         first = solve_partition_plan(project_with_groups(4))
         second = solve_partition_plan(project_with_groups(4))

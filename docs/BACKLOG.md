@@ -2354,3 +2354,18 @@ P44-M007 est ready-for-explicit-go.
   et gate P64-H02V dans le package 0.1.44.
 - Statut : implemented, automated-validated, human-fusion-check-required ;
   fusion-validated: false, print-validated: false. P44-V et P45 restent bloqués.
+
+#### P64-H03 — Recherche dirigée par contraintes
+
+- Capability : C-SOLVER-VOLUMETRIC, C-TOP-INSET-RESERVATION, C-FUSION-UI.
+- Dépendance : P64-H02 intégré ; KO contextuel P64-H02V reproduit.
+- Objectif : éliminer les faux impossibles dus à l’élagage vertical/XY après un
+  petit ajout, sans relâcher les validations physiques.
+- Livrables : ordres structurés, faisceau de piles diversifié, classement par
+  dette de hauteur, redistribution Z bornée, ordres XY géométriques, tests,
+  ADR-0067, contrat, journal et gate Fusion 0.1.45.
+- Acceptation locale : autosauvegarde 8/8, +6 assets, 28/28 conteneurs en stress,
+  495 tests OK, digest P66 inchangé.
+- Statut : implemented, automated-validated, human-fusion-check-required par
+  P64-H03V ; package d’essai 0.1.45, `fusion-validated: false`,
+  `print-validated: false`. Aucun commit avant retour de l’essai Fusion.

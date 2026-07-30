@@ -2312,3 +2312,22 @@ human-fusion-check-required par P64-H02V ; `fusion-validated: false`,
 `print-validated: false`. Aucun schéma, default, dimension physique, tolérance,
 cavité, réservation, géométrie, CAD IR ou comportement de scène ne change.
 P44-V reste ouverte et P45 reste bloqué.
+
+## P64-H03 — Recherche dirigée par contraintes (2026-07-17)
+
+Le faux impossible restant est reproduit sur l’autosauvegarde Fusion exacte :
+les validations de cavité sont correctes, mais les compositions verticales et
+les ordres XY valides sont élagués avant validation.
+
+Le package d’essai 0.1.45 conserve le chemin canonique, puis essaie des ordres
+structurés avant les seeds hash. Son portefeuille spécialisé explore un faisceau
+borné de piles non contiguës, conserve plusieurs nombres de piles, classe la
+dette de hauteur, évalue des ordres XY géométriques et redistribue le surplus Z
+entre membres expansibles lorsque la position finale sous plateau l’exige.
+
+Preuves locales : état exact 8/8 construit, +6 assets construit, +20 conteneurs
+soit 28/28 construits avec 14 intervalles Z, 495 tests OK. Les validateurs
+physiques restent autoritaires. Package 0.1.45 : implemented,
+automated-validated, human-fusion-check-required par P64-H03V,
+`fusion-validated: false`, `print-validated: false`. Aucun commit avant le retour
+de l’essai Fusion demandé.

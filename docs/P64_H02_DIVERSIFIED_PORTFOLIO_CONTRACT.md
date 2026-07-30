@@ -2,7 +2,7 @@
 
 ## Statut
 
-Implémenté et automated-validated dans le package 0.1.44.
+Implémenté et automated-validated dans le package 0.1.44 ; gate P64-H02V en KO contextuel après un nouvel ajout, supersédée par P64-H03V.
 `fusion-validated: false`, `print-validated: false`. Gate suivante : P64-H02V.
 
 ## Déclencheur

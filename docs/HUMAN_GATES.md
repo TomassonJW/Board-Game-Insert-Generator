@@ -633,7 +633,7 @@ P64-H02V. Le même retour révèle aussi un nouveau faux impossible du solveur.
 
 ## P64-H02V — Reprise diversifiée et actions alignées 0.1.44
 
-Statut : human-fusion-check-required. P64-H02 et P44-VH02H01 sont implemented et
+Statut : contextual-KO, supersédée par P64-H03V. P64-H02 et P44-VH02H01 sont implemented et
 automated-validated dans le package 0.1.44.
 
 Préparation : `scripts/fusion/prepare_p64_h02_diversified_portfolio_test.ps1`.
@@ -656,3 +656,28 @@ Cette gate valide uniquement ces comportements logiciels et complète le retour
 contextuel « le reste est OK ». Elle ne calibre aucune valeur physique, ne valide
 aucune géométrie imprimée et ne vaut pas impression réelle.
 `print-validated: false`.
+
+## P64-H03V — Recherche dirigée par contraintes 0.1.45
+
+Statut : human-fusion-check-required. P64-H03 est implemented et
+automated-validated dans le package d’essai 0.1.45. `fusion-validated: false`,
+`print-validated: false`.
+
+Préparation : `scripts/fusion/prepare_p64_h03_constraint_directed_search_test.ps1`.
+
+Vérifier dans Fusion :
+
+1. recharger l’add-in en conservant le projet problématique laissé ouvert ;
+2. lancer `Recalculer maintenant` et confirmer l’absence du faux diagnostic de
+   cavité/plateau ;
+3. ajouter le petit asset qui faisait échouer le calcul ;
+4. ajouter progressivement plusieurs assets puis plusieurs conteneurs et vérifier
+   que les étages sont réorganisés tant qu’une solution valide existe ;
+5. confirmer que `...` et la croix restent sur la même ligne ;
+6. confirmer qu’aucune scène ne change avant `Matérialiser dans Fusion`.
+
+Avant commit, retour d’essai : `P64-H03 Fusion trial OK 0.1.45 (uncommitted)` ou
+KO contextuel détaillé. Après essai positif et intégration, une preuve avec le SHA
+final sera demandée si nécessaire.
+
+Cette gate ne calibre aucune valeur physique et ne vaut pas impression réelle.

@@ -17,7 +17,8 @@ Ce document est le point d’entrée court de reprise. Il indique l’état acti
 - Code produit : P64-H01 ajoute la recherche dense adaptative et l'équilibre spatial X/Y/Z dans le package 0.1.42.
 - Code produit : P44-VH02 ajoute suppression directe, confirmation transactionnelle et noms incrementaux ; P44-VH02H01 aligne la croix avec le menu.
 - Code produit : P64-H02 ajoute la reprise diversifiée seulement après un cul-de-sac canonique, dans le package 0.1.44.
-- Prochaine action : gate humaine P64-H02V ; P44-V et P45 restent bloques.
+- Code produit : P64-H03 ajoute la recherche dirigée par contraintes et les piles diversifiées dans le package d’essai 0.1.45.
+- Prochaine action : essai Fusion P64-H03V ; P44-V et P45 restent bloques.
 
 ## Vue de séquence
 
@@ -28,8 +29,9 @@ Ce document est le point d’entrée court de reprise. Il indique l’état acti
 | Supersédé | P44-VH01V | Le cas Z originel passe, mais la densité a révélé P64-H01 ; aucune fusion-validation formelle n'est revendiquée. |
 | Terminé | P64-H01 / H01V | Recherche dense et répartition progressive X/Y/Z observées dans Fusion 0.1.42. |
 | KO contextuel | P44-VH02V | Le reste est observe comme OK, mais la croix passait sur une nouvelle ligne ; supersede par P64-H02V. |
-| Pret | P64-H02V | Verifier la croix a droite de ... et le projet laisse ouvert, complet en 2 niveaux dans Fusion 0.1.44. |
-| KO contextuel | P44-V | Reprendre après P64-H02V ; P45 reste bloqué. |
+| KO contextuel | P64-H02V | Le petit ajout reproduit encore un faux impossible ; supersede par P64-H03V. |
+| Pret | P64-H03V | Tester le package 0.1.45 non committe sur le projet laisse ouvert et en montee de densite. |
+| KO contextuel | P44-V | Reprendre après P64-H03V ; P45 reste bloqué. |
 | Bloqué | P45 à P50, P67 à P69 | Dépendances et gates de version non satisfaites. |
 
 ## Autorité documentaire

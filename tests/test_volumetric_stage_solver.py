@@ -10,6 +10,7 @@ from board_game_insert_generator.volumetric_stage_solver import (
     SOLUTION_COMPLETE,
     SOLUTION_WITH_RESIDUALS,
     VOLUMETRIC_STAGE_SOLVER_SCHEMA_V1,
+    _rebalance_stack_top_height_for_inset,
     solve_stage_portfolio,
 )
 
@@ -237,6 +238,113 @@ class VolumetricStageSolverTests(unittest.TestCase):
                 for item in first["candidates"]
             )
         )
+
+    def test_constraint_directed_stack_transfers_lower_surplus_to_safe_top(self) -> None:
+        lower = participant(0, z=10.0)
+        upper = participant(1, z=10.0)
+        upper["top_inset_search_hint_v1"] = {
+            "required_safe_height_mm": 16.0,
+            "floor_thickness_mm": 1.0,
+            "cavities": [
+                {
+                    "local_origin_mm": {"x": 0.0, "y": 0.0, "z": 1.0},
+                    "inner_dimensions_mm": {"x": 20.0, "y": 20.0, "z": 10.0},
+                }
+            ],
+        }
+        descriptor = {
+            "stack_members": [
+                {"participant": lower},
+                {"participant": upper},
+            ],
+            "top_inset_layout_subject": {
+                "participant": upper,
+                "body_height_mm": 15.0,
+                "rotated_xy": False,
+            },
+        }
+        item_layout = {
+            "origin_mm": {"x": 0.0, "y": 0.0},
+            "world_size_mm": {"x": 20.0, "y": 20.0},
+        }
+        context = {
+            "reservations": [
+                {
+                    "cut_origin_mm": {"x": 0.0, "y": 0.0},
+                    "cut_size_mm": {"x": 20.0, "y": 20.0},
+                    "inset_depth_from_top_mm": 5.0,
+                }
+            ]
+        }
+
+        adjusted = _rebalance_stack_top_height_for_inset(
+            descriptor,
+            item_layout,
+            [15.0, 15.0],
+            context,
+        )
+
+        self.assertEqual(adjusted, [14.0, 16.0])
+        self.assertEqual(sum(adjusted), 30.0)
+        self.assertGreaterEqual(adjusted[0], 10.0)
+    def test_structured_headroom_order_is_single_order_bounded_and_deterministic(self) -> None:
+        values = [participant(index) for index in range(3)]
+        for value, deficit in zip(values, (5.0, 0.0, 2.0)):
+            value["top_inset_search_hint_v1"] = {
+                "headroom_deficit_mm": deficit,
+            }
+
+        first = solve_stage_portfolio(
+            values,
+            {"x": 90.0, "y": 40.0, "z": 30.0},
+            30.0,
+            0.6,
+            structured_order_strategy="top_inset_headroom_asc",
+        )
+        second = solve_stage_portfolio(
+            values,
+            {"x": 90.0, "y": 40.0, "z": 30.0},
+            30.0,
+            0.6,
+            structured_order_strategy="top_inset_headroom_asc",
+        )
+
+        self.assertEqual(first["candidates"], second["candidates"])
+        self.assertEqual(first["search"]["ordering_count"], 1)
+        self.assertEqual(
+            first["search"]["structured_order_strategy"],
+            "top_inset_headroom_asc",
+        )
+
+        single_row = next(
+            item for item in first["candidates"]
+            if ":g3:width:1s" in item["candidate_id"]
+        )
+        ordered_ids = [
+            item["id"]
+            for item in sorted(
+                single_row["placements"],
+                key=lambda item: item["origin_mm"]["x"],
+            )
+        ]
+        self.assertEqual(
+            ordered_ids,
+            ["container:g1", "container:g2", "container:g0"],
+        )
+
+    def test_structured_and_hash_orders_are_mutually_exclusive(self) -> None:
+        with self.assertRaisesRegex(
+            ValueError,
+            "cannot combine hash diversification",
+        ):
+            solve_stage_portfolio(
+                [participant(0)],
+                {"x": 40.0, "y": 40.0, "z": 20.0},
+                20.0,
+                0.6,
+                diversified_order_seed=0,
+                structured_order_strategy="area_interleave",
+            )
 
     def test_adaptive_partition_solves_dense_variable_footprints(self) -> None:
         dimensions = [
