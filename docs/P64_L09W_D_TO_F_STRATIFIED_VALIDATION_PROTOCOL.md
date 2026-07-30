@@ -10,8 +10,10 @@ Autorité : ADR-0108.
 
 - worktree : `C:\Users\janko\.codex\worktrees\930b\BGIG` ;
 - branche de reprise : `codex/p64-l09w-d-stratified-validation` ;
-- HEAD, `main` et `origin/main` après fetch :
+- au préflight, HEAD, `main` et `origin/main` après fetch :
   `82e66c78ff9fd513e0c57016aac68cb23a20f1bc` ;
+- lot de recadrage intégré dans `origin/main` :
+  `2dd6f38f48c3e2b2c81bab20ff8dde2fd3af5f90` ;
 - checkpoint Git D :
   `2de5959d4363e63e45b943ffff712b0de53e51f5`, ancêtre de HEAD ;
 - les fichiers techniques D sont identiques entre ce checkpoint et HEAD ;

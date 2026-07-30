@@ -53,9 +53,10 @@
 - La campagne D est arrêtée à une frontière propre `39/400` :
   `active_case_id=None`, aucun processus restant, 18 résultats prêts contre
   8 sur les mêmes cas C et zéro régression d’un résultat déjà prêt.
-- Le nettoyage Git est terminé. `HEAD`, `main` et `origin/main` pointent sur
+- Au préflight de reprise, `HEAD`, `main` et `origin/main` pointaient sur
   `82e66c78ff9fd513e0c57016aac68cb23a20f1bc`; le checkpoint D est un ancêtre
-  et ses deux fichiers techniques sont inchangés.
+  et ses deux fichiers techniques sont inchangés. Le lot de recadrage est
+  intégré dans `origin/main` par `2dd6f38f48c3e2b2c81bab20ff8dde2fd3af5f90`.
 - ADR-0108 recadre D à F avant toute nouvelle campagne. Les 361 cas D restants
   sont non nécessaires pour le changement de finalisation courant : 39
   résultats sont réutilisés, 67 nouveaux cas et 81 replays suffisent pour les

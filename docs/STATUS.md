@@ -73,9 +73,11 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
 - D n’est ni terminé ni validé globalement. Le commit courant est une
   sauvegarde de passation, pas un verdict D. Des échecs avancent vers des refus
   CAD ou de certificat final et ne sont pas comptés comme gains.
-- Le nettoyage Git est terminé ; `HEAD`, `main` et `origin/main` valent
+- Au préflight, `HEAD`, `main` et `origin/main` valaient
   `82e66c78ff9fd513e0c57016aac68cb23a20f1bc`. La branche de reprise
-  `codex/p64-l09w-d-stratified-validation` préserve le checkpoint D.
+  `codex/p64-l09w-d-stratified-validation` préserve le checkpoint D ; le lot
+  de recadrage `2dd6f38f48c3e2b2c81bab20ff8dde2fd3af5f90` est intégré dans
+  `origin/main`.
 - ADR-0108 et le protocole D à F remplacent les 361 cas restants par 67
   nouveaux cas et 81 replays : deux causaux, les 61 prêts et huit pertes
   cibles par strate. Le plan vaut
