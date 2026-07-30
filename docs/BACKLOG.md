@@ -82,13 +82,31 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 
 ### P64-L09W-D-N — Déterminisme du payload minimal
 
-- Statut : `ready`, dépend de l'arrêt D v4.
+- Statut : `done-diagnostic`, `selected-product-contract-implemented`, dépend
+  de l'arrêt D v4.
 - Reproduire les trois empreintes du cas public sans holdout.
 - Identifier l'ordre, la collection ou l'état mutable qui change le payload
   minimal malgré un placement stable.
 - Corriger sans augmenter les budgets ni changer la grille ou les valeurs
   physiques.
 - Ajouter une régression déterministe avant toute nouvelle validation D.
+- Verdict : même placement et même route sur les observations historiques ;
+  variation attribuée à la trace de travail non retenu sous limite de temps.
+- Cinq relectures exactes identiques champ par champ ; ADR-0109 sépare identité
+  produit et identité de trace sans augmenter les budgets.
+- Preuve : `docs/P64_L09W_D_N_DETERMINISM_EVIDENCE.md`.
+
+### P64-L09W-D-P — Panels permanents de performance
+
+- Statut : `ready`, dépend de P64-L09W-D-N.
+- Panel sentinelle permanent : 12 à 16 cas reproductibles, causaux et
+  représentatifs des strates `common` et `stress`.
+- Panel candidat : 48 cas, utilisé uniquement après un signal sentinelle
+  prometteur.
+- Campagne ouverte de 400 cas réservée aux changements globaux ou au candidat
+  gelé avant E.
+- Seuils de régression dérivés de la variance mesurée, avec arrêts anticipés et
+  non-régression fonctionnelle dure.
 
 ### P64-L09W-E — Holdout et verdict
 

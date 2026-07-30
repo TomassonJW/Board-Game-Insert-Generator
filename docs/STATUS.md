@@ -102,6 +102,15 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
   `p64-l09w-tuning-360-c8628c8c54` publie une troisième empreinte minimale
   absente de C. Le rapport `a9892696...de46` conclut
   `increment_validation_failed`; les 17 cas restants ne sont pas exécutés.
+- Le diagnostic D-N établit que les trois empreintes historiques du cas
+  `tuning-360` viennent de la trace de recherche bornée par le temps, pas d'un
+  placement différent. Les quatre observations C/D ont le même digest de
+  placement et la même route sélectionnée.
+- Cinq relectures exactes supplémentaires produisent cinq plans identiques
+  champ par champ, entre `21,994 s` et `22,772 s`.
+- ADR-0109 et le runner séparent maintenant `selected_product_digest` de
+  `execution_trace_digest`. Tests ciblés : `17/17` ; suite complète sans échec
+  observé mais bornée à `600 s`, donc verdict honnête `timeout`.
 - L'incrément D reste sauvegardé, mais sa non-régression exacte n'est pas
   démontrée. E est bloquée par cette gate et par le plafond certifié
   `332/400`; F n'est pas lancée.
@@ -122,6 +131,7 @@ Preuves :
 - `docs/P64_L09W_D_PAUSED_HANDOFF.md`.
 - `docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md`.
 - `docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md`.
+- `docs/P64_L09W_D_N_DETERMINISM_EVIDENCE.md`.
 
 ### Historique R9 clos positivement
 

@@ -70,6 +70,18 @@
   démontrée.
 - Les 17 cas planifiés restants ne sont pas nécessaires après cet arrêt et ne
   sont pas déclarés réussis. L'incrément D reste sauvegardé mais non validé.
+- ADR-0109 clôt le diagnostic `tuning-360`. Les empreintes historiques
+  différentes couvraient une quantité variable de travail non retenu avant la
+  limite de temps, alors que le placement et la route sélectionnés restaient
+  identiques. Cinq relectures exactes produisent cinq plans identiques champ
+  par champ.
+- Le runner sépare désormais l'identité du produit sélectionné de l'identité
+  stricte de la trace. Les budgets, la grille, les valeurs physiques et les
+  checkpoints historiques restent inchangés.
+- L'action courante est la construction des panels permanents : 12 à 16
+  sentinelles, 48 cas pour un candidat prometteur, 400 cas seulement pour un
+  changement global ou le candidat gelé avant E. Les seuils seront dérivés de
+  la variance mesurée.
 - Cet échantillon ne mesure aucun taux. Le correctif courant ne peut pas faire
   passer les 332/400 solutions certifiées de C au seuil E de 380/400 ; le
   holdout reste donc fermé après ce seul incrément.
@@ -91,8 +103,10 @@ Autorités :
 - `docs/P64_L09W_D_PAUSED_HANDOFF.md` ;
 - `docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md` ;
 - `docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md` ;
+- `docs/P64_L09W_D_N_DETERMINISM_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
 - `docs/DECISIONS/ADR-0108-validation-stratifiee-et-arrets-anticipes-p64-l09w.md` ;
+- `docs/DECISIONS/ADR-0109-identite-produit-selectionne-et-trace-de-recherche.md` ;
 - `docs/P64_L09U_R9_V_0180_HUMAN_OK_EVIDENCE.md` ;
 - `docs/P64_L09W_GENERAL_SOLVER_ROBUSTNESS_HANDOFF.md` ;
 - `docs/P64_L06B_BENCHMARK_CORPUS_CONTRACT.md` ;

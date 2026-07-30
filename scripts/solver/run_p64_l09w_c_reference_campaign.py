@@ -35,6 +35,9 @@ from board_game_insert_generator.contextual_local_analysis import (  # noqa: E40
 from board_game_insert_generator.incremental_project_state import (  # noqa: E402
     canonical_digest,
 )
+from board_game_insert_generator.selected_product_identity import (  # noqa: E402
+    selected_product_digest,
+)
 from board_game_insert_generator.partition_cad import build_partition_cad  # noqa: E402
 from board_game_insert_generator.product_solver_robustness_corpus import (  # noqa: E402
     HOLDOUT_RECEIPT_SCHEMA,
@@ -622,6 +625,10 @@ def _functional_digest(plan: Mapping[str, object]) -> str | None:
     return str(value) if value else None
 
 
+def _selected_product_digest(plan: Mapping[str, object]) -> str:
+    return selected_product_digest(plan)
+
+
 def _route(plan: Mapping[str, object]) -> dict[str, object]:
     minimal = plan.get("minimal_layout")
     provenance = (
@@ -986,6 +993,8 @@ def _run_once(
         "stop_reason": _stop_reason(plan_payload),
         "plan_digest": plan_payload.get("plan_digest"),
         "functional_digest": _functional_digest(plan_payload),
+        "selected_product_digest": _selected_product_digest(plan_payload),
+        "execution_trace_digest": _functional_digest(plan_payload),
         "placement_digest": _placement_digest(plan_payload),
         "timings": timings,
         "certificate": certificate_payload,
@@ -1036,7 +1045,8 @@ def _functional_runs_identical(
     expected = (
         runs[0]["status"],
         runs[0]["solver_status"],
-        runs[0]["functional_digest"],
+        runs[0].get("selected_product_digest")
+        or runs[0].get("functional_digest"),
         runs[0]["placement_digest"],
         dict(runs[0]["route"]).get("candidate_source"),
         dict(runs[0]["route"]).get("lane_id"),
@@ -1045,10 +1055,30 @@ def _functional_runs_identical(
         (
             value["status"],
             value["solver_status"],
-            value["functional_digest"],
+            value.get("selected_product_digest")
+            or value.get("functional_digest"),
             value["placement_digest"],
             dict(value["route"]).get("candidate_source"),
             dict(value["route"]).get("lane_id"),
+        )
+        == expected
+        for value in runs[1:]
+    )
+
+
+def _execution_traces_identical(
+    runs: Sequence[Mapping[str, object]],
+) -> bool | None:
+    if len(runs) < 2:
+        return None
+    expected = runs[0].get(
+        "execution_trace_digest",
+        runs[0].get("functional_digest"),
+    )
+    return all(
+        value.get(
+            "execution_trace_digest",
+            value.get("functional_digest"),
         )
         == expected
         for value in runs[1:]
@@ -1270,6 +1300,9 @@ def run_open_case(
         "stop_reason": runs[0]["stop_reason"],
         "runs": runs,
         "deterministic": _functional_runs_identical(runs),
+        "execution_trace_deterministic": _execution_traces_identical(
+            runs
+        ),
         "resources": {
             "peak_working_set_bytes": sampler.peak_bytes,
             "measurement_method": sampler.method,

@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09W-NEXT -->
-## Action courante : fermer le non-déterminisme minimal observé par D
+## Action courante : construire les panels permanents de performance
 
 R9-V est close en `human-positive` sur Fusion 0.1.80.
 `fusion-validated=true`, `print-validated=false`.
@@ -51,13 +51,23 @@ La campagne stratifiée v4 applique maintenant son arrêt anticipé :
 - rapport `a9892696...de46` ;
 - holdout toujours fermé.
 
+Le diagnostic `tuning-360` est clos par ADR-0109 :
+
+- les observations C/D conservent le même placement et la même route retenue ;
+- la variation historique vient de la quantité de travail non retenu terminée
+  avant la limite de temps globale ;
+- cinq relectures exactes donnent cinq plans identiques champ par champ ;
+- le runner sépare maintenant `selected_product_digest` et
+  `execution_trace_digest` sans augmenter les budgets.
+
 Action unique :
 
-1. diagnostiquer sur ce cas public l'ordre ou l'état qui produit les trois
-   empreintes minimales ;
-2. ajouter une preuve automatisée de déterminisme sans modifier les budgets ;
-3. décider ensuite si l'incrément de finalisation D peut être revalidé ;
-4. ne pas reprendre le checkpoint v4 arrêté, ne pas appeler
+1. construire un panel permanent de 12 à 16 sentinelles reproductibles ;
+2. construire un panel candidat de 48 cas représentatifs ;
+3. mesurer plusieurs replays du panel sentinelle avant de fixer les seuils ;
+4. réserver les 400 cas ouverts à un changement global ou au candidat gelé
+   avant E ;
+5. ne pas reprendre le checkpoint v4 arrêté, ne pas appeler
    `run_d_batch.ps1` et conserver le holdout fermé.
 
 Le correctif courant ne change pas la recherche et laisse donc le plafond
@@ -78,6 +88,9 @@ Protocole :
 
 Verdict D :
 `docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md`.
+
+Diagnostic D-N :
+`docs/P64_L09W_D_N_DETERMINISM_EVIDENCE.md`.
 
 Contrats et preuves :
 

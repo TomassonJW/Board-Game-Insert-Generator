@@ -41,6 +41,8 @@ def _run(
             else "portfolio_budget_exhausted"
         ),
         "functional_digest": "f" * 64,
+        "selected_product_digest": "s" * 64,
+        "execution_trace_digest": "f" * 64,
         "placement_digest": "p" * 64,
         "plan_digest": "d" * 64,
         "route": {
@@ -180,6 +182,36 @@ class P64L09WCReferenceCampaignTests(unittest.TestCase):
         second["plan_digest"] = "e" * 64
 
         self.assertTrue(
+            campaign._functional_runs_identical([first, second])
+        )
+
+    def test_selected_product_replay_ignores_trace_progress(self) -> None:
+        first = _run(
+            status=campaign.RESULT_CERTIFIED,
+            lane="lane-a",
+            calculation_ms=10.0,
+        )
+        second = dict(first)
+        second["functional_digest"] = "g" * 64
+        second["execution_trace_digest"] = "g" * 64
+
+        self.assertTrue(
+            campaign._functional_runs_identical([first, second])
+        )
+        self.assertFalse(
+            campaign._execution_traces_identical([first, second])
+        )
+
+    def test_selected_product_replay_detects_product_change(self) -> None:
+        first = _run(
+            status=campaign.RESULT_CERTIFIED,
+            lane="lane-a",
+            calculation_ms=10.0,
+        )
+        second = dict(first)
+        second["selected_product_digest"] = "t" * 64
+
+        self.assertFalse(
             campaign._functional_runs_identical([first, second])
         )
 
