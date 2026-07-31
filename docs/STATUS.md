@@ -11,6 +11,7 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
 `P64-L09W-D-increment-not-validated`,
 `P64-L09W-D-stratified-protocol-preregistered`,
 `P64-L09W-D-Q-automated-validated`,
+`P64-L09W-D-S-increment-rejected`,
 `automated-baseline-observed`, `holdout-sealed`.
 
 - R9-V est `human-positive` sur Fusion 0.1.80 :
@@ -145,6 +146,16 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
 - Validation D-Q : 53 tests ciblés passent avec 1 skip prévu, 11/11 contrats
   documentaires passent, puis 1097/1097 tests de la suite complète passent en
   `662,969 s` avec 1 skip prévu.
+- D-S classe les 52 cas non couverts par D-Q : 24 `common` avec élément plat
+  et 28 `stress` arrêtés par la deadline. Le sous-groupe choisi contient 15
+  témoins projetés recertifiés mais publiés trop tard.
+- Le cache candidat récupère `tuning-338` en réduisant son calcul de
+  `23 290,096 ms` à `13 825,920 ms`. Les 66 tests ciblés passent.
+- La campagne sentinelle D-S s'arrête à `13/16` : les 13 gates fonctionnelles
+  passent, mais `tuning-388` mesure `37 814,985 ms` contre une limite gelée de
+  `23 070,369 ms`.
+- L'incrément D-S est rejeté et retiré. Les 48 et les 400 ne sont pas
+  exécutés ; aucun changement produit D-S n'est retenu.
 - Le holdout reste fermé jusqu'à E :
   `opening_count=0`, `solver_invocation_count=0`.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.
@@ -163,6 +174,7 @@ Preuves :
 - `docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md`.
 - `docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md`.
 - `docs/P64_L09W_D_N_DETERMINISM_EVIDENCE.md`.
+- `docs/P64_L09W_D_S_TOP_INSET_WALL_CACHE_REJECTION_EVIDENCE.md`.
 - `docs/P64_L09W_D_Q_MINIMUM_ENVELOPE_SCIP_FALLBACK_EVIDENCE.md`.
 
 ### Historique R9 clos positivement

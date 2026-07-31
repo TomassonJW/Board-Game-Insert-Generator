@@ -11,7 +11,9 @@
   conservés ; récupération historiquement faible sur dense et presque saturé.
   D-Q ajoute un repli SCIP sur enveloppes minimales, après échec interne et
   rejet exact, sans hausse de budget. Les panels 16 et 48 sont verts ; deux
-  contrôles bornés deviennent certifiés.
+  contrôles bornés deviennent certifiés. D-S teste ensuite un cache exact des
+  contrôles de paroi, mais le rejette sur régression de temps sentinelle ;
+  aucune capacité D-S n'est ajoutée.
 - `C-OBSERVABILITY` : `automated-validated`. Le runner C publie calcul,
   certificat, finalisation, CAD IR, routes, compteurs, temps et mémoire sur
   400 cas ouverts avec reprise atomique et deux replays par cas.
@@ -33,8 +35,9 @@
 - `C-PRODUCT-GRID` : `0,1 mm`, inchangée ; epsilon `0,0001 mm` distinct.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : second levier causal atomique sur les `bounded_unknown`
-non couverts par D-Q, à budget, grille, valeurs physiques et holdout inchangés.
+Prochaine frontière : nouveau levier causal atomique sur les `bounded_unknown`
+non couverts par D-Q, distinct du cache D-S rejeté, à budget, grille, valeurs
+physiques et holdout inchangés.
 E reste bloquée : le plafond causal D-Q est 348/400 contre 380/400 requis.
 
 ### Historique R9 clos positivement

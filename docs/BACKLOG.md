@@ -56,8 +56,8 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 - Campagne v4 arrêtée à `60/77`, dont `50/67` nouveaux : les deux causaux et
   56 non-régressions prêtes passent avant une troisième empreinte minimale
   `stress` absente de C. Les 17 cas restants ne sont pas exécutés.
-- Prochaine sous-mission : second levier causal atomique sur les
-  `bounded_unknown` non couverts par D-Q.
+- Prochaine sous-mission : nouveau levier causal atomique sur les
+  `bounded_unknown` non couverts par D-Q, distinct du cache D-S rejeté.
 - Un incrément mesuré, testé, documenté, committé et intégré à la fois.
 - Zéro budget augmenté, faux impossible, solution perdue ou coût déplacé.
 - ADR obligatoire pour tout changement structurant.
@@ -133,6 +133,23 @@ Priorité : avant P64-L10 et la roadmap d’origine.
   second levier causal atomique.
 - Preuve :
   `docs/P64_L09W_D_Q_MINIMUM_ENVELOPE_SCIP_FALLBACK_EVIDENCE.md`.
+
+### P64-L09W-D-S — Cache des contrôles de paroi
+
+- Statut : `done-diagnostic`, `increment-rejected`,
+  `performance-hard-stop`.
+- Cause ciblée : 15 cas `stress` où un témoin projeté est recertifié, mais
+  trop tard pour être publié dans la deadline.
+- Gain isolé : `tuning-338` passe de `bounded_unknown` à
+  `certified_solution`, de `23 290,096 ms` à `13 825,920 ms`.
+- Tests ciblés : 66/66.
+- Sentinelles : arrêt anticipé à 13/16 ; gates fonctionnelles vertes, mais
+  `tuning-388` mesure `37 814,985 ms` contre une limite gelée de
+  `23 070,369 ms`.
+- Décision : code candidat retiré, panel 48 non exécuté, 400 non exécutés,
+  aucun changement produit retenu.
+- Preuve :
+  `docs/P64_L09W_D_S_TOP_INSET_WALL_CACHE_REJECTION_EVIDENCE.md`.
 
 ### P64-L09W-E — Holdout et verdict
 

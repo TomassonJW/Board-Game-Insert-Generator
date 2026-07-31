@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09W-NEXT -->
-## Action courante : second levier causal sur les `bounded_unknown`
+## Action courante : nouveau levier causal après rejet de D-S
 
 R9-V est close en `human-positive` sur Fusion 0.1.80.
 `fusion-validated=true`, `print-validated=false`.
@@ -71,11 +71,23 @@ P64-L09W-D-Q est terminée et retenue :
   `bounded_unknown -> certified_solution` et aucun autre changement de statut ;
 - holdout intact.
 
+P64-L09W-D-S est terminée et rejetée :
+
+- le résiduel est classé en 24 cas `common` avec élément plat et 28 cas
+  `stress` arrêtés par la deadline ;
+- le cache exact des contrôles statiques de paroi récupère le cas causal
+  `tuning-338`, de `bounded_unknown` à `certified_solution` ;
+- les 13 premières sentinelles passent leurs gates fonctionnelles ;
+- arrêt immédiat sur la médiane de `tuning-388` :
+  `37 814,985 ms` contre une limite gelée de `23 070,369 ms` ;
+- le code candidat est retiré, les 48 et les 400 ne sont pas exécutés ;
+- holdout intact.
+
 Action unique :
 
-1. attribuer causalement le résiduel `bounded_unknown` non couvert par D-Q ;
-2. choisir un seul levier de recherche distinct, mesurable et sans hausse de
-   budget ;
+1. choisir une nouvelle mission atomique distincte du cache D-S rejeté ;
+2. traiter un seul sous-groupe mesuré sans rendre une recertification
+   non interruptible capable de franchir la deadline ;
 3. repartir par les 16 sentinelles, puis 48 uniquement sur gain réel ;
 4. réserver les 400 au candidat capable d'approcher honnêtement 380/400 ;
 5. ne pas reprendre le checkpoint v4, ne pas appeler `run_d_batch.ps1` et
@@ -111,6 +123,9 @@ Baseline et seuils :
 
 Preuve D-Q :
 `docs/P64_L09W_D_Q_MINIMUM_ENVELOPE_SCIP_FALLBACK_EVIDENCE.md`.
+
+Rejet D-S :
+`docs/P64_L09W_D_S_TOP_INSET_WALL_CACHE_REJECTION_EVIDENCE.md`.
 
 Contrats et preuves :
 

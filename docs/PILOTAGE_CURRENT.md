@@ -107,8 +107,17 @@
   sans autre changement de statut.
 - Le rayon causal couvre au plus 16 des 68 `bounded_unknown`. Son plafond
   ouvert est donc 348/400, encore inférieur à 380/400 : les 400 ne sont pas
-  lancés, E reste fermée et la prochaine mission doit choisir un autre levier
-  causal atomique.
+  lancés et E reste fermée.
+- P64-L09W-D-S classe le résiduel en 24 cas `common` avec élément plat et
+  28 cas `stress` arrêtés par la deadline. Le cache exact des contrôles
+  statiques de paroi récupère le cas causal `tuning-338`.
+- D-S est rejetée par arrêt anticipé à `13/16` sentinelles :
+  `tuning-388` mesure une médiane `37 814,985 ms` contre une limite gelée de
+  `23 070,369 ms`. Les 13 gates fonctionnelles passent, mais la gate de
+  performance est dure.
+- Le code candidat est retiré. Les 48 et les 400 ne sont pas exécutés. La
+  prochaine mission doit choisir un autre levier atomique et ne pas
+  réintroduire le cache D-S tel quel.
 - E conservera une ouverture unique et des arrêts anticipés uniquement lorsque
   les seuils deviennent mathématiquement impossibles. F reste conditionnelle à
   une candidate réellement retenue et acceptée.
@@ -131,6 +140,7 @@ Autorités :
 - `docs/P64_L09W_PERFORMANCE_PANEL_CONTRACT.md` ;
 - `docs/P64_L09W_PERFORMANCE_SENTINEL_BASELINE_EVIDENCE.md` ;
 - `docs/P64_L09W_D_Q_MINIMUM_ENVELOPE_SCIP_FALLBACK_EVIDENCE.md` ;
+- `docs/P64_L09W_D_S_TOP_INSET_WALL_CACHE_REJECTION_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
 - `docs/DECISIONS/ADR-0108-validation-stratifiee-et-arrets-anticipes-p64-l09w.md` ;
 - `docs/DECISIONS/ADR-0109-identite-produit-selectionne-et-trace-de-recherche.md` ;
