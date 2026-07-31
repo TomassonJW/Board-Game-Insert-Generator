@@ -118,6 +118,17 @@
 - Le code candidat est retiré. Les 48 et les 400 ne sont pas exécutés. La
   prochaine mission doit choisir un autre levier atomique et ne pas
   réintroduire le cache D-S tel quel.
+- P64-L09W-D-T étend ensuite le rejeu minimum D-Q aux projets avec éléments
+  plats, uniquement après échec complet et rejet exact
+  `MINIMAL_ENVELOPE_EXPANDED`. Trois sondes `common` bornées deviennent trois
+  solutions minimales certifiées, dont une prête hors Fusion.
+- D-T est rejetée à `15/16` sentinelles malgré 15 gates fonctionnelles vertes :
+  `tuning-384` mesure `28 782,506 ms` contre une limite gelée de
+  `28 699,258 ms`. La voie candidate n'est pas invoquée sur ce cas, mais la
+  gate de performance reste dure et interdit un rejeu opportuniste.
+- Le code D-T est retiré. `tuning-300` n'est pas exécutée, les 48 et les 400
+  ne sont pas lancés. La prochaine mission doit cibler un autre sous-groupe,
+  en priorité les neuf témoins projetés `stress` refusés.
 - E conservera une ouverture unique et des arrêts anticipés uniquement lorsque
   les seuils deviennent mathématiquement impossibles. F reste conditionnelle à
   une candidate réellement retenue et acceptée.
@@ -141,6 +152,7 @@ Autorités :
 - `docs/P64_L09W_PERFORMANCE_SENTINEL_BASELINE_EVIDENCE.md` ;
 - `docs/P64_L09W_D_Q_MINIMUM_ENVELOPE_SCIP_FALLBACK_EVIDENCE.md` ;
 - `docs/P64_L09W_D_S_TOP_INSET_WALL_CACHE_REJECTION_EVIDENCE.md` ;
+- `docs/P64_L09W_D_T_FLAT_MINIMUM_ENVELOPE_RETRY_REJECTION_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
 - `docs/DECISIONS/ADR-0108-validation-stratifiee-et-arrets-anticipes-p64-l09w.md` ;
 - `docs/DECISIONS/ADR-0109-identite-produit-selectionne-et-trace-de-recherche.md` ;

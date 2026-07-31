@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09W-NEXT -->
-## Action courante : nouveau levier causal après rejet de D-S
+## Action courante : nouveau levier causal après rejets de D-S et D-T
 
 R9-V est close en `human-positive` sur Fusion 0.1.80.
 `fusion-validated=true`, `print-validated=false`.
@@ -83,11 +83,26 @@ P64-L09W-D-S est terminée et rejetée :
 - le code candidat est retiré, les 48 et les 400 ne sont pas exécutés ;
 - holdout intact.
 
+P64-L09W-D-T est terminée et rejetée :
+
+- le rejeu minimum tardif D-Q est étendu aux projets avec éléments plats après
+  échec complet et rejet exact `MINIMAL_ENVELOPE_EXPANDED` ;
+- trois sondes publiques `common` passent de `bounded_unknown` à
+  `certified_solution`, dont une devient prête hors Fusion ;
+- les tests ciblés passent `60/60` ;
+- les 15 sentinelles exécutées passent leurs gates fonctionnelles ;
+- arrêt dur sur `tuning-384`, médiane `28 782,506 ms` contre une limite gelée
+  de `28 699,258 ms` ;
+- `tuning-300`, les 48 et les 400 ne sont pas exécutés ;
+- le code candidat est retiré et le holdout reste intact.
+
 Action unique :
 
-1. choisir une nouvelle mission atomique distincte du cache D-S rejeté ;
-2. traiter un seul sous-groupe mesuré sans rendre une recertification
-   non interruptible capable de franchir la deadline ;
+1. mesurer les neuf cas `stress` dont le témoin projeté est refusé et isoler
+   exactement un code de rejet causal ;
+2. choisir un levier distinct du cache D-S et de l'extension générale D-T,
+   sans rendre une recertification non interruptible capable de franchir la
+   deadline ;
 3. repartir par les 16 sentinelles, puis 48 uniquement sur gain réel ;
 4. réserver les 400 au candidat capable d'approcher honnêtement 380/400 ;
 5. ne pas reprendre le checkpoint v4, ne pas appeler `run_d_batch.ps1` et
@@ -126,6 +141,9 @@ Preuve D-Q :
 
 Rejet D-S :
 `docs/P64_L09W_D_S_TOP_INSET_WALL_CACHE_REJECTION_EVIDENCE.md`.
+
+Rejet D-T :
+`docs/P64_L09W_D_T_FLAT_MINIMUM_ENVELOPE_RETRY_REJECTION_EVIDENCE.md`.
 
 Contrats et preuves :
 

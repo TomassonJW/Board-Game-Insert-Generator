@@ -56,8 +56,8 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 - Campagne v4 arrêtée à `60/77`, dont `50/67` nouveaux : les deux causaux et
   56 non-régressions prêtes passent avant une troisième empreinte minimale
   `stress` absente de C. Les 17 cas restants ne sont pas exécutés.
-- Prochaine sous-mission : nouveau levier causal atomique sur les
-  `bounded_unknown` non couverts par D-Q, distinct du cache D-S rejeté.
+- Prochaine sous-mission : mesurer les neuf témoins projetés `stress` refusés,
+  puis choisir un levier causal atomique distinct de D-S et D-T.
 - Un incrément mesuré, testé, documenté, committé et intégré à la fois.
 - Zéro budget augmenté, faux impossible, solution perdue ou coût déplacé.
 - ADR obligatoire pour tout changement structurant.
@@ -150,6 +150,23 @@ Priorité : avant P64-L10 et la roadmap d’origine.
   aucun changement produit retenu.
 - Preuve :
   `docs/P64_L09W_D_S_TOP_INSET_WALL_CACHE_REJECTION_EVIDENCE.md`.
+
+### P64-L09W-D-T — Rejeu minimum tardif avec éléments plats
+
+- Statut : `done-diagnostic`, `increment-rejected`,
+  `performance-hard-stop`.
+- Cause ciblée : 21 cas `common` avec élément plat et rejet SCIP
+  `MINIMAL_ENVELOPE_EXPANDED`.
+- Gain isolé : trois sondes publiques passent de `bounded_unknown` à
+  `certified_solution`, dont une devient prête hors Fusion.
+- Tests ciblés : `60/60`.
+- Sentinelles : arrêt anticipé à `15/16` ; gates fonctionnelles vertes, mais
+  `tuning-384` mesure `28 782,506 ms` contre une limite gelée de
+  `28 699,258 ms`.
+- Décision : code candidat retiré, dernière sentinelle non exécutée, panel 48
+  non exécuté, 400 non exécutés, aucun changement produit retenu.
+- Preuve :
+  `docs/P64_L09W_D_T_FLAT_MINIMUM_ENVELOPE_RETRY_REJECTION_EVIDENCE.md`.
 
 ### P64-L09W-E — Holdout et verdict
 

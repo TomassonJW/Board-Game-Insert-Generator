@@ -13,7 +13,9 @@
   rejet exact, sans hausse de budget. Les panels 16 et 48 sont verts ; deux
   contrôles bornés deviennent certifiés. D-S teste ensuite un cache exact des
   contrôles de paroi, mais le rejette sur régression de temps sentinelle ;
-  aucune capacité D-S n'est ajoutée.
+  aucune capacité D-S n'est ajoutée. D-T étend le rejeu minimum aux projets
+  plats et certifie trois sondes causales, mais dépasse une borne sentinelle à
+  `15/16` ; aucune capacité D-T n'est ajoutée.
 - `C-OBSERVABILITY` : `automated-validated`. Le runner C publie calcul,
   certificat, finalisation, CAD IR, routes, compteurs, temps et mémoire sur
   400 cas ouverts avec reprise atomique et deux replays par cas.
@@ -35,9 +37,9 @@
 - `C-PRODUCT-GRID` : `0,1 mm`, inchangée ; epsilon `0,0001 mm` distinct.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : nouveau levier causal atomique sur les `bounded_unknown`
-non couverts par D-Q, distinct du cache D-S rejeté, à budget, grille, valeurs
-physiques et holdout inchangés.
+Prochaine frontière : mesurer les neuf témoins projetés `stress` refusés, puis
+retenir un seul levier causal distinct du cache D-S et de l'extension D-T, à
+budget, grille, valeurs physiques et holdout inchangés.
 E reste bloquée : le plafond causal D-Q est 348/400 contre 380/400 requis.
 
 ### Historique R9 clos positivement

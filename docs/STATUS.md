@@ -12,6 +12,7 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
 `P64-L09W-D-stratified-protocol-preregistered`,
 `P64-L09W-D-Q-automated-validated`,
 `P64-L09W-D-S-increment-rejected`,
+`P64-L09W-D-T-increment-rejected`,
 `automated-baseline-observed`, `holdout-sealed`.
 
 - R9-V est `human-positive` sur Fusion 0.1.80 :
@@ -156,6 +157,15 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
   `23 070,369 ms`.
 - L'incrément D-S est rejeté et retiré. Les 48 et les 400 ne sont pas
   exécutés ; aucun changement produit D-S n'est retenu.
+- D-T cible les 21 rejets `MINIMAL_ENVELOPE_EXPANDED` avec élément plat. Trois
+  sondes publiques bornées deviennent trois solutions minimales certifiées,
+  dont une prête hors Fusion ; les tests ciblés passent `60/60`.
+- La campagne D-T s'arrête à `15/16` malgré 15 gates fonctionnelles vertes :
+  `tuning-384` mesure `28 782,506 ms` contre une limite gelée de
+  `28 699,258 ms`. La voie candidate n'est pas invoquée sur ce cas, mais la
+  gate dure interdit tout rejeu opportuniste.
+- L'incrément D-T est rejeté et retiré. `tuning-300`, les 48 et les 400 ne
+  sont pas exécutés ; aucun changement produit D-T n'est retenu.
 - Le holdout reste fermé jusqu'à E :
   `opening_count=0`, `solver_invocation_count=0`.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.
@@ -175,6 +185,7 @@ Preuves :
 - `docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md`.
 - `docs/P64_L09W_D_N_DETERMINISM_EVIDENCE.md`.
 - `docs/P64_L09W_D_S_TOP_INSET_WALL_CACHE_REJECTION_EVIDENCE.md`.
+- `docs/P64_L09W_D_T_FLAT_MINIMUM_ENVELOPE_RETRY_REJECTION_EVIDENCE.md`.
 - `docs/P64_L09W_D_Q_MINIMUM_ENVELOPE_SCIP_FALLBACK_EVIDENCE.md`.
 
 ### Historique R9 clos positivement
