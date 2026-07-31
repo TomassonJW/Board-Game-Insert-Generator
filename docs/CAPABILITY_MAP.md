@@ -1,7 +1,7 @@
 # Capability Map
 
 <!-- P64-L09W-CAPABILITY -->
-## P64-L09W — baseline produit mesurée, optimisation causale prête
+## P64-L09W — premier gain causal de recherche validé
 
 - `C-FUSION` : 0.1.80 `human-positive`, `fusion-validated=true`.
 - `C-STAGED-CALCULATION` : performance R9 validée sur les deux cas
@@ -9,6 +9,9 @@
   reconstructibles consommées, sans extrapolation au futur domaine.
 - `C-GLOBAL-LAYOUT` et `C-MINIMAL-LAYOUT` : solutions certifiées et résultat R9
   conservés ; récupération historiquement faible sur dense et presque saturé.
+  D-Q ajoute un repli SCIP sur enveloppes minimales, après échec interne et
+  rejet exact, sans hausse de budget. Les panels 16 et 48 sont verts ; deux
+  contrôles bornés deviennent certifiés.
 - `C-OBSERVABILITY` : `automated-validated`. Le runner C publie calcul,
   certificat, finalisation, CAD IR, routes, compteurs, temps et mémoire sur
   400 cas ouverts avec reprise atomique et deux replays par cas.
@@ -30,9 +33,9 @@
 - `C-PRODUCT-GRID` : `0,1 mm`, inchangée ; epsilon `0,0001 mm` distinct.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : diagnostic causal public du non-déterminisme minimal
-observé sur `p64-l09w-tuning-360-c8628c8c54`, à budget, grille, valeurs
-physiques et holdout inchangés.
+Prochaine frontière : second levier causal atomique sur les `bounded_unknown`
+non couverts par D-Q, à budget, grille, valeurs physiques et holdout inchangés.
+E reste bloquée : le plafond causal D-Q est 348/400 contre 380/400 requis.
 
 ### Historique R9 clos positivement
 

@@ -3,13 +3,14 @@
 <!-- P64-L09W-STATUS -->
 ## P64-L09W — robustesse générale du solveur
 
-Date : 2026-07-30.
+Date : 2026-07-31.
 
 Statut : `priority-active`, `P64-L09W-A-complete`,
 `P64-L09W-B-complete`, `P64-L09W-C-complete`,
 `P64-L09W-D-handoff-committed`, `campaign-D-stratified-stopped`,
 `P64-L09W-D-increment-not-validated`,
 `P64-L09W-D-stratified-protocol-preregistered`,
+`P64-L09W-D-Q-automated-validated`,
 `automated-baseline-observed`, `holdout-sealed`.
 
 - R9-V est `human-positive` sur Fusion 0.1.80 :
@@ -129,9 +130,21 @@ Statut : `priority-active`, `P64-L09W-A-complete`,
   reproductible avant le gel final du panel.
 - Validation finale : `34/34` tests ciblés, `11/11` tests documentaires et
   `1093/1093` tests de la suite complète passent, avec `1` skip prévu.
-- L'incrément D reste sauvegardé, mais sa non-régression exacte n'est pas
-  démontrée. E est bloquée par cette gate et par le plafond certifié
-  `332/400`; F n'est pas lancée.
+- D-Q isole 40 rejets SCIP `MINIMAL_ENVELOPE_EXPANDED`, dont 16 sans élément
+  plat. Une sonde minimale certifie 40/40, avec un maximum SCIP observé de
+  `757,393 ms`.
+- Le repli retenu conserve la priorité des voies internes et rejoue SCIP sur
+  les enveloppes minimales uniquement après échec interne et rejet exact,
+  sous le même délai global et sans budget ajouté.
+- Les sentinelles D-Q passent 16/16 avec les seuils gelés. Le panel candidat
+  passe 48/48 et transforme exactement deux contrôles bornés en solutions
+  certifiées, sans autre changement de statut.
+- L'incrément D-Q est retenu, mais son rayon causal maximal donne seulement
+  348/400. Les 400 ouverts ne sont pas exécutés ; E reste bloquée par le seuil
+  380/400 et F n'est pas lancée.
+- Validation D-Q : 53 tests ciblés passent avec 1 skip prévu, 11/11 contrats
+  documentaires passent, puis 1097/1097 tests de la suite complète passent en
+  `662,969 s` avec 1 skip prévu.
 - Le holdout reste fermé jusqu'à E :
   `opening_count=0`, `solver_invocation_count=0`.
 - P64-L09W passe avant P64-L10 et la trajectoire d’origine.
@@ -150,6 +163,7 @@ Preuves :
 - `docs/P64_L09W_D_TO_F_STRATIFIED_VALIDATION_PROTOCOL.md`.
 - `docs/P64_L09W_D_STRATIFIED_VALIDATION_EVIDENCE.md`.
 - `docs/P64_L09W_D_N_DETERMINISM_EVIDENCE.md`.
+- `docs/P64_L09W_D_Q_MINIMUM_ENVELOPE_SCIP_FALLBACK_EVIDENCE.md`.
 
 ### Historique R9 clos positivement
 

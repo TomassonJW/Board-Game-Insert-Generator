@@ -56,8 +56,8 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 - Campagne v4 arrêtée à `60/77`, dont `50/67` nouveaux : les deux causaux et
   56 non-régressions prêtes passent avant une troisième empreinte minimale
   `stress` absente de C. Les 17 cas restants ne sont pas exécutés.
-- Prochaine sous-mission : diagnostic causal du non-déterminisme minimal sur le
-  cas public `p64-l09w-tuning-360-c8628c8c54`.
+- Prochaine sous-mission : second levier causal atomique sur les
+  `bounded_unknown` non couverts par D-Q.
 - Un incrément mesuré, testé, documenté, committé et intégré à la fois.
 - Zéro budget augmenté, faux impossible, solution perdue ou coût déplacé.
 - ADR obligatoire pour tout changement structurant.
@@ -117,13 +117,30 @@ Priorité : avant P64-L10 et la roadmap d’origine.
 - Contrat : `docs/P64_L09W_PERFORMANCE_PANEL_CONTRACT.md`.
 - Preuve : `docs/P64_L09W_PERFORMANCE_SENTINEL_BASELINE_EVIDENCE.md`.
 
+### P64-L09W-D-Q — Repli SCIP sur enveloppes minimales
+
+- Statut : `done`, `automated-validated`, `increment-retained`.
+- Cause : 40 cas bornés trouvent une géométrie SCIP ensuite refusée par
+  `MINIMAL_ENVELOPE_EXPANDED` ; 16 d'entre eux n'ont aucun élément plat.
+- Le repli minimum intervient après les voies internes, sous le même délai
+  global et sans hausse de budget.
+- Sentinelles : 16/16 et seuils gelés verts.
+- Panel candidat : 48/48, deux contrôles bornés deviennent certifiés, aucun
+  autre statut ne change.
+- Rayon causal maximal : 16/68 ; plafond ouvert 348/400, inférieur à la gate E
+  de 380/400.
+- Décision : conserver l'incrément, ne pas lancer les 400 et poursuivre par un
+  second levier causal atomique.
+- Preuve :
+  `docs/P64_L09W_D_Q_MINIMUM_ENVELOPE_SCIP_FALLBACK_EVIDENCE.md`.
+
 ### P64-L09W-E — Holdout et verdict
 
-- Statut : `planned-blocked-by-D-hard-gate-and-certified-rate`, dépend de
+- Statut : `planned-blocked-by-certified-rate`, dépend de
   P64-L09W-D.
 - Geler un candidat unique puis ouvrir le nouveau holdout une seule fois.
-- Ne pas ouvrir avec le seul correctif courant : 332/400 certifiés ne peuvent
-  pas atteindre 380/400 sans changement causal de recherche.
+- Ne pas ouvrir après D-Q : son plafond causal de 348/400 ne peut pas atteindre
+  380/400 sans autre changement de recherche.
 - Arrêter au troisième échec `common`, au vingt-et-unième échec global ou à
   la première invalidation dure.
 - Publier les résultats par famille, y compris les échecs.

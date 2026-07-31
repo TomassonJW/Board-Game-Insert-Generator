@@ -138,7 +138,19 @@ class P64L09WPerformanceThresholdTests(unittest.TestCase):
 
         changed_product = deepcopy(report)
         changed_product.pop("report_digest")
-        changed_product["functional"]["assessments"][0][
+        ready_case_id = next(
+            case_id
+            for case_id, value in self.thresholds[
+                "case_thresholds"
+            ].items()
+            if value["expected_status"] == "certified_solution"
+        )
+        ready_assessment = next(
+            value
+            for value in changed_product["functional"]["assessments"]
+            if value["case_id"] == ready_case_id
+        )
+        ready_assessment[
             "selected_product_digests"
         ] = ["changed"]
         changed_product["report_digest"] = derived.canonical_digest(
@@ -153,6 +165,35 @@ class P64L09WPerformanceThresholdTests(unittest.TestCase):
                 value.startswith("selected_product_regression:")
                 for value in failed_product["failures"]
             )
+        )
+
+        bounded_improvement = deepcopy(report)
+        bounded_improvement.pop("report_digest")
+        bounded_case_id = next(
+            case_id
+            for case_id, value in self.thresholds[
+                "case_thresholds"
+            ].items()
+            if value["expected_status"] == "bounded_unknown"
+        )
+        bounded_assessment = next(
+            value
+            for value in bounded_improvement["functional"]["assessments"]
+            if value["case_id"] == bounded_case_id
+        )
+        bounded_assessment["selected_product_digests"] = [
+            "new-certified-product"
+        ]
+        bounded_improvement["report_digest"] = derived.canonical_digest(
+            bounded_improvement
+        )
+        improved = derived.evaluate_report(
+            self.thresholds,
+            bounded_improvement,
+        )
+        self.assertNotIn(
+            f"selected_product_regression:{bounded_case_id}",
+            improved["failures"],
         )
 
     def test_holdout_remains_absent(self) -> None:

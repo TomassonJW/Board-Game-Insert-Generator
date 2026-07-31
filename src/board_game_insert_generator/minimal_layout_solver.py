@@ -111,6 +111,7 @@ _AXES = ("x", "y", "z")
 _EPSILON = 0.0001
 _DEEP_EXTENSION_DEADLINE_MS = 30_000
 _FLOOR_FIRST_NUMERIC_AXIS_COUNT = 12
+_MINIMUM_ENVELOPE_EXTERNAL_RETRY_RESERVE_MS = 1_000.0
 
 
 @dataclass(frozen=True)
@@ -478,6 +479,7 @@ def solve_minimal_layout(
         if _solver_result_status(projected_plan) == SOLUTION_FOUND:
             initial_incumbent = projected_plan
     external_fallback_report: dict[str, object] | None = None
+    minimum_envelope_retry_admissible = False
     if scip_product_runtime_configured():
         primary_plan = _solve_minimal_layout_once(
             raw_project,
@@ -503,8 +505,19 @@ def solve_minimal_layout(
         if _deadline_has_expired(deadline_at_ms):
             return primary_plan
         external_fallback_report = _external_lane_report(primary_plan)
+        minimum_envelope_retry_admissible = (
+            _minimum_envelope_external_retry_is_admissible(
+                primary_plan,
+                raw_project=raw_project,
+            )
+        )
 
-    return _solve_minimal_layout_once(
+    internal_deadline_at_ms = deadline_at_ms
+    if minimum_envelope_retry_admissible:
+        internal_deadline_at_ms -= (
+            _MINIMUM_ENVELOPE_EXTERNAL_RETRY_RESERVE_MS
+        )
+    internal_plan = _solve_minimal_layout_once(
         raw_project,
         effort_profile=effort_profile,
         request_id=request_id,
@@ -513,10 +526,92 @@ def solve_minimal_layout(
         container_frontiers=container_frontiers,
         frontier_digests=frontier_digests,
         lane_specs_override=remaining_lane_specs,
-        deadline_at_ms=deadline_at_ms,
+        deadline_at_ms=internal_deadline_at_ms,
         initial_incumbent=initial_incumbent,
         external_lane_report_override=external_fallback_report,
         prior_lane_reports=prior_lane_reports,
+    )
+    internal_status = _solver_result_status(internal_plan)
+    if (
+        internal_status in {
+            SOLUTION_FOUND,
+            INVALID_INPUT,
+            STALE_OR_CANCELLED,
+        }
+        or _deadline_has_expired(deadline_at_ms)
+    ):
+        return internal_plan
+    retry_trigger_plan = internal_plan
+    if (
+        not minimum_envelope_retry_admissible
+        and external_fallback_report is None
+        and _minimum_envelope_external_retry_project_is_admissible(
+            raw_project
+        )
+        and scip_product_runtime_configured()
+    ):
+        internal_provenance = _plan_search_provenance(internal_plan)
+        external_diagnostic_plan = _solve_minimal_layout_once(
+            raw_project,
+            effort_profile=effort_profile,
+            request_id=request_id,
+            request_revision=request_revision,
+            cancel_check=cancel_check,
+            container_frontiers=container_frontiers,
+            frontier_digests=frontier_digests,
+            lane_specs_override=(),
+            deadline_at_ms=deadline_at_ms,
+            initial_incumbent=initial_incumbent,
+            external_lane_enabled=True,
+            prior_lane_reports=tuple(
+                _mapping_items(internal_provenance.get("lanes"))
+            ),
+        )
+        external_diagnostic_status = _solver_result_status(
+            external_diagnostic_plan
+        )
+        if (
+            external_diagnostic_status
+            in {
+                SOLUTION_FOUND,
+                INVALID_INPUT,
+                STALE_OR_CANCELLED,
+            }
+            or _deadline_has_expired(deadline_at_ms)
+        ):
+            return external_diagnostic_plan
+        minimum_envelope_retry_admissible = (
+            _minimum_envelope_external_retry_is_admissible(
+                external_diagnostic_plan,
+                raw_project=raw_project,
+            )
+        )
+        if not minimum_envelope_retry_admissible:
+            return external_diagnostic_plan
+        retry_trigger_plan = external_diagnostic_plan
+        external_fallback_report = _external_lane_report(
+            external_diagnostic_plan
+        )
+    if not minimum_envelope_retry_admissible:
+        return internal_plan
+    retry_trigger_provenance = _plan_search_provenance(retry_trigger_plan)
+    return _solve_minimal_layout_once(
+        raw_project,
+        effort_profile=effort_profile,
+        request_id=request_id,
+        request_revision=request_revision,
+        cancel_check=cancel_check,
+        container_frontiers=container_frontiers,
+        frontier_digests=frontier_digests,
+        lane_specs_override=(),
+        deadline_at_ms=deadline_at_ms,
+        initial_incumbent=initial_incumbent,
+        external_lane_enabled=True,
+        prior_lane_reports=tuple(
+            _mapping_items(retry_trigger_provenance.get("lanes"))
+        ),
+        external_minimum_envelopes_only=True,
+        external_retry_trigger_report=external_fallback_report,
     )
 
 
@@ -555,6 +650,8 @@ def _solve_minimal_layout_once(
     prior_lane_reports: Sequence[Mapping[str, object]] = (),
     first_certified_lane_authority: bool = False,
     skipped_lane_ids: Sequence[str] = (),
+    external_minimum_envelopes_only: bool = False,
+    external_retry_trigger_report: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Execute one explicit lane prefix or extension without orchestration."""
 
@@ -982,7 +1079,11 @@ def _solve_minimal_layout_once(
                 ordered_frontier_digests=ordered_digests,
             )
         external_execution = solve_scip_product_3d(
-            participants_with_options,
+            (
+                variant_search_participants
+                if external_minimum_envelopes_only
+                else participants_with_options
+            ),
             certification_problem,
             effort_profile=effort_profile,
             cancel_check=cancel_check,
@@ -993,6 +1094,34 @@ def _solve_minimal_layout_once(
             ),
         )
         external_lane_report = external_execution.deterministic_report()
+        if external_minimum_envelopes_only:
+            trigger_report = _mapping(external_retry_trigger_report)
+            trigger_recertification = _mapping(
+                trigger_report.get("recertification")
+            )
+            trigger_rejections = trigger_recertification.get(
+                "rejection_codes"
+            )
+            external_lane_report["participant_projection"] = (
+                "minimum_outer_envelopes_only"
+            )
+            external_lane_report["fallback_trigger"] = {
+                "reason": (
+                    "prior_external_common_certificate_rejected_"
+                    "minimal_envelope_expanded"
+                ),
+                "prior_report_digest": str(
+                    trigger_report.get("report_digest", "")
+                ),
+                "prior_rejection_codes": sorted(
+                    str(value)
+                    for value in (
+                        trigger_rejections
+                        if isinstance(trigger_rejections, list)
+                        else []
+                    )
+                ),
+            }
         external_report_limits = _mapping(external_lane_report.get("limits"))
         external_report_limits["wall_seconds"] = solver_deadline_seconds(
             effort_profile
@@ -1074,6 +1203,11 @@ def _solve_minimal_layout_once(
                             "effort_profile": effort_profile,
                             "lane_id": _SCIP_PRODUCT_LANE.lane_id,
                             "candidate_source": "external_scip_real_3d",
+                            "participant_projection": (
+                                "minimum_outer_envelopes_only"
+                                if external_minimum_envelopes_only
+                                else "product_dimensions"
+                            ),
                             "external_report_digest": external_lane_report[
                                 "report_digest"
                             ],
@@ -1891,6 +2025,40 @@ def _external_lane_report(plan: Mapping[str, object]) -> dict[str, object] | Non
 def _external_lane_status(plan: Mapping[str, object]) -> str:
     report = _external_lane_report(plan)
     return str(report.get("status", "")) if report is not None else ""
+
+
+def _minimum_envelope_external_retry_is_admissible(
+    plan: Mapping[str, object],
+    *,
+    raw_project: object,
+) -> bool:
+    if not _minimum_envelope_external_retry_project_is_admissible(
+        raw_project
+    ):
+        return False
+    if _solver_result_status(plan) != NO_SOLUTION_WITHIN_BUDGET:
+        return False
+    report = _external_lane_report(plan)
+    if (
+        report is None
+        or report.get("status") != SCIP_STATUS_CERTIFICATE_REJECTED
+    ):
+        return False
+    recertification = _mapping(report.get("recertification"))
+    rejection_codes = recertification.get("rejection_codes")
+    return bool(
+        isinstance(rejection_codes, list)
+        and "MINIMAL_ENVELOPE_EXPANDED" in rejection_codes
+    )
+
+
+def _minimum_envelope_external_retry_project_is_admissible(
+    raw_project: object,
+) -> bool:
+    return bool(
+        isinstance(raw_project, Mapping)
+        and not _mapping_items(raw_project.get("flat_items"))
+    )
 
 
 def _plan_search_provenance(

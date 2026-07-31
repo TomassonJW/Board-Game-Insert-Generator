@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09W-NEXT -->
-## Action courante : construire les panels permanents de performance
+## Action courante : second levier causal sur les `bounded_unknown`
 
 R9-V est close en `human-positive` sur Fusion 0.1.80.
 `fusion-validated=true`, `print-validated=false`.
@@ -60,22 +60,31 @@ Le diagnostic `tuning-360` est clos par ADR-0109 :
 - le runner sépare maintenant `selected_product_digest` et
   `execution_trace_digest` sans augmenter les budgets.
 
+P64-L09W-D-Q est terminée et retenue :
+
+- un repli SCIP sur enveloppes minimales intervient seulement après échec des
+  voies internes et rejet exact `MINIMAL_ENVELOPE_EXPANDED` ;
+- aucun budget, dimension, certificat ou comportement des projets avec
+  éléments plats n'est modifié ;
+- sentinelles 16/16 et seuils gelés verts ;
+- panel candidat 48/48, avec deux passages
+  `bounded_unknown -> certified_solution` et aucun autre changement de statut ;
+- holdout intact.
+
 Action unique :
 
-1. utiliser les 16 sentinelles et leurs seuils gelés sur le prochain changement
-   causal de recherche ;
-2. exécuter le panel candidat de 48 cas uniquement si les sentinelles passent ;
-3. ne pas exécuter le panel 48 sur l'état inchangé : la baseline sentinelle est
-   déjà complète et aucun candidat prometteur distinct n'existe ;
-4. réserver les 400 cas ouverts à un changement global ou au candidat gelé
-   avant E ;
-5. ne pas reprendre le checkpoint v4 arrêté, ne pas appeler
-   `run_d_batch.ps1` et conserver le holdout fermé.
+1. attribuer causalement le résiduel `bounded_unknown` non couvert par D-Q ;
+2. choisir un seul levier de recherche distinct, mesurable et sans hausse de
+   budget ;
+3. repartir par les 16 sentinelles, puis 48 uniquement sur gain réel ;
+4. réserver les 400 au candidat capable d'approcher honnêtement 380/400 ;
+5. ne pas reprendre le checkpoint v4, ne pas appeler `run_d_batch.ps1` et
+   conserver le holdout fermé.
 
-Le correctif courant ne change pas la recherche et laisse donc le plafond
-certifié à 332/400 contre 380/400 requis. E n'est pas admissible après ce seul
-incrément ; D devra traiter ensuite les 68 `bounded_unknown` par un changement
-causal distinct. E restera une ouverture unique avec arrêt anticipé au
+Le rayon causal D-Q couvre au plus 16 des 68 cas bornés. Même dans le meilleur
+cas, le plafond passe seulement de 332 à 348/400 contre 380/400 requis. E n'est
+pas admissible après cet incrément. E restera une ouverture unique avec arrêt
+anticipé au
 troisième échec `common` ou au vingt-et-unième échec global. F restera
 conditionnelle à un changement réellement retenu et à un verdict E positif.
 
@@ -99,6 +108,9 @@ Contrat des panels :
 
 Baseline et seuils :
 `docs/P64_L09W_PERFORMANCE_SENTINEL_BASELINE_EVIDENCE.md`.
+
+Preuve D-Q :
+`docs/P64_L09W_D_Q_MINIMUM_ENVELOPE_SCIP_FALLBACK_EVIDENCE.md`.
 
 Contrats et preuves :
 

@@ -94,9 +94,21 @@
 - Les seuils sont dérivés de la variance réelle par borne robuste unilatérale
   à 99 % et correction de Bonferroni, sans marge fixe. Le digest des seuils est
   `beac0010...54a4b72`.
-- Cet échantillon ne mesure aucun taux. Le correctif courant ne peut pas faire
+- Cet échantillon ne mesure aucun taux. Le correctif de finalisation précédent
+  ne peut pas faire
   passer les 332/400 solutions certifiées de C au seuil E de 380/400 ; le
   holdout reste donc fermé après ce seul incrément.
+- P64-L09W-D-Q retient un premier changement causal de recherche : après
+  échec interne et rejet SCIP `MINIMAL_ENVELOPE_EXPANDED`, les projets sans
+  élément plat peuvent rejouer SCIP sur les enveloppes minimales, sous le même
+  délai global et sans budget ajouté.
+- Les sentinelles passent 16/16 avec les seuils gelés. Le panel candidat passe
+  48/48 et transforme exactement deux contrôles bornés en solutions certifiées,
+  sans autre changement de statut.
+- Le rayon causal couvre au plus 16 des 68 `bounded_unknown`. Son plafond
+  ouvert est donc 348/400, encore inférieur à 380/400 : les 400 ne sont pas
+  lancés, E reste fermée et la prochaine mission doit choisir un autre levier
+  causal atomique.
 - E conservera une ouverture unique et des arrêts anticipés uniquement lorsque
   les seuils deviennent mathématiquement impossibles. F reste conditionnelle à
   une candidate réellement retenue et acceptée.
@@ -118,6 +130,7 @@ Autorités :
 - `docs/P64_L09W_D_N_DETERMINISM_EVIDENCE.md` ;
 - `docs/P64_L09W_PERFORMANCE_PANEL_CONTRACT.md` ;
 - `docs/P64_L09W_PERFORMANCE_SENTINEL_BASELINE_EVIDENCE.md` ;
+- `docs/P64_L09W_D_Q_MINIMUM_ENVELOPE_SCIP_FALLBACK_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0107-campagne-produit-fermee-et-verites-reconstructibles.md` ;
 - `docs/DECISIONS/ADR-0108-validation-stratifiee-et-arrets-anticipes-p64-l09w.md` ;
 - `docs/DECISIONS/ADR-0109-identite-produit-selectionne-et-trace-de-recherche.md` ;

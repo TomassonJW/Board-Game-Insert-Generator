@@ -58,7 +58,7 @@ pour confirmer un candidat, soit environ `25 min 08 s`.
 Un changement commence par les 16 sentinelles. Arrêt immédiat sur :
 
 - faux impossible ou solution non certifiée ;
-- changement du produit sélectionné ;
+- changement du produit sélectionné pour un résultat déjà prêt ;
 - régression d'un résultat déjà prêt ;
 - échec d'un cas causal ;
 - nouveau non-déterminisme du produit ;
@@ -66,6 +66,11 @@ Un changement commence par les 16 sentinelles. Arrêt immédiat sur :
 
 Une variation de trace seule est publiée, mais n'est pas une régression
 fonctionnelle.
+
+Un contrôle `bounded_unknown` ne possède pas de produit prêt. Son passage vers
+une solution certifiée est un gain cible autorisé si la gate dure confirme le
+certificat, le placement déterministe et l'absence de régression des résultats
+déjà prêts. Son ancien digest d'échec n'est pas une identité produit gelée.
 
 ### Candidat 48
 

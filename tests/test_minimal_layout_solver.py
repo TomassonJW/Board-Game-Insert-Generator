@@ -488,6 +488,264 @@ class MinimalLayoutSolverTests(unittest.TestCase):
             (prefix_report,),
         )
 
+    def test_minimum_envelope_scip_retry_preserves_internal_lane_priority(
+        self,
+    ) -> None:
+        project = simple_success_project()
+        internal_lane = {
+            "lane_id": "historical_legacy_corner",
+            "telemetry": {"search_states": 12},
+        }
+        prior_external = {
+            "status": "certificate_rejected",
+            "report_digest": "prior-external-report",
+            "recertification": {
+                "rejection_codes": ["MINIMAL_ENVELOPE_EXPANDED"],
+            },
+        }
+
+        def plan(
+            status: str,
+            *,
+            lanes: list[dict[str, object]] | None = None,
+            external_lane: dict[str, object] | None = None,
+        ) -> dict[str, object]:
+            provenance: dict[str, object] = {"lanes": lanes or []}
+            if external_lane is not None:
+                provenance["external_lane"] = external_lane
+            return {
+                "solver": {
+                    "result": {"status": status},
+                    "telemetry": {"stop_reason": "bounded_test_result"},
+                },
+                "minimal_layout": {
+                    "search_provenance": provenance,
+                },
+            }
+
+        primary_failure = plan(
+            NO_SOLUTION_WITHIN_BUDGET,
+            external_lane=prior_external,
+        )
+        internal_failure = plan(
+            NO_SOLUTION_WITHIN_BUDGET,
+            lanes=[internal_lane],
+            external_lane=prior_external,
+        )
+        minimum_envelope_success = plan(SOLUTION_FOUND)
+
+        with (
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "scip_product_runtime_configured",
+                return_value=True,
+            ),
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "_solve_minimal_layout_once",
+                side_effect=(
+                    primary_failure,
+                    internal_failure,
+                    minimum_envelope_success,
+                ),
+            ) as solve_once,
+        ):
+            result = solve_minimal_layout(project, effort_profile="normal")
+
+        self.assertIs(result, minimum_envelope_success)
+        self.assertEqual(solve_once.call_count, 3)
+        internal_call = solve_once.call_args_list[1].kwargs
+        retry_call = solve_once.call_args_list[2].kwargs
+        self.assertEqual(
+            retry_call["deadline_at_ms"] - internal_call["deadline_at_ms"],
+            1_000.0,
+        )
+        self.assertEqual(retry_call["lane_specs_override"], ())
+        self.assertTrue(retry_call["external_lane_enabled"])
+        self.assertTrue(retry_call["external_minimum_envelopes_only"])
+        self.assertEqual(
+            retry_call["prior_lane_reports"],
+            (internal_lane,),
+        )
+        self.assertEqual(
+            retry_call["external_retry_trigger_report"],
+            prior_external,
+        )
+
+    def test_minimum_envelope_scip_retry_ignores_other_rejections(
+        self,
+    ) -> None:
+        project = simple_success_project()
+        other_external_rejection = {
+            "status": "certificate_rejected",
+            "report_digest": "prior-external-report",
+            "recertification": {
+                "rejection_codes": ["SUPPORT_COVERAGE"],
+            },
+        }
+        failure = {
+            "solver": {
+                "result": {"status": NO_SOLUTION_WITHIN_BUDGET},
+                "telemetry": {"stop_reason": "bounded_test_result"},
+            },
+            "minimal_layout": {
+                "search_provenance": {
+                    "lanes": [],
+                    "external_lane": other_external_rejection,
+                },
+            },
+        }
+
+        with (
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "scip_product_runtime_configured",
+                return_value=True,
+            ),
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "_solve_minimal_layout_once",
+                side_effect=(failure, failure),
+            ) as solve_once,
+        ):
+            result = solve_minimal_layout(project, effort_profile="normal")
+
+        self.assertIs(result, failure)
+        self.assertEqual(solve_once.call_count, 2)
+
+    def test_minimum_envelope_scip_retry_diagnoses_rejected_warm_start(
+        self,
+    ) -> None:
+        project = simple_success_project()
+        internal_lane = {
+            "lane_id": "historical_legacy_corner",
+            "telemetry": {"search_states": 12},
+        }
+        prior_external = {
+            "status": "certificate_rejected",
+            "report_digest": "prior-external-report",
+            "recertification": {
+                "rejection_codes": ["MINIMAL_ENVELOPE_EXPANDED"],
+            },
+        }
+
+        def plan(
+            status: str,
+            *,
+            lanes: list[dict[str, object]] | None = None,
+            external_lane: dict[str, object] | None = None,
+        ) -> dict[str, object]:
+            provenance: dict[str, object] = {"lanes": lanes or []}
+            if external_lane is not None:
+                provenance["external_lane"] = external_lane
+            return {
+                "solver": {
+                    "result": {"status": status},
+                    "telemetry": {"stop_reason": "bounded_test_result"},
+                },
+                "minimal_layout": {
+                    "search_provenance": provenance,
+                },
+            }
+
+        warm_start_failure = plan(NO_SOLUTION_WITHIN_BUDGET)
+        internal_failure = plan(
+            NO_SOLUTION_WITHIN_BUDGET,
+            lanes=[internal_lane],
+        )
+        external_diagnostic_failure = plan(
+            NO_SOLUTION_WITHIN_BUDGET,
+            lanes=[internal_lane],
+            external_lane=prior_external,
+        )
+        minimum_envelope_success = plan(SOLUTION_FOUND)
+
+        with (
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "scip_product_runtime_configured",
+                return_value=True,
+            ),
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "_solve_minimal_layout_once",
+                side_effect=(
+                    warm_start_failure,
+                    internal_failure,
+                    external_diagnostic_failure,
+                    minimum_envelope_success,
+                ),
+            ) as solve_once,
+        ):
+            result = solve_minimal_layout(
+                project,
+                effort_profile="normal",
+                initial_incumbent={"minimal_layout": {}},
+            )
+
+        self.assertIs(result, minimum_envelope_success)
+        self.assertEqual(solve_once.call_count, 4)
+        primary_call = solve_once.call_args_list[0].kwargs
+        diagnostic_call = solve_once.call_args_list[2].kwargs
+        retry_call = solve_once.call_args_list[3].kwargs
+        self.assertFalse(primary_call["external_lane_enabled"])
+        self.assertTrue(diagnostic_call["external_lane_enabled"])
+        self.assertFalse(
+            diagnostic_call.get("external_minimum_envelopes_only", False)
+        )
+        self.assertTrue(retry_call["external_minimum_envelopes_only"])
+        self.assertEqual(
+            retry_call["external_retry_trigger_report"],
+            prior_external,
+        )
+
+    def test_minimum_envelope_scip_retry_excludes_flat_projects(
+        self,
+    ) -> None:
+        project = localized_reservation_project()
+        target_external_rejection = {
+            "status": "certificate_rejected",
+            "report_digest": "prior-external-report",
+            "recertification": {
+                "rejection_codes": ["MINIMAL_ENVELOPE_EXPANDED"],
+            },
+        }
+        failure = {
+            "solver": {
+                "result": {"status": NO_SOLUTION_WITHIN_BUDGET},
+                "telemetry": {"stop_reason": "bounded_test_result"},
+            },
+            "minimal_layout": {
+                "search_provenance": {
+                    "lanes": [],
+                    "external_lane": target_external_rejection,
+                },
+            },
+        }
+
+        with (
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "scip_product_runtime_configured",
+                return_value=True,
+            ),
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "_solve_minimal_layout_once",
+                side_effect=(failure, failure, failure),
+            ) as solve_once,
+        ):
+            result = solve_minimal_layout(project, effort_profile="normal")
+
+        self.assertIs(result, failure)
+        self.assertEqual(solve_once.call_count, 3)
+        self.assertFalse(
+            any(
+                call.kwargs.get("external_minimum_envelopes_only")
+                for call in solve_once.call_args_list
+            )
+        )
+
     def test_open_thin_stack_is_allowed_by_envelope_support(self) -> None:
         project = _project_from_dimensions(
             {

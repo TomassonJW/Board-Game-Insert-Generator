@@ -327,8 +327,10 @@ def evaluate_report(
         assessment = assessments.get(case_id)
         if not isinstance(assessment, Mapping):
             failures.append(f"missing_assessment:{case_id}")
-        elif list(assessment["selected_product_digests"]) != list(
-            expected["selected_product_digests"]
+        elif (
+            expected["expected_status"] == "certified_solution"
+            and list(assessment["selected_product_digests"])
+            != list(expected["selected_product_digests"])
         ):
             failures.append(f"selected_product_regression:{case_id}")
         observed = timings.get(case_id)
